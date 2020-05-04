@@ -1,5 +1,30 @@
 # Define functions used in the analysis
 
+clean_recovery <- function (recovery_data_raw) {
+  
+  # Convert any recovery >100% to 1
+  recovery_data_raw %>%
+    mutate(recover = case_when(
+      recover > 1 ~ 1,
+      TRUE ~ recover
+    ))
+  
+}
+
+summarize_recovery <- function (recovery_data) {
+  
+  # Summarize recovery by salt treatment, dry time, recovery time, generation, and species
+  recovery_data %>%
+    group_by(salt, drytime, rectime, generation, genus_species) %>%
+    summarize(
+      mean_recover = mean(recover, na.rm = TRUE),
+      sd_recover = sd(recover, na.rm = TRUE),
+      n = n()
+    )
+  
+}
+
+
 # filmy_process_physio
 # Calculates mean values per species from raw physiological data 
 # (percent desiccation tolerance and light curve data)

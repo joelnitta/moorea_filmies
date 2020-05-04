@@ -17,13 +17,16 @@ plan <- drake_plan(
   traits = readr::read_csv("data/filmy_trait_data.csv"),
   
   # Physiological data
-  DT_data = readr::read_csv("data/filmy_DT_data.csv"),
+  recovery_data_raw = readr::read_csv("data/filmy_DT_data.csv"),
+  
+  recovery_data = clean_recovery(recovery_data_raw),
+  
+  recovery_means = summarize_recovery(recovery_data),
+  
   light_data = readr::read_csv("data/filmy_light_data.csv"),
   
   # Presence/absence community data
   comm.s = readr::read_csv("data/filmy_sporo_comm.csv"),
   comm.g = readr::read_csv("data/filmy_gameto_comm.csv"),
-  
-  physio_data = process_physio (DT_data, light_data)
   
 )
