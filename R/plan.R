@@ -22,7 +22,8 @@ plan <- drake_plan(
   
   # Presence/absence community data
   comm.s = readr::read_csv("data/filmy_sporo_comm.csv"),
-  comm.g = readr::read_csv("data/filmy_gameto_comm.csv")
+  comm.g = readr::read_csv("data/filmy_gameto_comm.csv"),
   
+  physio_data = process_physio (DT_data, light_data)
   
 )
