@@ -290,3 +290,74 @@ match_comm_and_tree <- function (comm, phy, return = c("comm", "tree")) {
   }
   
 }
+
+# Plots ----
+
+make_sporo_dt_plot <- function  (recovery_species_means, traits) {
+  # Define color-blind palette
+  cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+  
+  plot_data <-
+    recovery_species_means %>%
+    # Use only sporophytes
+    filter(generation == "sporo") %>%
+    # Don't plot control
+    filter(salt != "Control") %>%
+    # Add growth habit data
+    left_join(traits, by = "species") %>%
+    assert(not_na, habit, range) %>%
+    # Abbreviate species names to G. species
+    mutate(species = str_replace_all(species, "[a-z]+_", ". ")) %>%
+    # Reorder levels for species: alphabetical within growth habit
+    mutate(species = fct_reorder2(species, habit, species, .desc = FALSE)) %>%
+    rename(recover = recover_mean, sd = recover_sd, n = recover_n)
+  
+  # Self-defined formatting function for percent
+  percent_formatter <- function(x) {
+    lab <- x*100
+  }
+  
+  # Format legend (include title, but get rid of boxes)
+  legend_theme <- theme (legend.background = element_rect(colour = "transparent", fill = "transparent", size = 0.5),
+                         legend.key = element_rect(colour = "white", fill = "white", size = 0.5),
+                         legend.text = element_text(size = 12))
+  
+  # Set colors for desiccation intensity
+  col <- c(cbPalette[7], cbPalette[5], cbPalette[6])
+  
+  # Set offset of datapoints (dodge)
+  pd <- position_dodge(.3)
+  
+  # Make plot
+  ggplot(data = plot_data, aes(x = rectime, y = recover, group = interaction(drytime, salt), shape = salt, fill = salt)) +
+    geom_line(position = pd, aes(linetype = drytime)) +
+    geom_errorbar(
+      aes(ymin = recover - sd, ymax = recover + sd), 
+      colour = "grey50", width = 0, 
+      position = pd) +
+    geom_point(position = pd, size = 1.5) +
+    scale_linetype_manual(name = "Desiccation Time",
+                          values = c("solid", "dashed"),
+                          breaks = c("15d", "2d"),
+                          labels = c("15 days", "2 days")) +
+    scale_shape_manual(name = "Desiccation Intensity",
+                       values = c(23,24,21),
+                       breaks = c("NaCl", "MgNO3",  "LiCl"),
+                       labels = c("-38 MPa", "-86 MPa", "-282 Mpa")) + 
+    scale_fill_manual(name = "Desiccation Intensity",
+                      values = col, 
+                      breaks = c("NaCl", "MgNO3",  "LiCl"),
+                      labels = c("-38 MPa", "-86 MPa", "-282 Mpa")) + 
+    scale_y_continuous(label = percent_formatter, limits = c(0,1.1), expand = c(0,0), breaks=c(0,.2,.4,.6,.8,1.0)) +
+    scale_x_discrete(limits = c("30min","24hr","48hr"),
+                     labels = c("0.5", "24", "48")) +
+    xlab("Recovery Time (hr)") +
+    ylab("Recovery (%)") +
+    theme_bw() +
+    legend_theme +
+    theme(legend.position="bottom",
+          panel.grid.minor=element_blank(), 
+          panel.grid.major=element_blank()) + 
+    facet_wrap( ~ species, ncol=3)
+}
+
