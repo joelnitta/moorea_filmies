@@ -14,11 +14,12 @@ plan <- drake_plan(
   phy = ape::read.tree("data/filmy_tree.tre"),
   
   # -traits
-  traits = readr::read_csv("data/filmy_trait_data.csv"),
+  traits = readr::read_csv("data/filmy_trait_data.csv") %>%
+    rename(species = genus_species),
   
   # -physiological data
   recovery_data_raw = readr::read_csv("data/filmy_DT_data.csv"),
-
+  
   # FIXME: check number of measurements per individual; shouldn't have more than 10 each.
   # Crepidomanes_minutum2 (2834), Crepidomanes_minutum2 (2998), and Hymenophyllum_braithwaitei (Hymenophyllum_sp1_6)
   # have too many
@@ -40,9 +41,17 @@ plan <- drake_plan(
   par_species_means = calculate_mean_par(light_data),
   
   # -Combine the means into a single df
-  combined_species_means = combine_mean_phys_traits
-  (recovery_species_means = recovery_species_means, 
+  combined_species_means = combine_mean_phys_traits(
+    recovery_species_means = recovery_species_means, 
     etr_species_means = etr_species_means, 
-    par_species_means = par_species_means),
+    par_species_means = par_species_means
+  ),
+  
+  # Phylogenetic signal ----
+  phylosig = analyze_phylosig_by_generation(
+    combined_species_means = combined_species_means, 
+    phy = phy, 
+    traits_select = c("recover_mean", "etr_mean", "par_mean")
+  )
   
 )

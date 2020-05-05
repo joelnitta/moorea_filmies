@@ -7,5 +7,5 @@ library(ape)
 library(assertr)
 library(assertthat)
 
-
 conflict_prefer("filter", "dplyr")
+conflict_prefer("rename", "dplyr")
