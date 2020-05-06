@@ -7,5 +7,7 @@ library(ape)
 library(assertr)
 library(assertthat)
 
-
+# Resolve conflicts
 conflict_prefer("filter", "dplyr")
+conflict_prefer("gather", "tidyr")
+
