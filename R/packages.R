@@ -9,3 +9,4 @@ library(assertthat)
 
 conflict_prefer("filter", "dplyr")
 conflict_prefer("rename", "dplyr")
+conflict_prefer("gather", "tidyr")

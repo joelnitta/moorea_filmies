@@ -25,16 +25,12 @@ plan <- drake_plan(
     col_types = "cnnn") %>%
     filter(str_detect(site, "Aorai", negate = TRUE)),
 
-  # - habitat types
-  traits = readr::read_csv("data/filmy_trait_data.csv") %>%
-    rename(species = genus_species),
-
-  filmy_species = traits$species,
-
   # -traits
   traits = readr::read_csv("data/filmy_trait_data.csv") %>%
     rename(species = genus_species),
 
+  filmy_species = traits$species,
+  
   # -phylogenetic tree
   filmy_phy = ape::read.tree(
     file_in("data/nitta_2017/treepl_Moorea_Tahiti.tre"
