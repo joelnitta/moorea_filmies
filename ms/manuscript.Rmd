@@ -1,45 +1,90 @@
 ---
-title: "Untitled"
-output: html_document
+title: ""
 bibliography: references.bib
+mainfont: Roboto-Regular.ttf
+fontsize: 12pt
+mainfontoptions: 
+  - BoldFont=Roboto-Bold.ttf
+  - ItalicFont=Roboto-Italic.ttf
+  - BoldItalicFont=Roboto-BoldItalic.ttf
+output: 
+  bookdown::pdf_document2:
+    citation_package: none # Use pandoc default, otherwise csl can't be used for reference formatting
+    toc: no
+    number_sections: no
+    fig_caption: yes
+    keep_tex: yes
+    latex_engine: xelatex
+    pandoc_args: [ "--csl", "journal-of-plant-research.csl"]
+    includes:
+      in_header: journal-of-plant-research.sty
+header-includes: 
+  \usepackage{float}
+  \makeatletter\renewcommand*{\fps@figure}{H}\makeatother
 editor_options: 
   markdown: 
     wrap: sentence
 ---
 
-Intergenerational Niche Differentiation in Filmy Ferns (Hymenophyllaceae)^1^
+<!-- to move to the next line without starting a new paragraph, 
+add two spaces after last word, e.g., Atsushi Ebihara__ -->
+**Corresponding author**  
+Joel H. Nitta  
+Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo, 113-0032, Japan  
+Phone: +81-  
+Fax: +81-  
+joelnitta@gmail.com
 
-Joel H. Nitta^2,5,6^, James E. Watkins, Jr.^3^, N. Michele Holbrook^2^, Ravahere Taputuarai^4^, Tristan W. Wang^2^, and Charles C. Davis^2^
+**Membership of the Botanical Society of Japan**  
+YES (Joel H. Nitta)
 
-Running Head: Intergenerational Niche Differentiation in Filmy Ferns
+**Subject area**  
+(1)	Taxonomy/Phylogenetics/Evolutionary Biology
 
-**PREMISE OF THE STUDY**: Desiccation tolerance was a key trait allowing plants to colonize land.
+**Number of tables, black-and-white figures, and color figures.**  
+No tables / 2 black-and-white figure / 1 color figure
+
+<!-- See https://stackoverflow.com/questions/24672111/how-to-add-a-page-break-in-word-document-generated-by-rstudio-markdown/40474753
+for inserting page breaks when rendering to MS word -->
+#####
+\newpage
+
+# Intergenerational Niche Differentiation in Filmy Ferns (Hymenophyllaceae)
+
+Joel H. Nitta^1,4^, James E. Watkins, Jr.^2^, N. Michele Holbrook^1^, Ravahere Taputuarai^3^, Tristan W. Wang^1^, and Charles C. Davis^1^
+
+^1^Department of Organismic and Evolutionary Biology and Harvard University Herbaria, Harvard University, Cambridge, Massachusetts 02138 USA
+
+^2^Department of Biology, Colgate University, 13 Oak Drive, Hamilton, New York 13346 USA
+
+^3^Association Te Rau Ati Ati a Tau a Hiti Noa Tu, Mahina, Tahiti, French Polynesia
+
+^4^Current address: Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo, 113-0032, Japan
+
+Author for correspondence: Joel Nitta (joelnitta\@gmail.com)
+
+ORCID ID numbers  
+- Joel H. Nitta: \textnormal{https://orcid.org/0000-0003-4719-7472}  
+- N. Michele Holbrook: \textnormal{https://orcid.org/0000-0003-3325-5395}  
+- Charles C. Davis: \textnormal{https://orcid.org/0000-0001-8747-1101}  
+
+### Abstract
+Desiccation tolerance was a key trait allowing plants to colonize land.
 However, little is known about the transition from desiccation tolerant non-vascular plants to desiccation sensitive vascular ones.
 Filmy ferns (Hymenophyllaceae) present a useful system to study how water-stress strategies differ between non-vascular and vascular stages within a single organism, as they have vascularized sporophytes and nonvascular gametophytes that are each capable of varying degrees of desiccation tolerance.
-
-**METHODS**: We surveyed sporophytes and gametophytes of 22 species of filmy ferns on Moorea (French Polynesia).
-We used chlorophyll fluorescence to measure desiccation tolerance and light responses.
-We sequenced plastid *rbcL* and *trnHpsbA* to identify field-collected gametophytes, and conducted phylogenetically informed analyses to identify differences in physiology between life stages and growth habits.
-
-**KEY RESULTS**: Gametophytes had similar or less desiccation tolerance and lower photosynthetic optima than sporophytes.
-Despite their lack of greater physiological tolerances, gametophytes of several species occurred over a wider elevational range than conspecific sporophytes.
+We surveyed sporophytes and gametophytes of 22 species of filmy ferns on Moorea (French Polynesia) and used chlorophyll fluorescence to measure desiccation tolerance and light responses.
+We sequenced plastid *rbcL* and *trnHpsbA* to identify field-collected gametophytes, and conducted phylogenetically informed analyses to identify differences in physiology between life stages and growth habits. 
+Gametophytes had similar or less desiccation tolerance and lower photosynthetic optima than sporophytes.
 Epiphytes were more tolerant of desiccation than terrestrial species.
+Despite their lack of greater physiological tolerances, gametophytes of several species occurred over a wider elevational range than conspecific sporophytes.
+Our results show that filmy fern gametophytes and sporophytes differ in their physiology and niche requirements, and point to the importance of microhabitat in shaping the evolution of water-use strategies in vascular plants.
 
-**CONCLUSIONS**: Our results show that filmy fern gametophytes and sporophytes differ in their physiology and niche requirements, and point to the importance of microhabitat in shaping the evolution of water-use strategies in vascular plants.
+**Keywords**: chlorophyll fluorescence; desiccation tolerance; DNA barcoding; French Polynesia; gametophyte; Hymenophyllaceae
 
-**KEYWORDS**: chlorophyll fluorescence; desiccation tolerance; DNA barcoding; filmy ferns; French Polynesia; gametophyte; Hymenophyllaceae; Moorea; photosynthesis
+#####
+\newpage
 
-^1^Manuscript received \_\_\_\_ ; revision accepted \_\_\_\_.
-
-^2^Department of Organismic and Evolutionary Biology and Harvard University Herbaria, Harvard University, Cambridge, Massachusetts 02138 USA;
-
-^3^Department of Biology, Colgate University, 13 Oak Drive, Hamilton, New York 13346 USA; and
-
-^4^Association Te Rau Ati Ati a Tau a Hiti Noa Tu, Mahina, Tahiti, French Polynesia
-
-^5^Current address: Department of Botany, National Museum of Nature and Science, 4-1-1 Amakubo, Tsukuba, Ibaraki 305-0005 Japan
-
-^6^Author for correspondence (email: joelnitta\@gmail.com)
+## Introduction
 
 The movement of plants from water to land was one of the most important evolutionary events in the history of the earth, fundamentally altering the global carbon and water cycle and setting the stage for modern terrestrial ecosystems [@Graham1993; @Kenrick1997a].
 The transition from aquatic to terrestrial growth was complex, requiring the evolution of a suite of adaptations to survive in dry habitats bombarded with radiation [@Waters2003].
@@ -55,43 +100,46 @@ Little is known about the details of the transition from desiccation tolerance t
 
 Ferns represent an important, understudied group of tracheophytes for investigating the transition from desiccation tolerance to desiccation avoidance in land plants.
 Ferns are the only major lineage among land plants with sporophytes and gametophytes that are capable of growing independently from each other.
-These two life stages differ drastically in their morphology and physiology---fern sporophytes have true vascular tissue and are homoiohydric (i.e., they regulate their internal water content), whereas fern gametophytes are much smaller (often *\<*1 cm), lack vascular tissue, and are poikilohydric.
-Recent studies indicate that the gametophytes of many fern species are desiccation tolerant, while sporophytes of the same species are thought to lack DT [@WatkinsJr.2007c; @Pittermann2013a].
+These two life stages differ drastically in their morphology and physiology---fern sporophytes have true vascular tissue and are homoiohydric (i.e., they regulate their internal water content), whereas fern gametophytes are much smaller (often <1 cm), lack vascular tissue, and are poikilohydric.
+Recent studies indicate that the gametophytes of many fern species are desiccation tolerant, while sporophytes of the same species are thought to lack DT [@WatkinsJr.2007c; @Pittermann2013].
 Thus, ferns present a unique opportunity to observe the transition from desiccation tolerance to desiccation avoidance across independently growing life phases within a single organism.
 
 Filmy ferns (Hymenophyllaceae) represent a particularly interesting case for studying the ecological and evolutionary significance of vegetative DT across life stages in ferns.
 Filmy ferns are a large family (ca. 430 spp.; PPG I, 2016) of primarily tropical, leptosporangiate ferns named for their remarkably thin leaf laminae, which are usually only a single cell layer in thickness and lack cuticle or stomata (Fig. 1A--D).
-Filmy fern sporophytes are an exception to the 'typical' fern sporophyte described above because they have reverted to poikilohydry: their thin laminae allow for passive, rapid uptake and loss of moisture, thereby maintaining nearly constant equilibrium with atmospheric humidity (Raven, 1999).
-Many species of epiphytic filmy ferns have extremely reduced root systems (Schneider, 2000), relying completely upon absorption through leaf laminae for water (Shreve, 1911), although terrestrial species possess true roots and use ground water (Dubuisson et al., 2011).
+Filmy fern sporophytes are an exception to the 'typical' fern sporophyte described above because they have reverted to poikilohydry: their thin laminae allow for passive, rapid uptake and loss of moisture, thereby maintaining nearly constant equilibrium with atmospheric humidity [@Raven1999].
+Many species of epiphytic filmy ferns have extremely reduced root systems [@Schneider2000], relying completely upon absorption through leaf laminae for water [@Shreve1911], although terrestrial species possess true roots and use ground water [@Dubuisson2011].
 As would be expected from their poikilohydric nature, DT of varying degrees has been reported in sporophytes of many filmy fern species (see references below).
 
-Filmy fern sporophytes encompass a broad diversity of growth forms (terrestrial, saxicolous, hemi-epiphytic, and holoepiphytic) and morphologies, with rhizome and leaf sizes varying over an order of magnitude (Hennequin et al., 2008; Nitta and Epps, 2009; Dubuisson et al., 2013).
+Filmy fern sporophytes encompass a broad diversity of growth forms (terrestrial, saxicolous, hemi-epiphytic, and holoepiphytic) and morphologies, with rhizome and leaf sizes varying over an order of magnitude [@Hennequin2008; @Nitta2009; @Dubuisson2013].
 Filmy fern gametophytes are similarly diverse, with morphotypes including filamentous, ribbon, and a combination of these two types (Fig. 1E--H).
-While there are no quantitative data about DT in filmy fern gametophytes available, DT has been reported in gametophytes from several other fern lineages (Watkins et al., 2007; Watkins and Cardelús, 2012; Pittermann et al., 2013), and may be expected to occur in filmy ferns as well.
+While there are no quantitative data about DT in filmy fern gametophytes available, DT has been reported in gametophytes from several other fern lineages [@WatkinsJr.2007a; @WatkinsJr.2012; @Pittermann2013], and may be expected to occur in filmy ferns as well.
 The possibility for varying degrees of vegetative DT in both stages of the life cycle of filmy ferns makes them a potentially useful system to compare how DT is utilized between haploid, non-vascular and diploid, vascular life stages.
 Furthermore, the diversity of growth forms and habitats in filmy ferns makes them an ideal group for a comparative study of water-stress strategies (i.e., desiccation tolerance vs. desiccation avoidance) and the correlation of these strategies with ecological niche.
 
 The degree of DT in filmy fern sporophytes occupying different niches has been relatively well studied.
-In a series of elegant experiments on Jamaican filmy ferns, Shreve (1911) demonstrated that water-use strategies differ between species occupying contrasting habitats (i.e., terrestrial, low elevation epiphyte, and high elevation epiphyte).
-Proctor (2003, 2012) investigated water relations and the ability to recover from desiccation in sporophytes of several filmy ferns, and found a general correlation between high DT and adaptation for high light levels in widespread species vs. low DT and adaptation to low light levels in species occupying more sheltered habitats.
-In the only study to our knowledge including in situ physiological observations of hymenophyllaceous gametophytes, Johnson et al. (2000) found that gametophytes of *Vandenboschia speciosa* (Willd.) G.
+In a series of elegant experiments on Jamaican filmy ferns, [@Shreve1911] demonstrated that water-use strategies differ between species occupying contrasting habitats (i.e., terrestrial, low elevation epiphyte, and high elevation epiphyte).
+Proctor [-@Proctor2003; -@Proctor2012] investigated water relations and the ability to recover from desiccation in sporophytes of several filmy ferns, and found a general correlation between high DT and adaptation for high light levels in widespread species vs. low DT and adaptation to low light levels in species occupying more sheltered habitats.
+In the only study to our knowledge including in situ physiological observations of hymenophyllaceous gametophytes, @Johnson2000 found that gametophytes of *Vandenboschia speciosa* (Willd.) G.
 Kunkel (= *Trichomanes speciosum* Willd.) are adapted for extremely low light environments, and operate at lower light levels than conspecific sporophytes.
-Parra et al. (2009) and Saldan˜a et al. (2014) investigated the relationship between physiology (photosynthetic rates and water relations) and vertical stratification in several epiphytic filmy fern species (primarily genus *Hymenophyllum*) along tree trunks in Chile.
+@Parra2009 and @Saldana2013 investigated the relationship between physiology (photosynthetic rates and water relations) and vertical stratification in several epiphytic filmy fern species (primarily genus *Hymenophyllum*) along tree trunks in Chile.
 They found that species occurring at greater heights in the trees tended to have greater DT, higher photosynthetic capacity (A~max~), and lower rates of evapotranspiration.
-A recent study using two species of *Hymenophyllum* demonstrated that DT in filmy ferns likely operates via a constitutive mechanism, which is more similar to that of bryophytes than other drought-tolerant vascular plants, thus allowing filmy ferns to adjust to dry conditions extremely rapidly (Cea et al., 2014).
+A recent study using two species of *Hymenophyllum* demonstrated that DT in filmy ferns likely operates via a constitutive mechanism, which is more similar to that of bryophytes than other drought-tolerant vascular plants, thus allowing filmy ferns to adjust to dry conditions extremely rapidly [@GarcesCea2014].
 
-Despite this considerable interest in filmy fern ecophysiology, with the sole exception of Johnson et al. (2000), no studies have compared physiology between gametophyte and sporophyte phases, and we are aware of none that have done so across multiple species.
+Despite this considerable interest in filmy fern ecophysiology, with the sole exception of @Johnson2000, no studies have compared physiology between gametophyte and sporophyte phases, and we are aware of none that have done so across multiple species.
 Furthermore, to our knowledge, no physiological studies of filmy ferns have accounted for their phylogenetic relationships, and we lack an understanding of how physiological strategies have evolved in this clade.
-In addition to DT, photosynthetic optima (adaptation to different light levels) are likely to be important in determining the niches of life stages and species of filmy ferns (Proctor, 2003; Parra et al., 2015; Flores-Bavestrello et al., 2016).
-Terrestrial and epiphytic species experience different levels of photosynthetic radiation and desiccation, and light intensity varies with height along the host plant in epiphytes (Benzing, 1990; Watkins and Cardelús, 2009).
+In addition to DT, photosynthetic optima (adaptation to different light levels) are likely to be important in determining the niches of life stages and species of filmy ferns [@Proctor2003; @Parra2015; @Flores-Bavestrello2016].
+Terrestrial and epiphytic species experience different levels of photosynthetic radiation and desiccation, and light intensity varies with height along the host plant in epiphytes  [@Benzing1990; @WatkinsJr.2009].
 In a recent study (Testo et al., unpublished), the combined effect of desiccation and light stress was found to have a greater impact on filmy fern physiological performance than either of these stressors alone, suggesting the need to integrate studies of DT with photosynthesis to gain a full picture of physiological adaptation in filmy ferns.
-Here, we leverage a recently developed DNA barcoding system (Nitta et al., 2016) to test several hypotheses related to DT and photosynthesis in a comparative phylogenetic framework including both filmy fern sporophytes and gametophytes: 1.) Epiphytic filmy ferns have higher DT and photosynthetic optima than non-epiphytic species.
+Here, we leverage a recently developed DNA barcoding system [@Nitta2017] to test several hypotheses related to DT and photosynthesis in a comparative phylogenetic framework including both filmy fern sporophytes and gametophytes: 1.) Epiphytic filmy ferns have higher DT and photosynthetic optima than non-epiphytic species.
 2.) Amongst epiphytic filmy ferns, those occurring at high elevation have higher DT and photosynthetic optima than those at low elevation.
 3.) For filmy ferns with gametophytes that occur over a wider range than sporophytes, the gametophyte has higher DT and photosynthetic optima than the sporophyte.
 
-MATERIALS AND METHODS
+<!-- 
+## Materials and methods
 
-***Study system***---We selected the island of Moorea, French Polynesia (17*◦*32' S, 149*◦*50' W) for our survey of filmy fern ecophysiology (Fig. 2).
+### Study system
+
+We selected the island of Moorea, French Polynesia (17*◦*32' S, 149*◦*50' W) for our survey of filmy fern ecophysiology (Fig. 2).
 Moorea is a small (135 km^2^; maximum elevation 1206 m) tropical oceanic island, located ca.
 15 km NW of its larger sister island, Tahiti.
 Despite its small size, it hosts a range of habitats including coastal strand, low elevation rainforest, and high elevation cloud forest.
@@ -99,7 +147,9 @@ At the time of the study, a total of 18 filmy fern species were known from Moore
 The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages (Pryer et al., 2001), are represented by similar numbers of species.
 We follow the taxonomic system of Ebihara et al. (2006).
 
-***Field survey***---We surveyed filmy ferns on Moorea as part of a larger study including all ferns of Moorea and Tahiti (Nitta et al., 2016).
+### Field survey
+
+We surveyed filmy ferns on Moorea as part of a larger study including all ferns of Moorea and Tahiti (Nitta et al., 2016).
 During this study, 17 sampling sites were established from ca.
 200 m to 1200 m primarily along trails to the summits of three large peaks on Moorea: Mt. Rotui (899 m), Mt. Mouaputa (880 m), and Mt. Tohiea (1206 m; Fig. 2).
 At each site, sporophytes were sampled in a single 10 m *×* 10 m plot, and gametophytes sampled in two to three 50 cm *×* 50 cm subplots located within the sporophyte plot.
@@ -110,7 +160,9 @@ This allowed us to specifically use field-collected filmy fern gametophytes for 
 We characterized the elevational range of each species based on the results of the field survey; any species found with gametophytes occurring *\>*200 m above the maximum or below the minimum observed elevational range of sporophytes was considered 'widespread' (i.e., facultatively independent sensu Rumsey and Sheffield $$1996$$).
 We scored growth habit of each species based on field observations as terrestrial, saxicolous, low elevation epiphyte (mostly occurring outside of cloud forest, i.e., below ca. 500 m), or high elevation epiphyte (mostly occurring in cloud forest, i.e., above ca. 500 m).
 
-***Microclimate***---We characterized the microenvironment experienced by filmy ferns by logging relative humidity (RH) and temperature every 15 min from July 7, 2013 to July 5, 2014 at 16 of the sampling sites (Fig. 2).
+### Microclimate
+
+We characterized the microenvironment experienced by filmy ferns by logging relative humidity (RH) and temperature every 15 min from July 7, 2013 to July 5, 2014 at 16 of the sampling sites (Fig. 2).
 To do this we used Hobo ProV2 dataloggers (Onset Computer Corporation, Bourne, Massachusetts, USA) with external sensors outfitted with radiation shields (RS1 or RS3, Onset Computer Corporation, Bourne, Massachusetts, USA) to prevent direct contact with precipitation and solar radiation.
 To compare between terrestrial and epiphytic habitats, dataloggers were placed in pairs at each site (one 'epiphytic' datalogger at ca. 1.5 m on a tree, one 'terrestrial' datalogger at ca. 10 cm next to the tree).
 During the study period, some dataloggers malfunctioned, presumably due to prolonged exposure to high humidity.
@@ -120,7 +172,9 @@ We used the previous year's data for this site instead.
 The final dataset included 201 days of data from 15 sites (26 dataloggers).
 We tested for differences in climatic variables between epiphytic and terrestrial habitats using analysis of covariance (ANCOVA) with each climatic variable in turn as the response variable and elevation as the explanatory variable with habitat (terrestrial vs. epiphytic) as a cofactor.
 
-***Desiccation tolerance***---Samples were collected in the field and stored in plastic bags with a small amount of water to keep them fresh during transport to the lab.
+### Desiccation tolerance
+
+Samples were collected in the field and stored in plastic bags with a small amount of water to keep them fresh during transport to the lab.
 For sporophytes, 8--16 individuals (one individual = single whole frond including a ca. 2 cm section of rhizome) were used per treatment, and all individuals for each species came from a single population.
 We did not attempt to differentiate genotypes between fronds in species with long-creeping rhizomes, which often form clonal mats; hence, in some cases, individuals may be genetically identical ramets.
 All experiments were initiated within 48 h of collection.
@@ -135,7 +189,9 @@ Following the desiccation treatment, plants were rewetted using water from a loc
 Plants were allowed to rehydrate, and chlorophyll fluorescence was again measured at 0*.*5 h, 24 h, and 48 h following rewetting.
 Ability to recover from desiccation was quantified by comparing pre- and post-treatment chlorophyll fluorescence yield (Watkins et al., 2007).
 
-***Light responses***---Rapid light response curves were constructed for each species by measuring photosynthetic yield at gradually increasing levels of photosynthetically active actinic light (400--700 nm) with the Light Curve function of the mini-PAM portable chlorophyll fluorometer (Walz Gmbh, Effeltrich, Germany) as described by the manufacturer.
+### Light responses
+
+Rapid light response curves were constructed for each species by measuring photosynthetic yield at gradually increasing levels of photosynthetically active actinic light (400--700 nm) with the Light Curve function of the mini-PAM portable chlorophyll fluorometer (Walz Gmbh, Effeltrich, Germany) as described by the manufacturer.
 Briefly, the maximum yield (F~m~) was first measured in the absence of actinic light.
 Next, plants were equilibrated to the actinic light for 30 s, and photosynthetic yield (∆F/F~m~) measured with a 0*.*8 s saturating pulse.
 This was repeated for each photosynthetic photon flux density (PPFD) level, up to ca.
@@ -144,14 +200,18 @@ Response curves were fitted using the equation *y* = *A*(1 --*e^-kx^*), where *y
 The PPFD at 95% saturation of RETR (PPFD~95%~) and maximum RETR (ETR~max~) were then calculated from the curve.
 Light responses were measured in 8--16 field-collected sporophyte individuals for each species, and on single gametophyte individuals in the field, which were later identified to species using the DNA barcodes.
 
-***DNA barcoding***---We used DNA barcoding to identify filmy fern gametophytes to species as described in Nitta et al. (2016).
+### DNA barcoding
+
+We used DNA barcoding to identify filmy fern gametophytes to species as described in Nitta et al. (2016).
 Briefly, DNA extraction was performed using a modified CTAB protocol (Doyle and Doyle, 1987) or the Plant Mini DNEasy kit (Qiagen, Valencia, California, USA) following the manufacturer's protocol.
 Chloroplast *rbcL* and *trnH--psbA* were amplified and sequenced using primers and protocols following Nitta et al. (2016).
 For each marker, a reference library was constructed from sporophyte sequences using the makeblastDB command in BLAST (Altschul et al., 1997).
 Field-collected gametophytes were identified by a local BLAST query against the reference library.
 Gametophytes matching *\>*99.5% with a single reference sequence and no others were identified as that species; those that did not match any reference sequence or matched *\>*99.5% with multiple reference sequences were not identified and excluded from further analysis.
 
-***Statistical analysis and phylogenetic comparative methods***---All statistical analyses were done in R v.3.2.1 (R Core Team, 2015).
+### Statistical analysis and phylogenetic comparative methods
+
+All statistical analyses were done in R v.3.2.1 (R Core Team, 2015).
 Datasets and R scripts used in this study are available on Dryad (\#\#\#\#\#\#).
 
 We derived the phylogenetic tree used in this study by extracting Hymenophyllaceae from the tree of Nitta et al. (2016) with the extract.clade function of the ape package in R (Paradis et al., 2004).
@@ -168,21 +228,23 @@ For all further analyses, we used methods that account for phylogenetic history 
 We used general linear mixed models (GLMMs) to investigate the effect of growth habit, range size, and life stage on DT (% recovery of F~v~/F~m~ after 48 h recovery from desiccation at --86 MPa for 2 d) and photosynthetic parameters (ETR~max~ and PPFD~95%~) using the MCMCglmm R package (Hadfield, 2010).
 For each of the three response variables (DT, ETR~max~ , and PPFD~95%~), we used growth habit (epiphyte vs. non-epiphyte $$i.e., terrestrial or saxicolous$$) or range size (widespread vs. not widespread) and generation (sporophyte vs. gametophyte) and their interactions as fixed effects.
 Two species were observed both as low-elevation epiphytes and saxicoles (Table 1), but we treated them as epiphytic to distinguish them from exclusively saxicolous species, which we regard as the more specialized growth habit.
-We accounted for intraspecific variation and phylogeny (only for response variables with significant phylogenetic signal) by including species (within generation) and an inverse phylogenetic variance-covariance matrix as random effects, respectively (Hadfield, 2010).
+We included species as a random effect in all models, and included a phylogenetic variance-covariance matrix only for response variables with significant phylogenetic signal (Hadfield, 2010).
 We used an inverse-Gamma distribution for all priors, and ran analyses for 500 000 iterations, with burnin after 1000 iterations and thinning every 500 iterations.
 Comparisons of DT, ETR~max~ , and PPFD~95%~ between gametophytes and sporophytes of the same species do not involve phylogeny, so we used a *t*-test for these.
 
 To test for a correlation between environmental water potential and DT, we first derived a single minimum water potential value for each species by taking the average of the minimum daily water potential at all sites where that species was present.
 We used minimum values because these may represent a climatic extreme that limits the occurrence of species.
-We used data from the 'epiphytic' dataloggers mounted at 1*.*5 m on trees for epiphytic species and data from the 'terrestrial' dataloggers on the ground for non-epiphytic species.
+We used data from the 'epiphytic' dataloggers mounted at 1.5 m on trees for epiphytic species and data from the 'terrestrial' dataloggers on the ground for non-epiphytic species.
 Data from the Mt. Rotui 830 m site were excluded because this site is much more exposed than the other high elevation sites, and appears as a significant outlier in the microclimatic data (see Results).
 This may be due to its location; unlike other mountains on Moorea, Mt. Rotui is completely isolated with no connecting ridges to other peaks (Fig. 2).
 Since DT showed significant phylogenetic signal (see Results), we used phylogenetic generalized least squares (PGLS) to test for a relationship between environmental water potential and DT while taking phylogeny into account, using species' means.
 We ran PGLS using the caper R package (Orme et al., 2013).
 
-RESULTS
+## Results
 
-***Field survey***---Twenty-two filmy fern taxa (including one new record and two species that were recognized as multiple varieties) were observed as sporophytes, and 18 as gametophytes on Moorea in total (Table 1).
+### Field survey
+
+Twenty-two filmy fern taxa (including one new record and two species that were recognized as multiple varieties) were observed as sporophytes, and 18 as gametophytes on Moorea in total (Table 1).
 *Hymenophyllum braithwaitei* (Ebihara & K. Iwats.), only observed near the peak of Mt. Tohiea (1206 m), is a new record for Moorea and French Polynesia.
 It was previously known only from Vanuatu and New Caledonia (Ebihara et al., 2010).
 Three taxa with distinct *rbcL* sequences, morphology, and elevational ranges could be distinguished within the *Crepidomanes minutum* (Blume) K.
@@ -201,7 +263,9 @@ In several species, gametophytes exceeded the maximum or minimum elevational ran
 Iwats., and *Polyphlebium borbonicum* (Bosch) Ebihara & Dubuisson.
 All of these have sporophytes that are normally only found in cloud forest (ca. 500--1200 m), but gametophytes that are distributed to lower elevations.
 
-***Microclimate***---Mean daily temperature was strongly correlated with elevation, and dropped ca.
+### Microclimate
+
+Mean daily temperature was strongly correlated with elevation, and dropped ca.
 6 *◦*C from the lowest surveyed site (201 m) to the highest (1206 m; Fig. 3).
 Although epiphytic and terrestrial habitats were similar in temperature, epiphytic habitats tended to have lower daily mean RH, and greater daily variation in RH, than terrestrial ones (Fig. 3, Appendix S2).
 This difference was greatest at low elevations, and smallest at high elevations.
@@ -209,9 +273,13 @@ One significant departure from these trends was observed at the Mt. Rotui 830 m 
 This site is much more exposed than the other cloud forest sites (Fig. 2), and many of the plants on the N facing slope are stunted (J. Nitta, pers. obs.).
 Daily variation in temperature and RH was much greater, and mean RH much lower, at this site than other high elevation sites.
 
-***Phylogenetic signal***---Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT (gametophytes *K* and λ both near 1, *P \<*0.05; sporophytes *K* = 0.78, *P* = 0.02 and λ = 0.96, *P* = 0.11), but no signal for PPFD~95%~ or ETR~max~ (Table 2).
+### Phylogenetic signal
 
-***Desiccation tolerance***---Ability to recover from desiccation was tested in sporophytes of 15 species and gametophytes of 14 species, including 12 species with both life phases (Appendix S3).
+Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT (gametophytes *K* and λ both near 1, *P \<*0.05; sporophytes *K* = 0.78, *P* = 0.02 and λ = 0.96, *P* = 0.11), but no signal for PPFD~95%~ or ETR~max~ (Table 2).
+
+### Desiccation tolerance
+
+Ability to recover from desiccation was tested in sporophytes of 15 species and gametophytes of 14 species, including 12 species with both life phases (Appendix S3).
 A general correlation of DT with habitat was observed in sporophytes (Fig. 4).
 Both terrestrial species (*Abrodictyum dentatum* (Bosch) Ebihara & K Iwats.
 and *C. apiifolia*) lacked even moderate DT, and failed to recover from the gentlest treatment of 2 d at --38 MPa (more stringent tests were not conducted on these species after confirming their lack of DT at this level).
@@ -233,24 +301,30 @@ DT of gametophytes did not significantly exceed that of sporophytes for any spec
 The GLMM showed that both generation and the interaction of generation and growth habit, but not growth habit alone, have a significant effect on DT while controlling for phylogeny (Table 3).
 In contrast, range type (gametophytes widespread beyond sporophytes or not) has no significant effect on DT (Table 3).
 
-***Photosynthetic optima***---Light responses were measured in sporophytes of 18 species and gametophytes of 11 species, including nine species with both life phases (Appendix S4).
+### Photosynthetic optima
+
+Light responses were measured in sporophytes of 18 species and gametophytes of 11 species, including nine species with both life phases (Appendix S4).
 Unlike DT, photosynthetic optima tended to vary between life phases, but not across growth habits or range type: sporophytes are adapted for higher light levels, whereas gametophytes are adapted for lower light levels (Fig. 5).
 Sporophytes reached their maximum photosynthetic rate (PPFD~95%~) at light levels ca.
 142 ± 46 µmol·m^--2^ ·s^--1^ , whereas gametophytes did so at 51 ± 22 µmol·m^--2^ ·s^--1^.
 Similarly, sporophytes attained higher rates of electron transport (ETR~max~; 8.1 ± 2.7 µmol·m^--2^ ·s^--1^) than gametophytes (3.9 ± 0.9 µmol·m^--2^ ·s^--1^).
 The GLMMs showed a significant effect of generation, but neither range type nor growth habit, on PPFD~95%~ and ETR~max~ (Table 3).
 
-***Environmental water potential and DT***---Desiccation tolerance tended to increase with decreasing environmental water potential for both gametophytes and sporophytes (Fig. 6).
+### Environmental water potential and DT
+
+Desiccation tolerance tended to increase with decreasing environmental water potential for both gametophytes and sporophytes (Fig. 6).
 These trends were significant when analyzed using PGLS for sporophytes (*P* = 0.036) but not gametophytes (*P* = 0.123; Appendix S5).
 
-DISCUSSION
+## Discussion
 
 Vegetative DT was a key innovation linked to the rise of early land plants, but is largely limited to non-vascular groups such as bryophytes and algae in modern plants.
 Filmy ferns have received considerable attention over the years for their remarkable reversion to vegetative DT in the sporophyte phase (e.g., Shreve, 1911; Proctor, 2003; Cea et al., 2014).
 Yet, no previous study to our knowledge has evaluated parallel physiology of sporophytes and gametophytes of filmy ferns in relation to DT.
 Here, we present the first comparisons of physiological parameters between generations within filmy ferns in a phylogenetic comparative framework.
 
-***Filmy fern sporophytes have a wide range of DT***---We found a wide variation of DT in filmy fern sporophytes on Moorea, from no tolerance in terrestrial species to tolerance of water potentials well below --200 MPa in some epiphytes.
+### Filmy fern sporophytes have a wide range of DT
+
+We found a wide variation of DT in filmy fern sporophytes on Moorea, from no tolerance in terrestrial species to tolerance of water potentials well below --200 MPa in some epiphytes.
 Levels of similarly extreme DT have also been reported in other species of *Hymenophyllum* (Proctor, 2003, 2012) and a general correlation of habitat with DT in filmy ferns has been previously established (Shreve, 1911; Proctor, 2003, 2012; Parra et al., 2009; Saldan˜a et al., 2014; Testo et al., unpublished), but no other studies to our knowledge have documented a similar range of DT values in filmy ferns from a single site.
 One may wonder then, what is the adaptive significance of being able to withstand drying at --200 MPa vs. --100 MPa when the ambient water potential is typically *\>*--5 MPa and only rarely, if ever, drops below −50 MPa.
 The recent finding of a constitutive mechanism for DT in filmy ferns (Cea et al., 2014) supports the need for a relatively wide 'safety margin,' and similar (or even more extreme) levels of constitutive DT are well known in bryophytes (Oliver et al., 1993).
@@ -265,7 +339,9 @@ Comparison of DT with the minimum water potential envelope of each species (Fig.
 --7 MPa.
 In contrast, habitats with minimum water potential below --7 MPa are nearly all epiphytic, and the filmy fern sporophytes occurring there are all capable of DT.
 
-***Filmy fern gametophytes are not more stress-tolerant than sporophytes***---Contrary to our hypotheses, gametophytes of filmy ferns are in general not more tolerant of the abiotic environment (light levels and water potential) than sporophytes.
+### Filmy fern gametophytes are not more stress-tolerant than sporophytes
+
+Contrary to our hypotheses, gametophytes of filmy ferns are in general not more tolerant of the abiotic environment (light levels and water potential) than sporophytes.
 This differs from other fern groups with desiccation tolerant gametophytes but desiccation sensitive sporophytes (Watkins et al., 2007).
 In the filmy ferns we studied, DT levels of both sporophytes and gametophytes largely reflected habitat; in general, epiphytic species tended to have higher DT than terrestrial or saxicolous species, regardless of life stage.
 Interestingly, this echoes much earlier field observations (not experimental data) by Holloway (1930) on filmy fern gametophytes in New Zealand: he reported apparent DT in gametophytes of *Hymenophyllum rarum* R.
@@ -300,7 +376,9 @@ It is possible that there is a tradeoff between growth rate and DT, such that sp
 can better tolerate it (Oliver et al., 2000).
 Growth rates of tolerant and non-tolerant gametophytes including quantification of gemmae production should be investigated in these species to test this hypothesis.
 
-***Gametophytes are adapted for lower light levels than sporophytes***---Unlike DT, photosynthetic parameters did not vary significantly between species from different habitats.
+### Gametophytes are adapted for lower light levels than sporophytes
+
+Unlike DT, photosynthetic parameters did not vary significantly between species from different habitats.
 Rather, we observed a clear intergenerational difference, with gametophytes consistently adapted for lower light levels than sporophytes (Fig. 5, Table 3).
 In the only other study to our knowledge that compared photosynthetic rates between gametophytes and sporophytes of a filmy fern, Johnson et al. (2000) also found that gametophytes of *V. speciosa* reached maximum ETR at lower levels than sporophytes: in gametophytes of this species, photosynthesis became saturated at a PPFD of 4--5 µmol·m^--2^ ·s^--1^ in the field or 30--50 µmol·m^--2^·s^--1^ in the lab vs. 30--50 µmol·m^--2^ ·s^--1^ for the sporophyte (lab measurement only).
 Although we found similar differences in direction between gametophytes and sporophytes, the measurements of Johnson et al. (2000) are considerably lower than what we observed in the field for both Moorean filmy fern gametophytes (PPFD~95%~ ca. 40--60 µmol·m^--2^ ·s^--1^) and sporophytes (PPFD~95%~ ca. 130--160 µmol·m^--2^ ·s^--1^).
@@ -309,7 +387,9 @@ It is surprising, however, that we did not observe any differences between speci
 1 m scale.
 It is possible that the actual light levels experienced by gametophytes growing in these habitats may not vary significantly if they occupy protected microsites such as bryophyte mats or crevices in rock or bark.
 
-***Influence of phylogeny on traits***---Previous studies of filmy fern ecophysiology also found a link between habitat and DT and/or photosynthetic rates (Proctor, 2003, 2012; Parra et al., 2009; Saldan˜a et al., 2014); however, ours is the first to our knowledge to investigate this pattern while taking phylogeny into account.
+### Influence of phylogeny on traits
+
+Previous studies of filmy fern ecophysiology also found a link between habitat and DT and/or photosynthetic rates (Proctor, 2003, 2012; Parra et al., 2009; Saldan˜a et al., 2014); however, ours is the first to our knowledge to investigate this pattern while taking phylogeny into account.
 We detected significant phylogenetic signal in DT, suggesting that phylogeny should be considered when interpreting differences in DT between species (Table 2).
 In contrast, the lack of phylogenetic signal in photosynthetic traits, coupled with the clear intergenerational differences we observed, suggest that sporophytes and gametophytes are adapted for different light levels regardless of clade or ecological niche.
 In a more densely sampled study of morphological evolution in the trichomanoid clade, Dubuisson et al. (2013) identified several morphological changes including reduced stele and root systems associated with the evolution of epiphytic growth within the HE subclade (comprising the genera *Polyphlebium*, *Didymoglossum*, *Crepidomanes*, and *Vandenboschia*).
@@ -317,7 +397,9 @@ It is possible that both reduced morphology and increased DT are parts of an int
 However, Dubuisson et al. (2013) were unable to determine if these morphological changes had occurred independently, or if there was a single origin at the base of the HE clade followed by multiple losses.
 Increased sampling of both morphological and physiological traits of additional trichomanoid taxa is needed to distinguish between these scenarios.
 
-***Concluding remarks and future directions***---In filmy ferns, both sporophyte and gametophyte generations are poikilohydric; however, we have found here that this does not mean they necessarily share similar physiological optima.
+### Concluding remarks and future directions
+
+In filmy ferns, both sporophyte and gametophyte generations are poikilohydric; however, we have found here that this does not mean they necessarily share similar physiological optima.
 Although filmy fern sporophytes are often of small stature, elevating a leaf even a few cm above the substrate surface means escape from the boundary layer and exposure to substantially greater evapotranspiration.
 It is likely that even in this clade, wherein the physiological divide between sporophyte and gametophyte is probably the smallest amongst ferns, the two generations experience substantially different selective pressures.
 Fossils indicate that some of the earliest vascular plants may have had sporophytes and gametophytes that were both branched and small (Kenrick and Crane, 1997), but it is unclear at what point selective pressures began to diverge to favor large, complex sporophytes and small, simple gametophytes.
@@ -326,7 +408,7 @@ The relevance of plant size to water relations is supported by a recent study sh
 Future studies of DT in filmy ferns should include juvenile stages of the sporophyte, which are expected to experience similar microhabitats as gametophytes, to better determine the role of microhabitat vs. life stage (and plant size) on DT.
 Finally, more detailed analyses of the strategies used by each generation to cope with desiccation stress, such as transcriptomics, are needed to better understand the ecology and evolution of filmy ferns as well as the transition from desiccation tolerance to avoidance in vascular plants.
 
-ACKNOWLEDGEMENTS
+Acknowledgments
 
 Members of the Davis Lab and Jonathan B. Losos provided helpful discussion and comments on drafts.
 Saad Amer, Tohei Theophilus, and Suzanne Vinnette assisted with fieldwork and experiments.
@@ -334,3 +416,11 @@ Evan Zeng helped with analysis of microclimatic data.
 Weston Testo provided advice on settings for the DT test.
 Staff at the University of California Berkeley's Richard B. Gump South Pacific Research Station, Moorea, French Polynesia, in particular Valentine Brotherson, Neil Davies, Hinano Teavai-Murphy, and Frank Murphy, provided logistical support for fieldwork.
 Funding provided in part by the National Science Foundation (Doctoral Dissertation Improvement Grant DEB-1311169 to JHN and CCD), Setup Funds from Harvard University to CCD, American Society of Plant Taxonomists (Research Grant for Graduate Students to JHN), Garden Club of America (Award in Tropical Botany to JHN), Harvard University Herbaria (Fernald Fieldwork Fellowship to JHN), Society of Systematic Biologists (Graduate Student Research Award to JHN), and Systematics Association (Systematics Research Fund to JHN).
+
+-->
+
+## References
+<!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
+
+<div id="refs"></div>
+
