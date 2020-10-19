@@ -134,32 +134,29 @@ Here, we leverage a recently developed DNA barcoding system [@Nitta2017] to test
 2.) Amongst epiphytic filmy ferns, those occurring at high elevation have higher DT and photosynthetic optima than those at low elevation.
 3.) For filmy ferns with gametophytes that occur over a wider range than sporophytes, the gametophyte has higher DT and photosynthetic optima than the sporophyte.
 
-<!-- 
 ## Materials and methods
 
 ### Study system
 
-We selected the island of Moorea, French Polynesia (17*◦*32' S, 149*◦*50' W) for our survey of filmy fern ecophysiology (Fig. 2).
-Moorea is a small (135 km^2^; maximum elevation 1206 m) tropical oceanic island, located ca.
-15 km NW of its larger sister island, Tahiti.
+We selected the island of Moorea, French Polynesia (17°32' S, 149°50' W) for our survey of filmy fern ecophysiology (Fig. 2).
+Moorea is a small (135 km^2^; maximum elevation 1206 m) tropical oceanic island, located ca. 15 km NW of its larger sister island, Tahiti.
 Despite its small size, it hosts a range of habitats including coastal strand, low elevation rainforest, and high elevation cloud forest.
-At the time of the study, a total of 18 filmy fern species were known from Moorea (Murdock and Smith, 2003; Ranker et al., 2005; Nitta et al., 2011b; Florence, in press), including multiple terrestrial, saxicolous, and epiphytic species.
-The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages (Pryer et al., 2001), are represented by similar numbers of species.
-We follow the taxonomic system of Ebihara et al. (2006).
+At the time of the study, a total of 18 filmy fern species were known from Moorea [@Murdock2003; @Ranker2005; @Nitta2011b; @Florence], including multiple terrestrial, saxicolous, and epiphytic species.
+The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages [@Pryer2001a], are represented on Moorea by similar numbers of species.
+We follow the taxonomic system of @Ebihara2006.
 
 ### Field survey
 
-We surveyed filmy ferns on Moorea as part of a larger study including all ferns of Moorea and Tahiti (Nitta et al., 2016).
-During this study, 17 sampling sites were established from ca.
-200 m to 1200 m primarily along trails to the summits of three large peaks on Moorea: Mt. Rotui (899 m), Mt. Mouaputa (880 m), and Mt. Tohiea (1206 m; Fig. 2).
-At each site, sporophytes were sampled in a single 10 m *×* 10 m plot, and gametophytes sampled in two to three 50 cm *×* 50 cm subplots located within the sporophyte plot.
-Epiphytes were sampled to a maximum height of ca.
-2 m on their host plants.
-Unlike many other fern species, filmy fern gametophytes have unique morphologies that allow them to be identified to family (e.g., filamentous, ribbon with round gemmae; Nayar and Kaur 1971).
+We surveyed filmy ferns on Moorea as part of a larger study including all ferns of Moorea and Tahiti [@Nitta2017].
+During this study, 17 sampling sites were established from \circa 200 m to 1200 m primarily along trails to the summits of three large peaks on Moorea: Mt. Rotui (899 m), Mt. Mouaputa (880 m), and Mt. Tohiea (1206 m; Fig. 2).
+At each site, sporophytes were sampled in a single 10 m × 10 m plot, and gametophytes sampled in two to three 50 cm × 50 cm subplots located within the sporophyte plot.
+Epiphytes were sampled to a maximum height of \circa 2 m on their host plants.
+Unlike many other fern species, filmy fern gametophytes have unique morphologies that allow them to be identified to family [\eg, filamentous, ribbon with round gemmae; @Nayar1971].
 This allowed us to specifically use field-collected filmy fern gametophytes for physiological tests, which we later identified to species using DNA barcoding (see below).
-We characterized the elevational range of each species based on the results of the field survey; any species found with gametophytes occurring *\>*200 m above the maximum or below the minimum observed elevational range of sporophytes was considered 'widespread' (i.e., facultatively independent sensu Rumsey and Sheffield $$1996$$).
-We scored growth habit of each species based on field observations as terrestrial, saxicolous, low elevation epiphyte (mostly occurring outside of cloud forest, i.e., below ca. 500 m), or high elevation epiphyte (mostly occurring in cloud forest, i.e., above ca. 500 m).
+We characterized the elevational range of each species based on the results of the field survey; any species found with gametophytes occurring *\>*200 m above the maximum or below the minimum observed elevational range of sporophytes was considered 'widespread' [\ie, facultatively independent *sensu* @Rumsey1996].
+We scored growth habit of each species based on field observations as terrestrial, saxicolous, low elevation epiphyte (mostly occurring outside of cloud forest, \ie, below \circa 500 m), or high elevation epiphyte (mostly occurring in cloud forest, \ie, above \circa 500 m).
 
+<!-- 
 ### Microclimate
 
 We characterized the microenvironment experienced by filmy ferns by logging relative humidity (RH) and temperature every 15 min from July 7, 2013 to July 5, 2014 at 16 of the sampling sites (Fig. 2).
