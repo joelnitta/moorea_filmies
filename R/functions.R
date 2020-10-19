@@ -257,6 +257,158 @@ analyze_phylosig_by_generation <- function(combined_species_means, phy, traits_s
   
 }
 
+# Modeling ----
+
+#' Run (phylogenetic) generalized linear mixed models for filmy fern data
+#' 
+#' A phylogenetic effect is included for recovery from desiccation,
+#' but not `etr` or `par`.
+#'
+#' @param combined_species_means Means calculated at the species level for response
+#' variables ('recover_mean', 'etr_mean', and 'par_mean'), also including columns
+#' for 'species' and 'generation'.
+#' @param traits Trait data at the species level
+#' @param phy Phylogenetic tree; list of class 'DNAbin'
+#'
+#' @return Dataframe; one row per model, with model testing for effect of
+#' generation, growth habit, both (generation + growth habit), and their
+#' interaction (generation * growth habit), or null
+#' (effect of species only) on each response variable.
+#' 
+run_glmm <- function(combined_species_means, traits, phy) {
+  
+  # format trait data ---
+  
+  # - first combine DT and light response data 
+  # and set habit, generation, range, and species as factors
+  dt_light_data <-
+    select(combined_species_means, species, generation, recover = recover_mean, etr = etr_mean, par = par_mean) %>%
+    left_join(traits, by = "species") %>%
+    mutate(
+      habit = as.factor(habit),
+      generation = as.factor(generation),
+      range = as.factor(range),
+      species = as.factor(species))
+  
+  # then split each into a separate dataset with zero missing data
+  # and drop unused levels
+  dt_data <- dt_light_data %>%
+    select(species, generation, habit, range, recover) %>%
+    remove_missing %>%
+    mutate_if(is.factor, droplevels)
+  
+  etr_data <- dt_light_data %>%
+    select(species, generation, habit, range, etr) %>%
+    remove_missing %>%
+    mutate_if(is.factor, droplevels)
+  
+  par_data <- dt_light_data %>%
+    select(species, generation, habit, range, par) %>%
+    remove_missing %>%
+    mutate_if(is.factor, droplevels)
+  
+  # finally, put these into a tibble for looping later over mcmcGLMM
+  data_tibble <- tibble(
+    response = c("etr", "par", "recover"),
+    data = list(etr_data, par_data, dt_data))
+  
+  # format phylogeny (only for DT) ---
+  
+  # have to remove node labels or inverseA won't work
+  phy$node.label <- NULL
+  
+  # restrict phylogeny to only those species with DT data
+  dt_phy <- ape::keep.tip(phy, as.character(dt_data$species))
+  
+  # set up inverse phylogenetic distance matrix
+  dt_phy_inv <- MCMCglmm::inverseA(dt_phy, nodes="TIPS", scale = TRUE)
+  
+  # Run GLMMM ---
+  
+  # set number of iterations
+  num <- 500000
+  
+  # define prior list. Need one G for each random effect, one R for each fixed effect
+  my_prior <- list(G=list(G1=list(V=1,nu=0.02)),
+                   R=list(R1=list(V=1,nu=0.02),R2=list(V=1,nu=0.02),R3=list(V=1,nu=0.02)))
+  
+  # run MCMCglmm for each dataset: non-phylogenetic models ---
+  non_phylo_models <-
+    list(
+      fixed_effects = c("habit", "generation", "both", "intersect", "null"),
+      response = c("etr", "par")
+    ) %>%
+    cross_df() %>%
+    mutate(formula = case_when(
+      fixed_effects == "null" ~ glue("{response}~1"),
+      fixed_effects == "both" ~ glue("{response}~habit+generation"),
+      fixed_effects == "intersect" ~ glue("{response}~habit*generation"),
+      fixed_effects == "habit" ~ glue("{response}~habit"),
+      fixed_effects == "generation" ~ glue("{response}~generation")
+    )) %>%
+    mutate(formula = map(formula, as.formula)) %>%
+    left_join(data_tibble, by = "response") %>%
+    mutate(
+      model = map2(
+        formula, 
+        data,
+        ~MCMCglmm::MCMCglmm(
+          fixed = .x, 
+          random = ~species, 
+          family = "gaussian", 
+          prior = my_prior, 
+          data = as.data.frame(.y),
+          nitt = num, burnin = 1000, thin = 500,
+          verbose = FALSE)
+      )
+    )
+  
+  # run MCMCglmm for each dataset: phylogenetic models ---
+  phylo_models <-
+    list(
+      fixed_effects = c("habit", "generation", "both", "intersect", "null"),
+      response = c("recover")
+    ) %>%
+    cross_df() %>%
+    mutate(formula = case_when(
+      fixed_effects == "null" ~ glue("{response}~1"),
+      fixed_effects == "both" ~ glue("{response}~habit+generation"),
+      fixed_effects == "intersect" ~ glue("{response}~habit*generation"),
+      fixed_effects == "habit" ~ glue("{response}~habit"),
+      fixed_effects == "generation" ~ glue("{response}~generation")
+    )) %>%
+    mutate(formula = map(formula, as.formula)) %>%
+    left_join(data_tibble, by = "response") %>%
+    mutate(
+      model = map2(
+        formula, 
+        data,
+        ~MCMCglmm::MCMCglmm(
+          fixed = .x, 
+          random = ~species, 
+          family = "gaussian", 
+          ginverse = list(species = dt_phy_inv$Ainv), 
+          prior = my_prior, 
+          data = as.data.frame(.y),
+          nitt = num, burnin = 1000, thin = 500,
+          verbose = FALSE)
+      )
+    )
+  
+  bind_rows(non_phylo_models, phylo_models)
+  
+}
+
+# define function to extract p value table from summary as dataframe, append model name
+summary_to_csv <- function (model) {
+  results.df <- as.data.frame(summary(model)$solutions)
+  results.df$model <- deparse(substitute(model))
+  results.df$effect <- rownames(results.df)
+  rownames(results.df) <- NULL
+  colnames(results.df) <- c("Parameter estimate", "Lower 95% CI", "Upper 95% CI", "Effective sample size", "P-value", "Model", "Effect")
+  return(results.df)
+}
+
 # Etc ----
 
 #' Match trait data and tree

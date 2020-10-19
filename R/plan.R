@@ -81,8 +81,16 @@ plan <- drake_plan(
   # Phylogenetic signal ----
   phylosig = analyze_phylosig_by_generation(
     combined_species_means = combined_species_means,
-    phy = phy,
+    phy = filmy_phy,
     traits_select = c("recover_mean", "etr_mean", "par_mean")
-  )
+  ),
+  
+  # Generalized linear mixed models ----
+  
+  # Uses phylogeny for DT only
+  glmms = run_glmm(
+    combined_species_means = combined_species_means, 
+    traits = traits,
+    phy = filmy_phy)
 
 )
