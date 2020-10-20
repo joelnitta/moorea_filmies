@@ -17,7 +17,7 @@ plan <- drake_plan(
     out3 = file_out("data/nitta_2017/all_plots.csv")),
 
   # -microclimate data
-  # hobo = readr::read_csv("data/filmy_hobo_data.csv"),
+  climate = readr::read_csv("data_raw/doi_10.5061_dryad.fqz612jps__v2/moorea_climate.csv"),
 
   # - site data
   moorea_sites = readr::read_csv(
