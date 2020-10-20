@@ -91,6 +91,29 @@ plan <- drake_plan(
   glmms = run_glmm(
     combined_species_means = combined_species_means, 
     traits = traits,
-    phy = filmy_phy)
+    phy = filmy_phy),
+  
+  # Render manuscript ----
+  
+  # Track bibliography files
+  refs = target("ms/references.bib", format = "file"),
+  # refs_other = target("ms/references_other.yaml", format = "file"),
+  
+  # First render to PDF, keeping the latex
+  ms_pdf = render_tracked(
+    input = knitr_in("ms/manuscript.Rmd"),
+    quiet = TRUE,
+    output_dir = here::here("results"),
+    tracked_output = file_out("results/manuscript.tex"),
+    dep1 = refs
+  ),
+  
+  # Next use the latex to convert to docx with pandoc
+  ms_docx = latex2docx(
+    latex = file_in("results/manuscript.tex"),
+    docx = file_out("results/manuscript.docx"),
+    template = file_in("ms/journal-of-plant-research.docx"),
+    wd = here::here("results")
+  )
 
 )
