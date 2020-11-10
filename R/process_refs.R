@@ -30,7 +30,7 @@ bib_df <- as.data.frame(bib) %>% rownames_to_column("cite_key")
 # Make sure no citations are missing
 tibble(cite_key = citations) %>%
   anti_join(bib_df, by = "cite_key") %>%
-  verify(nrow(.) == 0, success_fun = success_logical)
+  verify(nrow(.) == 0, success_fun = success_logical, error_fun = error_stop)
 
 # Filter bibliography to only cited references, write it out
 bib_df %>%
