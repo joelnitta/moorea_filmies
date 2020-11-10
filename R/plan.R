@@ -97,7 +97,7 @@ plan <- drake_plan(
   
   # Track bibliography files
   refs = target("ms/references.bib", format = "file"),
-  # refs_other = target("ms/references_other.yaml", format = "file"),
+  refs_other = target("ms/references_other.yaml", format = "file"),
   
   # First render to PDF, keeping the latex
   ms_pdf = render_tracked(
@@ -105,7 +105,8 @@ plan <- drake_plan(
     quiet = TRUE,
     output_dir = here::here("results"),
     tracked_output = file_out("results/manuscript.tex"),
-    dep1 = refs
+    dep1 = refs,
+    dep2 = refs_other
   ),
   
   # Next use the latex to convert to docx with pandoc

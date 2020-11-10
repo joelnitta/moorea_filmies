@@ -1,0 +1,65 @@
+---
+references:
+- id: Florence
+  type: book
+  author:
+  - family: Florence
+    given: Jacques
+  pubstate: 'in press'
+  title: 'Flore de la Polynésie française. Volume 3. Fougères et alliés'
+  publisher: Editions de l’IRD, Collection Faune et Flore tropicales
+  publisher-place: Paris, France
+  
+- id: RCoreTeam2020a
+  type: webpage
+  author:
+  - literal: R Core Team
+  issued:
+  - year: 2020
+  title: 'R: A language and environment for statistical computing. Version 4.0.2. R Foundation for Statistical Computing, Vienna, Austria'
+  URL: https://www.R-project.org/
+
+- id: Orme2018
+  type: webpage
+  author:
+  - family: Orme
+    given: David
+  - family: Freckleton
+    given: Rob
+  - family: Thomas
+    given: Gavin
+  - family: Petzoldt
+    given: Thomas
+  - family: Fritz
+    given: Susanne
+  - family: Isaac
+    given: Nick
+  - family: Pearse
+    given: Will
+  issued:
+  - year: 2018
+  title: 'Caper: Comparative analyses of phylogenetics and evolution in r. Version 1.0.1'
+  title-short: Caper
+  note: R package version 1.0.1
+  URL: https://CRAN.R-project.org/package=caper
+
+- id: Nitta2020b
+  type: webpage
+  author:
+  - family: Nitta
+    given: Joel
+    middle: H.
+  - family: Ebihara
+    given: Atsushi
+  - family: Smith
+    given: Alan
+    middle: R.
+  issued:
+    year: 2020
+  accessed:
+    year: 2020
+    month: 03
+    day: 01
+  title: 'Data from: A taxonomic and molecular survey of the pteridophytes of the Nectandra Cloud Forest Reserve, Costa Rica'
+  container-title: 'Dryad Digital Repository'
+  URL: https://doi.org/10.5061/dryad.bnzs7h477
