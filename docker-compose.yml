@@ -5,7 +5,7 @@ services:
     ports:
       - "8787:8787"
     volumes:
-      - ".:/home/rstudio/moorea_filmies"
+            - "~:/home/rstudio/moorea_filmies"
     environment:
       DISABLE_AUTH: "true"
     working_dir: /home/rstudio/moorea_filmies
