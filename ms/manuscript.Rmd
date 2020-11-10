@@ -1,6 +1,8 @@
 ---
 title: ""
-bibliography: references.bib
+bibliography: 
+  - references.bib
+  - references_other.yaml
 mainfont: Roboto-Regular.ttf
 fontsize: 12pt
 mainfontoptions: 
@@ -35,7 +37,11 @@ library(jntools)
 ```{r load-data}
 loadd(
   list = c(
-    "climate"
+    "climate",
+    "filmy_species",
+    "moorea_sites",
+    "phylosig",
+    "range_types"
   )
 )
 ```
@@ -59,11 +65,8 @@ YES (Joel H. Nitta)
 **Number of tables, black-and-white figures, and color figures.**  
 No tables / 2 black-and-white figure / 1 color figure
 
-<!-- See https://stackoverflow.com/questions/24672111/how-to-add-a-page-break-in-word-document-generated-by-rstudio-markdown/40474753
-for inserting page breaks when rendering to MS word -->
-##### 
-
-\newpage
+\clearpage
+#####
 
 # Intergenerational Niche Differentiation in Filmy Ferns (Hymenophyllaceae)
 
@@ -98,9 +101,8 @@ Our results show that filmy fern gametophytes and sporophytes differ in their ph
 
 **Keywords**: chlorophyll fluorescence; desiccation tolerance; DNA barcoding; French Polynesia; gametophyte; Hymenophyllaceae
 
-##### 
-
-\newpage
+\clearpage
+#####
 
 ## Introduction
 
@@ -156,18 +158,35 @@ Here, we leverage a recently developed DNA barcoding system [@Nitta2017] to test
 
 ### Study system
 
+```{r study-system-stats}
+# Calculate number of all filmy fern species, trichomanoids, and hymenophylloids
+# (not considering numbered taxa)
+
+n_filmy_sp <- str_remove_all(filmy_species, "[0-9]") %>% 
+  n_distinct()
+
+n_trich_sp <- str_remove_all(filmy_species, "[0-9]") %>% 
+  magrittr::extract(., str_detect(., "^Hymeno", negate = TRUE)) %>%
+  n_distinct()
+
+n_hymeno_sp <- str_remove_all(filmy_species, "[0-9]") %>% 
+  magrittr::extract(., str_detect(., "^Hymeno", negate = FALSE)) %>%
+  n_distinct()
+
+```
+
 We selected the island of Moorea, French Polynesia (17°32' S, 149°50' W) for our survey of filmy fern ecophysiology (Fig. 2).
 Moorea is a small (135 km^2^; maximum elevation 1206 m) tropical oceanic island, located ca.
 15 km NW of its larger sister island, Tahiti.
 Despite its small size, it hosts a range of habitats including coastal strand, low elevation rainforest, and high elevation cloud forest.
-At the time of the study, a total of 18 filmy fern species were known from Moorea [@Murdock2003; @Ranker2005; @Nitta2011b; @Florence], including multiple terrestrial, saxicolous, and epiphytic species.
-The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages [@Pryer2001a], are represented on Moorea by similar numbers of species.
+A total of `r n_filmy_sp` filmy fern species are known from Moorea, including multiple terrestrial, saxicolous, and epiphytic species [@Murdock2003; @Ranker2005; @Nitta2011b; @Nitta2017; @Florence].
+The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages [@Pryer2001a], are represented on Moorea by `r n_hymeno_sp` and `r n_trich_sp` species, respectively.
 We follow the taxonomic system of @Ebihara2006.
 
 ### Field survey
 
 We surveyed filmy ferns on Moorea as part of a larger study including all ferns of Moorea and Tahiti [@Nitta2017].
-During this study, 17 sampling sites were established from \circa{ }200 m to 1200 m primarily along trails to the summits of three large peaks on Moorea: Mt. Rotui (899 m), Mt. Mouaputa (880 m), and Mt. Tohiea (1206 m; Fig. 2).
+During this study, `r n_distinct(moorea_sites$site)` sampling sites were established from \circa{ }200 m to 1200 m primarily along trails to the summits of three large peaks on Moorea: Mt. Rotui (899 m), Mt. Mouaputa (880 m), and Mt. Tohiea (1206 m; Fig. 2).
 At each site, sporophytes were sampled in a single 10 m × 10 m plot, and gametophytes sampled in two to three 50 cm × 50 cm subplots located within the sporophyte plot.
 Epiphytes were sampled to a maximum height of \circa{ }2 m on their host plants.
 Unlike many other fern species, filmy fern gametophytes have unique morphologies that allow them to be identified to family [\eg, filamentous, ribbon with round gemmae; @Nayar1971].
@@ -260,26 +279,26 @@ Since DT showed significant phylogenetic signal (see Results), we used phylogene
 
 To test whether gametophytes with wider ranges have higher DT, we conducted PGLS with DT as the response variable and range width (measured as the difference between maximum and minimum observed elevation) as the explanatory variable. We ran PGLS using the caper R package [@Orme2018].
 
-<!--
-
 ## Results
 
 ### Field survey
 
-Twenty-two filmy fern taxa (including one new record and two species that were recognized as multiple varieties) were observed as sporophytes, and 18 as gametophytes on Moorea in total (Table 1).
-*Hymenophyllum braithwaitei* (Ebihara & K. Iwats.), only observed near the peak of Mt. Tohiea (1206 m), is a new record for Moorea and French Polynesia.
-It was previously known only from Vanuatu and New Caledonia (Ebihara et al., 2010).
+In total, `r n_distinct(range_types$species)` filmy fern taxa (including two species that were recognized as multiple varieties) were observed on Moorea.
 Three taxa with distinct *rbcL* sequences, morphology, and elevational ranges could be distinguished within the *Crepidomanes minutum* (Blume) K. Iwats. species complex, but species status of these taxa remains uncertain (Nitta et al., 2011a).
 We refer to these here as *C. minutum* var. 1, 2, and 3.
 Similarly, two members of the *Abrodictyum asae-grayi* (Bosch) Ebihara & K. Iwats. complex (also including *Abrodictyum caudatum* (Brack.) Ebihara & K. Iwats. in our tree; Appendix S1) were observed on the basis of *rbcL* and morphology, but as taxonomic treatment is beyond the scope of the current study we refer to them as *A. asae-grayi* var. 1 and 2.
+
 In several species, gametophytes exceeded the maximum or minimum elevational range of sporophytes (Table 1) including *Callistopteris apiifolia* (C. Presl) Copel., *Crepidomanes minutum* var. 2 and 3, *Hymenophyllum digitatum* (Sw.) Fosberg, *Hymenophyllum javanicum* Spreng., *Hymenophyllum pallidum* (Blume) Ebihara & K.
 Iwats., and *Polyphlebium borbonicum* (Bosch) Ebihara & Dubuisson.
 All of these have sporophytes that are normally only found in cloud forest (ca. 500--1200 m), but gametophytes that are distributed to lower elevations.
 
+Sporophytes of two taxa, *C. minutum* var. 3 and *Hymenophyllum braithwaitei* (Ebihara & K. Iwats.), did not occur in the study plots, but each was observed from a single population on Mt. Tohiea, at ca. 1000 m and near the summit (1206 m), respectively.
+We include these observations for comparison of ranges between sporophytes and gametophytes.
+
 ### Microclimate
 
 Mean daily temperature was strongly correlated with elevation, and dropped ca.
-6 *◦*C from the lowest surveyed site (201 m) to the highest (1206 m; Fig. 3).
+6 °C from the lowest surveyed site (201 m) to the highest (1206 m; Fig. 3).
 Although epiphytic and terrestrial habitats were similar in temperature, epiphytic habitats tended to have lower daily mean RH, and greater daily variation in RH, than terrestrial ones (Fig. 3, Appendix S2).
 This difference was greatest at low elevations, and smallest at high elevations.
 One significant departure from these trends was observed at the Mt. Rotui 830 m site (indicated by arrows in Fig. 3).
@@ -288,7 +307,22 @@ Daily variation in temperature and RH was much greater, and mean RH much lower, 
 
 ### Phylogenetic signal
 
-Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT (gametophytes *K* and λ both near 1, *P \<*0.05; sporophytes *K* = 0.78, *P* = 0.02 and λ = 0.96, *P* = 0.11), but no signal for PPFD~95%~ or ETR~max~ (Table 2).
+```{r phy-sig-stats}
+sporo_recover_k <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(kval) %>% jntools::round_t(2)
+sporo_recover_k_pval <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(k_pval) %>% jntools::round_t(3)
+sporo_recover_lambda <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(lambda) %>% jntools::round_t(2)
+sporo_recover_lambda_pval <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(lambda_pval) %>% jntools::round_t(3)
+
+# Make sure that all ETRmax and PAR have pval > 0.05
+phylosig %>% 
+  filter(trait != "recover_mean") %>%
+  verify(all(k_pval > 0.05)) %>%
+  verify(all(lambda_pval > 0.05), success_fun = success_logical, error_fun = error_stop)
+```
+
+Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT (gametophytes *K* and λ both near 1, *P \<*0.05; sporophytes *K* = `r sporo_recover_k`, *P* = `r sporo_recover_k_pval` and λ = `r sporo_recover_lambda`, *P* = `r sporo_recover_lambda_pval`), but no signal for PPFD~95%~ or ETR~max~ (Table 2).
+
+<!--
 
 ### Desiccation tolerance
 
