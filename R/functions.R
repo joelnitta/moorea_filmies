@@ -409,6 +409,41 @@ summary_to_csv <- function (model) {
   return(results.df)
 }
 
+#' Run phylogenetic generalized least squares (PGLS)
+#' for gametophyte range size vs. desiccation tolerance
+#' in filmy ferns from Moorea
+#'
+#' @param range_data Dataframe with range size data
+#' @param combined_species_means Dataframe with desiccation tolerance data
+#' @param phy Phylogeny
+#'
+#' @return model object
+#' 
+run_pgls_range <- function (range_data, combined_species_means, phy) {
+  
+  range_data <-
+    range_data %>% 
+    mutate(range_breadth = gameto_max_range - gameto_min_range) %>%
+    select(species, range_breadth) %>%
+    filter(!is.na(range_breadth))
+  
+  dt_range_data <-
+    combined_species_means %>%
+    filter(generation == "gameto") %>%
+    filter(!is.na(recover_mean)) %>%
+    select(species, recover = recover_mean) %>%
+    left_join(range_data, by = "species") %>%
+    remove_missing() %>%
+    as.data.frame()
+  
+  dt_range_phy <- ape::keep.tip(phy, dt_range_data$species)
+  
+  dt_range_data_comp <- caper::comparative.data(dt_range_phy, dt_range_data, species)
+  
+  caper::pgls(recover ~ range_breadth, dt_range_data_comp)
+  
+}
+
 # Etc ----
 
 #' Match trait data and tree

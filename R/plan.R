@@ -93,6 +93,14 @@ plan <- drake_plan(
     traits = traits,
     phy = filmy_phy),
   
+  # Phylogenetic generalized least squares (PGLS) ----
+  
+  # Run PGLS for gametophyte range size vs. desiccation tolerance
+  range_dt_model = run_pgls_range(
+    range_data = range_types, 
+    combined_species_means = combined_species_means, 
+    phy = filmy_phy),
+  
   # Render manuscript ----
   
   # Track bibliography files
