@@ -471,6 +471,13 @@
       "Repository": "RSPM",
       "Hash": "6e58bd3d6b3dd82a944cd6f05ade228f"
     },
+    "janitor": {
+      "Package": "janitor",
+      "Version": "2.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7eb42c3bb09e2019b97de69d2ea9dfff"
+    },
     "jntools": {
       "Package": "jntools",
       "Version": "0.1.0",
@@ -818,6 +825,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "3838071b66e0c566d55cc26bd6e27bf4"
+    },
+    "snakecase": {
+      "Package": "snakecase",
+      "Version": "0.11.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4079070fc210c7901c0832a3aeab894f"
     },
     "storr": {
       "Package": "storr",
