@@ -42,7 +42,8 @@ loadd(
     "moorea_sites",
     "phylosig",
     "range_types",
-    "recovery_species_means"
+    "recovery_species_means",
+    "t_test_results"
   )
 )
 ```
@@ -348,18 +349,28 @@ n_dt_species_both <- recovery_species_means %>%
   n_distinct() %>%
   english2
 
-# Vector of species that I know *after* running the t-test have significant
-# differences and discuss in the MS.
-species_with_signif_dt_diff <- c("Hymenophyllum_polyanthos", "Hymenophyllum_digitatum", "Crepidomanes_minutum2", "Polyphlebium_endlicherianum", "Polyphlebium_borbonicum")
-
-t_test_results %>% 
-  filter(response == "recover", p_value < 0.05) %>%
-  # Make sure that species with signif diff in DT mentioned
-  # in MS match those in the actual analysis results
-  verify(setequal(.$species, species_with_signif_dt_diff)) %>%
-  select(species, estimate, p_value) %>%
-  arrange(p_value)
-
+# Make helper function to check on p-value significance and extract from t_test_results
+#
+#' @param species_select Name of species to select from t-test results
+#' @param response_select Name of response to select from t-test results
+#' @param data t-test results
+#' @param p_check Boolean: should the p-value be required to be less than 0.05?
+#'
+#' @return A p-value for the selected species and response
+ttest_pval <- function(species_select, response_select, data = t_test_results, p_check = TRUE) {
+  data %>% 
+    # Filter to appropriate species and response
+    filter(species == species_select, response == response_select) %>%
+    # Verify the p-value is significant (or override with `p_check = FALSE`)
+    assert(function (x) magrittr::is_less_than(x, 0.05) | !p_check, p_value) %>%
+    # Format the p-value
+    mutate(
+      p_value = case_when(
+        p_value < 0.001 ~ "<0.001",
+        TRUE ~ jntools::round_t(p_value, digits = 3))
+    ) %>% 
+    pull(p_value)
+}
 ```
 
 
@@ -373,12 +384,12 @@ Most of the high elevation epiphytes could recover from 2 d treatments regardles
 Interestingly, *C. minutum* var. 2, *Hymenophyllum multifidum* (G. Forst.) Sw., and *Hymenophyllum polyanthos* (Sw.) Sw. could recover from desiccation at --86 or --282 MPa for 15 d, but not --38 MPa.
 
 Gametophytes of low elevation epiphytes had the highest DT (ca. 80% recovery), followed by high elevation epiphytes and saxicolous species (both with recovery from ca. 25% to 75%), with terrestrial species essentially non-tolerant (less than 20% recovery; Fig. 5).
-DT of gametophytes did not significantly exceed that of sporophytes for any species except for saxicolous *P. endlicherianum* (Fig. 5; *t*-test, *P* = 0.012), and was significantly lower in gametophytes than sporophytes of some high elevation epiphytic species including *C. minutum* var. 2, *H.* *digitatum*, *H. polyanthos*, and *P. borbonicum* (Fig. 5; *t*-test, *P* = 0.0093, *\<*0.001, *\<*0.001, 0.012, respectively).
-
-<!-- 
+DT of gametophytes did not significantly exceed that of sporophytes for any species except for saxicolous *P. endlicherianum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Polyphlebium_endlicherianum", "recover")`), and was significantly lower in gametophytes than sporophytes of some high elevation epiphytic species including *C. minutum* var. 2, *H.* *digitatum*, *H. polyanthos*, and *P. borbonicum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Crepidomanes_minutum2", "recover")`, `r ttest_pval("Hymenophyllum_digitatum", "recover")`, `r ttest_pval("Hymenophyllum_polyanthos", "recover")`, and `r ttest_pval("Polyphlebium_borbonicum", "recover")`, respectively).
 
 The GLMM showed that both generation and the interaction of generation and growth habit, but not growth habit alone, have a significant effect on DT while controlling for phylogeny (Table 3).
 In contrast, range type (gametophytes widespread beyond sporophytes or not) has no significant effect on DT (Table 3).
+
+<!-- 
 
 ### Photosynthetic optima
 
