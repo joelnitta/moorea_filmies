@@ -101,19 +101,24 @@ calculate_mean_recovery <- function (data) {
   
 }
 
-calculate_mean_etr <- function (data) {
+calculate_indiv_etr <- function (data) {
   
-  individual_etr <-
-    data %>%
+  # Calculate maximum ETR for each individual
+  data %>%
     assert(not_na, ETR) %>%
     group_by(species, generation, individual) %>%
     summarize(
-      etr_max = max(ETR)
-    ) %>%
-    ungroup
+      etr_max = max(ETR),
+      .groups = "drop"
+    )
   
-  # Next calculate the mean value by species and generation
-  individual_etr %>%
+}
+
+calculate_mean_etr <- function (data) {
+  
+  # Calculate mean ETR max by species and generation
+  data %>%
+    assert(not_na, etr_max) %>%
     group_by(generation, species) %>%
     summarize(
       etr_mean = mean(etr_max),
@@ -124,11 +129,10 @@ calculate_mean_etr <- function (data) {
   
 }
 
-calculate_mean_par <- function (data) {
+calculate_indiv_par <- function (data) {
   
-  # First calculate critical PAR value for each individual
-  individual_par <-
-    data %>%
+  # Calculate critical PAR value for each individual
+  data %>%
     select(species, generation, individual, PAR, ETR) %>%
     nest(data = c(PAR, ETR)) %>%
     mutate(
@@ -149,8 +153,12 @@ calculate_mean_par <- function (data) {
     # calculate critical PAR (PAR where reach 95% of max ETR)
     mutate(par_critical = -log(0.05)/estimate)
   
+}
+
+calculate_mean_par <- function (data) {
+  
   # Next calculate the mean value by species and generation
-  individual_par %>%
+  data %>%
     group_by(generation, species) %>%
     summarize(
       par_mean = mean(par_critical),
@@ -183,6 +191,101 @@ combine_mean_phys_traits <- function (recovery_species_means, etr_species_means,
   
 }
 
+# t-test ----
+
+#' Run a t-test comparing response values between gametophytes and sporophytes.
+#' 
+#' Helper function for run_t_test()
+#'
+#' @param data Data with response variable (DT recovery, ETRmax or PAR95) for
+#' filmy fern sporophytes and gametophytes in wide format. Three columns: `species`,
+#' `gameto`, and `sporo`. `gameto` and `sporo` are each list-columns, where each
+#' element of the list is a character vector of response variables.
+#'
+#' @return The results of running a two-sided t-test comparing response variables
+#' between gametophytes and sporophytes.
+#' 
+run_t_test_gs <- function (data) {
+  
+  data %>%
+    # Count number of samples per species per generation
+    mutate(
+      n_gameto = map_dbl(gameto, length),
+      n_sporo = map_dbl(sporo, length)
+    ) %>%
+    # Only keep those with multiple samples
+    filter(n_gameto > 1, n_sporo > 1) %>%
+    # Run two-sided t-test, looping over species
+    # see https://cran.r-project.org/web/packages/broom/vignettes/broom_and_dplyr.html
+    # for more info
+    nest(data = c(gameto, sporo)) %>%
+    mutate(
+      t_test_res = map(data, ~t.test(x = .$sporo[[1]], y = .$gameto[[1]], paired = FALSE)),
+      tidy_res = map(t_test_res, broom::tidy)
+    ) %>%
+    select(species, tidy_res) %>%
+    unnest(cols = c(tidy_res)) %>%
+    janitor::clean_names()
+  
+}
+
+#' Run a t-test comparing response values between gametophytes and sporophytes
+#' for DT recovery, PAR95, and ETRmax
+#'
+#' @param recovery_data Data with recovery from desiccation treatment with
+#' one value per individual. Includes columns `species`, `salt`, `drytime`, `rectime`,
+#' `recover`, and `generation`.
+#' @param par_indiv Data with critical PAR (PAR where reach 95% of max ETR). One row
+#' per individual. Includes columns `species`, `generation`, and `par_critical`
+#' @param etr_indiv Data with maximum ETR. One row per individual. Includes columns
+#' `species`, `generation`, and `etr_max`.
+#'
+#' @return Tibble. Columns include:
+#' - `estimate`: estimate of difference between means (sporo value - gameto value)
+#' - `estimate1`: estimate of mean value of sporophytes
+#' - `estimate2`: estimate of mean value of gametophytes
+#' - `statistic`: t-value
+#' - `p_value`: p-value for the t-test
+#' - `response`: response type ("recover", "par", or "etr")
+#' 
+run_t_test <- function (recovery_data, par_indiv, etr_indiv) {
+  
+  # Run t-test for DT recovery between sporophytes and gametophytes
+  dt_t_test <-
+    recovery_data %>%
+    # Only compare recovery after 48hr between sporos and gametos dried using MgNO3 
+    filter(salt == "MgNO3", rectime == "48hr", drytime == "2d") %>%
+    select(species, recover, generation) %>%
+    # Convert to wide format. Values in columns are now a list of numeric vectors
+    # (recovery values)
+    pivot_wider(names_from = "generation", values_from = "recover", values_fn = list) %>%
+    run_t_test_gs() %>%
+    mutate(response = "recover")
+  
+  # Run t-test for PAR95 between sporophytes and gametophytes
+  par_t_test <-
+    par_indiv %>%
+    select(species, generation, par_critical) %>%
+    pivot_wider(names_from = "generation", values_from = "par_critical", values_fn = list) %>%
+    run_t_test_gs() %>%
+    mutate(response = "par")
+  
+  # Run t-test for ETRmax between sporophytes and gametophytes
+  etr_t_test <-
+    etr_indiv %>%
+    select(species, generation, etr_max) %>%
+    pivot_wider(names_from = "generation", values_from = "etr_max", values_fn = list) %>%
+    run_t_test_gs() %>%
+    mutate(response = "etr")
+  
+  # Combine the results
+  bind_rows(
+    dt_t_test,
+    par_t_test,
+    etr_t_test
+  )
+  
+}
 
 # Phylogentic signal ----
 

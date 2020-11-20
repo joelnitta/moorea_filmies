@@ -16,7 +16,7 @@ plan <- drake_plan(
     out2 = file_out("data/nitta_2017/treepl_Moorea_Tahiti.tre"),
     out3 = file_out("data/nitta_2017/all_plots.csv")),
 
-  # -microclimate data
+  # - microclimate data
   climate = readr::read_csv("data_raw/doi_10.5061_dryad.fqz612jps__v2/moorea_climate.csv"),
 
   # - site data
@@ -31,13 +31,13 @@ plan <- drake_plan(
 
   filmy_species = traits$species,
   
-  # -phylogenetic tree
+  # - phylogenetic tree
   filmy_phy = ape::read.tree(
     file_in("data/nitta_2017/treepl_Moorea_Tahiti.tre"
     )) %>%
     ape::keep.tip(filmy_species),
 
-  # -physiological data
+  # - physiological data
   recovery_data_raw = readr::read_csv("data/filmy_DT_data.csv"),
 
   # - community data
@@ -60,23 +60,37 @@ plan <- drake_plan(
   recovery_data = clean_recovery(recovery_data_raw),
 
   light_data = clean_light(light_data_raw),
+  
+  # - calculate PAR95 by individual
+  par_indiv = calculate_indiv_par(light_data),
+  
+  # - calculate ETRmax by individual
+  etr_indiv = calculate_indiv_etr(light_data),
 
   # Calculate means by species and generation ----
-  # -% recovery
+  # - DT recovery
   recovery_species_means = calculate_mean_recovery(recovery_data),
 
-  # -ETR max
-  etr_species_means = calculate_mean_etr(light_data),
+  # - ETR max
+  etr_species_means = calculate_mean_etr(etr_indiv),
 
-  # -PAR 95%
-  par_species_means = calculate_mean_par(light_data),
+  # - PAR95
+  par_species_means = calculate_mean_par(par_indiv),
 
-  # -Combine the means into a single df
+  # - Combine the means into a single df
   combined_species_means = combine_mean_phys_traits(
     recovery_species_means = recovery_species_means,
     etr_species_means = etr_species_means,
     par_species_means = par_species_means
   ),
+  
+  # t-test ----
+  
+  # Perform two-sided t-test on DT and light responses across generations
+  t_test_results = run_t_test(
+    recovery_data = recovery_data, 
+    par_indiv = par_indiv, 
+    etr_indiv = etr_indiv),
 
   # Phylogenetic signal ----
   phylosig = analyze_phylosig_by_generation(
