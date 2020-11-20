@@ -31,7 +31,6 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, results = "hide", cache = FALSE)
-library(jntools)
 ```
 
 ```{r load-data}
@@ -42,7 +41,7 @@ loadd(
     "moorea_sites",
     "phylosig",
     "range_types",
-    "recovery_species_means",
+    "combined_species_means",
     "t_test_results"
   )
 )
@@ -328,19 +327,24 @@ Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* w
 
 ```{r dt-stats}
 # Count number of species included in DT test by generation
-n_dt_species_gameto <- recovery_species_means %>% 
-  count(species, generation) %>% 
-  count(generation) %>% 
-  filter(generation == "gameto") %>% 
-  pull(n) %>% english2
-
-n_dt_species_gameto <- recovery_species_means %>% 
+n_dt_species_sporo <- combined_species_means %>% 
+  filter(!is.na(recover_mean)) %>% 
   count(species, generation) %>% 
   count(generation) %>% 
   filter(generation == "sporo") %>% 
-  pull(n) %>% english2
+  pull(n) %>% 
+  english2
 
-n_dt_species_both <- recovery_species_means %>% 
+n_dt_species_gameto <- combined_species_means %>% 
+  filter(!is.na(recover_mean)) %>%
+  count(species, generation) %>% 
+  count(generation) %>% 
+  filter(generation == "gameto") %>% 
+  pull(n) %>% 
+  english2
+
+n_dt_species_both <- combined_species_means %>% 
+  filter(!is.na(recover_mean)) %>% 
   count(species, generation) %>% 
   group_by(species) %>% 
   summarize(n_generation = n_distinct(generation), .groups = "drop") %>%
@@ -373,8 +377,7 @@ ttest_pval <- function(species_select, response_select, data = t_test_results, p
 }
 ```
 
-
-Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_gameto` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases (Appendix S3).
+Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases (Appendix S3).
 A general correlation of DT with habitat was observed in sporophytes (Fig. 4).
 Both terrestrial species (*Abrodictyum dentatum* (Bosch) Ebihara & K Iwats. and *C. apiifolia*) lacked even moderate DT, and failed to recover from the gentlest treatment of 2 d at --38 MPa (more stringent tests were not conducted on these species after confirming their lack of DT at this level).
 Saxicolous species (*Crepidomanes kurzii* (Bedd.) Tagawa & K. Iwats., *Polyphlebium endlicherianum* (C. Presl) Ebihara & K. Iwats., and *Vandenboschia maxima* (Blume) Copel.) also had low DT; only *C. kurzii* was able to recover from desiccation up to --86 MPa for 2 d but not more.
@@ -389,21 +392,76 @@ DT of gametophytes did not significantly exceed that of sporophytes for any spec
 The GLMM showed that both generation and the interaction of generation and growth habit, but not growth habit alone, have a significant effect on DT while controlling for phylogeny (Table 3).
 In contrast, range type (gametophytes widespread beyond sporophytes or not) has no significant effect on DT (Table 3).
 
-<!-- 
-
 ### Photosynthetic optima
 
-Light responses were measured in sporophytes of 18 species and gametophytes of 11 species, including nine species with both life phases (Appendix S4).
+```{r photosyn-stats}
+# Count number of species included in light data by generation
+n_light_species_sporo <- combined_species_means %>% 
+  filter(!is.na(etr_mean), !is.na(par_mean)) %>%
+  count(species, generation) %>% 
+  count(generation) %>% 
+  filter(generation == "sporo") %>% 
+  pull(n) %>% 
+  english2
+
+n_light_species_gameto <- combined_species_means %>% 
+  filter(!is.na(etr_mean), !is.na(par_mean)) %>%
+  count(species, generation) %>% 
+  count(generation) %>% 
+  filter(generation == "gameto") %>% 
+  pull(n) %>% 
+  english2
+
+n_light_species_both <- combined_species_means %>% 
+  filter(!is.na(etr_mean), !is.na(par_mean)) %>% 
+  count(species, generation) %>% 
+  group_by(species) %>% 
+  summarize(n_generation = n_distinct(generation), .groups = "drop") %>%
+  filter(n_generation == 2) %>%
+  pull(species) %>%
+  n_distinct() %>%
+  english2
+
+# Calculate grand means by generation for light responses
+# (so mean is the mean of species means, and sd is sd of species means)
+light_overall_means <-
+combined_species_means %>%
+  group_by(generation) %>%
+  summarize(
+    etr = mean(etr_mean, na.rm = TRUE),
+    etr_sd = sd(etr_mean, na.rm = TRUE),
+    par = mean(par_mean, na.rm = TRUE),
+    par_sd = sd(par_mean, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(across(where(is.numeric), ~round_t(.x, 1))) %>%
+  mutate(
+    etr_pretty = glue("{etr} ± {etr_sd}"),
+    par_pretty = glue("{par} ± {par_sd}"),
+  )
+
+# Extract values by response and generation for citing in MS
+mean_par_sporo <- light_overall_means %>% filter(generation == "sporo") %>% pull(par_pretty)
+mean_par_gameto <- light_overall_means %>% filter(generation == "gameto") %>% pull(par_pretty)
+mean_etr_sporo <- light_overall_means %>% filter(generation == "sporo") %>% pull(etr_pretty)
+mean_etr_gameto <- light_overall_means %>% filter(generation == "gameto") %>% pull(etr_pretty)
+```
+
+Light responses were measured in sporophytes of `r n_light_species_sporo` species and gametophytes of `r n_light_species_gameto` species, including `r n_light_species_both` species with both life phases (Appendix S4).
 Unlike DT, photosynthetic optima tended to vary between life phases, but not across growth habits or range type: sporophytes are adapted for higher light levels, whereas gametophytes are adapted for lower light levels (Fig. 5).
 Sporophytes reached their maximum photosynthetic rate (PPFD~95%~) at light levels ca.
-142 ± 46 µmol·m^--2^ ·s^--1^ , whereas gametophytes did so at 51 ± 22 µmol·m^--2^ ·s^--1^.
-Similarly, sporophytes attained higher rates of electron transport (ETR~max~; 8.1 ± 2.7 µmol·m^--2^ ·s^--1^) than gametophytes (3.9 ± 0.9 µmol·m^--2^ ·s^--1^).
+`r mean_par_sporo` µmol·m^--2^ ·s^--1^ , whereas gametophytes did so at `r mean_par_gameto` µmol·m^--2^ ·s^--1^.
+Similarly, sporophytes attained higher rates of electron transport (ETR~max~; `r mean_etr_sporo` µmol·m^--2^ ·s^--1^) than gametophytes (`r mean_etr_gameto` µmol·m^--2^ ·s^--1^).
 The GLMMs showed a significant effect of generation, but neither range type nor growth habit, on PPFD~95%~ and ETR~max~ (Table 3).
 
-### Environmental water potential and DT
+### Relationships of water potential and range size with DT
 
 Desiccation tolerance tended to increase with decreasing environmental water potential for both gametophytes and sporophytes (Fig. 6).
 These trends were significant when analyzed using PGLS for sporophytes (*P* = 0.036) but not gametophytes (*P* = 0.123; Appendix S5).
+
+No significant relationship was detected between range size of gametophytes and DT.
+
+<!-- 
 
 ## Discussion
 

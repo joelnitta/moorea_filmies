@@ -513,37 +513,47 @@ summary_to_csv <- function (model) {
 }
 
 #' Run phylogenetic generalized least squares (PGLS)
-#' for gametophyte range size vs. desiccation tolerance
+#' for range size and VPD vs. desiccation tolerance
 #' in filmy ferns from Moorea
 #'
 #' @param range_data Dataframe with range size data
 #' @param combined_species_means Dataframe with desiccation tolerance data
 #' @param phy Phylogeny
 #'
-#' @return model object
+#' @return list of model objects:
+#' - sporo_vpd_model:
+#' - gameto_vpd_model:
+#' - sporo_range_model:
+#' - gameto_range_model:
 #' 
 run_pgls_range <- function (range_data, combined_species_means, phy) {
   
-  range_data <-
-    range_data %>% 
-    mutate(range_breadth = gameto_max_range - gameto_min_range) %>%
-    select(species, range_breadth) %>%
-    filter(!is.na(range_breadth))
-  
-  dt_range_data <-
+  # Make a dataframe combining vpd and recovery
+  range_recover_data <-
     combined_species_means %>%
-    filter(generation == "gameto") %>%
     filter(!is.na(recover_mean)) %>%
-    select(species, recover = recover_mean) %>%
-    left_join(range_data, by = "species") %>%
-    remove_missing() %>%
+    select(species, generation, recover = recover_mean) %>%
+    pivot_wider(names_from = "generation", values_from = "recover", names_prefix = "recover_") %>%
+    left_join(
+      select(range_data, species, 
+            sporo_mean_vpd, 
+            gameto_mean_vpd,
+            sporo_range_breadth,
+            gameto_range_breadth
+            ), 
+      by = "species") %>%
     as.data.frame()
   
-  dt_range_phy <- ape::keep.tip(phy, dt_range_data$species)
+  # Create a comparative.data object for caper combining the vpd and recovery data with the phylogeny
+  range_recover_data_comp <- caper::comparative.data(phy, range_recover_data, species, na.omit = FALSE)
   
-  dt_range_data_comp <- caper::comparative.data(dt_range_phy, dt_range_data, species)
-  
-  caper::pgls(recover ~ range_breadth, dt_range_data_comp)
+  # Run PGLS for each combination of generation x vpd or range breadth vs. recovery
+  res <- list(
+    sporo_vpd_model = caper::pgls(recover_sporo ~ sporo_mean_vpd, range_recover_data_comp),
+    gameto_vpd_model = caper::pgls(recover_gameto ~ gameto_mean_vpd, range_recover_data_comp),
+    sporo_range_model = caper::pgls(recover_sporo ~ sporo_range_breadth, range_recover_data_comp),
+    gameto_range_model = caper::pgls(recover_gameto ~ gameto_range_breadth, range_recover_data_comp)
+    )
   
 }
 
@@ -720,10 +730,18 @@ make_sporo_dt_plot <- function  (recovery_species_means, traits) {
 #' @param filmy_species Character vector of filmy fern species names
 #' @param phy Phylogeny including filmy ferns of Moorea and Tahiti
 #' @param moorea_sites Site data for plots on Moorea including elevation
+#' @param climate Cleaned climate data for moorea, including columns `site` and `vpd`
+#' (vapor pressure decifit)
 #' 
 #' @return Dataframe
 #' 
-analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moorea_sites) {
+analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moorea_sites, climate) {
+  
+  # Calculate mean VPD at each site from the climate data
+  mean_vpd <-
+  climate %>% group_by(site) %>%
+    summarize(vpd = mean(vpd),
+              .groups = "drop")
   
   # Convert raw community data to long format by sporophyte and gametophyte
   # min and max elevational range.
@@ -741,13 +759,16 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
     filter(site %in% moorea_sites$site) %>%
     left_join(moorea_sites, by = "site") %>%
     filter(abundance > 0) %>%
+    # Add mean VPD for each site (missing for Rotui_800m_ridge)
+    left_join(mean_vpd, by = "site") %>%
     assert(not_na, el) %>%
     group_by(species, generation) %>%
     summarize(
       min_range = min(el),
-      max_range = max(el)
-    ) %>%
-    ungroup
+      max_range = max(el),
+      mean_vpd = mean(vpd, na.rm = TRUE),
+      .groups = "drop"
+    )
   
   # Compare ranges to see which species have gametophytes beyond sporophytes
   full_join(
@@ -756,13 +777,13 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
       filter(generation == "sporophyte") %>% 
       select(-generation) %>%
       spread(variable, value) %>%
-      rename_at(vars(max_range, min_range), ~paste("sporo", ., sep = "_")),
+      rename_at(vars(max_range, min_range, mean_vpd), ~paste("sporo", ., sep = "_")),
     range_long %>%
       gather(variable, value, -species, -generation) %>%
       filter(generation == "gametophyte") %>% 
       select(-generation) %>%
       spread(variable, value) %>%
-      rename_at(vars(max_range, min_range), ~paste("gameto", ., sep = "_")),
+      rename_at(vars(max_range, min_range, mean_vpd), ~paste("gameto", ., sep = "_")),
     by = "species"
   ) %>%
     assert(is_uniq, species) %>%
@@ -773,7 +794,9 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
         is.na(sporo_max_range) & is.na(sporo_min_range) ~ "widespread",
         TRUE ~ "not_widespread"
       )
-    )
+    ) %>%
+    mutate(gameto_range_breadth = gameto_max_range - gameto_min_range) %>%
+    mutate(sporo_range_breadth = sporo_max_range - sporo_min_range)
   
 }
 

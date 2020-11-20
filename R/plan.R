@@ -61,7 +61,8 @@ plan <- drake_plan(
     community_matrix_raw = community_matrix_raw,
     filmy_species = filmy_species,
     phy = filmy_phy,
-    moorea_sites = moorea_sites
+    moorea_sites = moorea_sites,
+    climate = climate
   ),
 
   # FIXME: check number of measurements per individual; shouldn't have more than 10 each.
