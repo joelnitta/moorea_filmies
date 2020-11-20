@@ -2,7 +2,7 @@
 
 plan <- drake_plan(
 
-  # Load raw data ----
+  # Unzip raw data ----
   
   # Unzip data from Nitta et al. 2017 Ecol. Monographs from Dryad
   # The dataset must be downloaded first by going to
@@ -16,8 +16,21 @@ plan <- drake_plan(
     out2 = file_out("data/nitta_2017/treepl_Moorea_Tahiti.tre"),
     out3 = file_out("data/nitta_2017/all_plots.csv")),
 
+  # Unzip data from Nitta et al. 2020 New Phyt. from Dryad
+  # The dataset must be downloaded first by going to
+  # https://datadryad.org/stash/dataset/doi:10.5061/dryad.fqz612jps, clicking on
+  # "Download dataset", and saving to the "data" folder in this project.
+  climate_unzipped = unzip(
+    zipfile = file_in("data/doi_10.5061_dryad.fqz612jps__v4.zip"), 
+    files = "moorea_climate.csv", 
+    exdir = file_out("data/nitta_2020/"), 
+    junkpaths = TRUE, 
+    overwrite = TRUE),
+  
+  # Load raw data ----
+  
   # - microclimate data
-  climate = readr::read_csv("data_raw/doi_10.5061_dryad.fqz612jps__v2/moorea_climate.csv"),
+  climate = readr::read_csv(file_in("data/nitta_2020/moorea_climate.csv")),
 
   # - site data
   moorea_sites = readr::read_csv(
@@ -25,7 +38,7 @@ plan <- drake_plan(
     col_types = "cnnn") %>%
     filter(str_detect(site, "Aorai", negate = TRUE)),
 
-  # -traits
+  # - traits
   traits = readr::read_csv("data/filmy_trait_data.csv") %>%
     rename(species = genus_species),
 
