@@ -456,17 +456,15 @@ The GLMMs showed a significant effect of generation, but neither range type nor 
 
 ### Relationships of water potential and range size with DT
 
-Desiccation tolerance tended to increase with decreasing environmental water potential for both gametophytes and sporophytes (Fig. 6).
+Desiccation tolerance tended to increase with VPD for both gametophytes and sporophytes (Fig. 6).
 These trends were significant when analyzed using PGLS for sporophytes (*P* = 0.036) but not gametophytes (*P* = 0.123; Appendix S5).
 
 No significant relationship was detected between range size of gametophytes and DT.
 
-<!-- 
-
 ## Discussion
 
 Vegetative DT was a key innovation linked to the rise of early land plants, but is largely limited to non-vascular groups such as bryophytes and algae in modern plants.
-Filmy ferns have received considerable attention over the years for their remarkable reversion to vegetative DT in the sporophyte phase (e.g., Shreve, 1911; Proctor, 2003; Cea et al., 2014).
+Filmy ferns have received considerable attention over the years for their remarkable reversion to vegetative DT in the sporophyte phase [\eg, @Shreve1911; @Proctor2003; @GarcesCea2014].
 Yet, no previous study to our knowledge has evaluated parallel physiology of sporophytes and gametophytes of filmy ferns in relation to DT.
 Here, we present the first comparisons of physiological parameters between generations within filmy ferns in a phylogenetic comparative framework.
 
@@ -486,6 +484,8 @@ Since controls kept at 100% RH maintained F~v~/F~m~ values near pre-treatment le
 Comparison of DT with the minimum water potential envelope of each species (Fig. 6) indicates that sporophytes of non-tolerant terrestrial and saxicolous species may not be able to occur in habitats with minimum water potential exceeding ca.
 --7 MPa.
 In contrast, habitats with minimum water potential below --7 MPa are nearly all epiphytic, and the filmy fern sporophytes occurring there are all capable of DT.
+
+<!-- 
 
 ### Filmy fern gametophytes are not more stress-tolerant than sporophytes
 

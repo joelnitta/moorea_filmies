@@ -191,24 +191,6 @@ combine_mean_phys_traits <- function (recovery_species_means, etr_species_means,
   
 }
 
-#' Calculate mean VPD by site x growth habit
-#'
-#' @param climate Climate data for sites on Moorea;
-#' relative humidity, temperature, and vapor pressure
-#' deficit (VPD) calculated from these once every 15 minutes
-#'
-#' @return Mean VPD by site and growth habit (epiphytic or terrestrial)
-#' 
-calculate_mean_vpd <- function(climate) {
-  climate %>%
-  assert(not_na, vpd) %>%
-  group_by(site, habit) %>%
-  summarize(
-    vpd = mean(vpd),
-    .groups = "drop"
-  )
-}
-
 #' Calculate mean VPD for filmy fern gametophytes
 #'
 #' Treats specimens collected from rock walls ("epipetric") as epiphytic
@@ -304,6 +286,34 @@ calculate_mean_vpd_sporo <- function (community_matrix_raw, filmy_species, moore
       sporo_vpd = mean(vpd),
       .groups = "drop"
     )
+}
+
+
+#' Make a dataframe combining range size, vpd, and recovery
+#' 
+#' For preparing a dataframe for analysis with caper::pgls()
+#'
+#' @param combined_species_means Dataframe with desiccation tolerance data
+#' @param env_range_data Dataframe with environmental (VPD) and range size data
+#'
+#' @return Datafrmae
+#'
+combine_env_env_range_recover <- function (combined_species_means, env_range_data) {
+
+  combined_species_means %>%
+  filter(!is.na(recover_mean)) %>%
+  select(species, generation, recover = recover_mean) %>%
+  pivot_wider(names_from = "generation", values_from = "recover", names_prefix = "recover_") %>%
+  left_join(
+    select(env_range_data, 
+           species, 
+           sporo_vpd, 
+           gameto_vpd,
+           sporo_range_breadth,
+           gameto_range_breadth
+    ), 
+    by = "species") %>%
+  as.data.frame()
 }
 
 # t-test ----
@@ -631,8 +641,8 @@ summary_to_csv <- function (model) {
 #' for range size and VPD vs. desiccation tolerance
 #' in filmy ferns from Moorea
 #'
-#' @param range_data Dataframe with range size data
-#' @param combined_species_means Dataframe with desiccation tolerance data
+#' @param env_range_recover_data Dataframe with range size, environmental (VPD), 
+#' and desiccation tolerance data
 #' @param phy Phylogeny
 #'
 #' @return list of model objects:
@@ -641,33 +651,19 @@ summary_to_csv <- function (model) {
 #' - sporo_range_model:
 #' - gameto_range_model:
 #' 
-run_pgls_range <- function (range_data, combined_species_means, phy) {
+run_pgls <- function (env_range_recover_data, phy) {
   
-  # Make a dataframe combining vpd and recovery
-  range_recover_data <-
-    combined_species_means %>%
-    filter(!is.na(recover_mean)) %>%
-    select(species, generation, recover = recover_mean) %>%
-    pivot_wider(names_from = "generation", values_from = "recover", names_prefix = "recover_") %>%
-    left_join(
-      select(range_data, species, 
-            sporo_mean_vpd, 
-            gameto_mean_vpd,
-            sporo_range_breadth,
-            gameto_range_breadth
-            ), 
-      by = "species") %>%
-    as.data.frame()
-  
-  # Create a comparative.data object for caper combining the vpd and recovery data with the phylogeny
-  range_recover_data_comp <- caper::comparative.data(phy, range_recover_data, species, na.omit = FALSE)
+  # Create a comparative.data object for caper combining the range size, vpd, 
+  # and recovery data with the phylogeny
+  env_range_recover_data_comp <- caper::comparative.data(
+    phy, env_range_recover_data, species, na.omit = FALSE)
   
   # Run PGLS for each combination of generation x vpd or range breadth vs. recovery
   res <- list(
-    sporo_vpd_model = caper::pgls(recover_sporo ~ sporo_mean_vpd, range_recover_data_comp),
-    gameto_vpd_model = caper::pgls(recover_gameto ~ gameto_mean_vpd, range_recover_data_comp),
-    sporo_range_model = caper::pgls(recover_sporo ~ sporo_range_breadth, range_recover_data_comp),
-    gameto_range_model = caper::pgls(recover_gameto ~ gameto_range_breadth, range_recover_data_comp)
+    sporo_vpd_model = caper::pgls(recover_sporo ~ sporo_vpd, env_range_recover_data_comp),
+    gameto_vpd_model = caper::pgls(recover_gameto ~ gameto_vpd, env_range_recover_data_comp),
+    sporo_range_model = caper::pgls(recover_sporo ~ sporo_range_breadth, env_range_recover_data_comp),
+    gameto_range_model = caper::pgls(recover_gameto ~ gameto_range_breadth, env_range_recover_data_comp)
     )
   
 }

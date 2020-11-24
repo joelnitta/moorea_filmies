@@ -97,10 +97,12 @@ plan <- drake_plan(
   ),
   
   # - combine environmental and range data
-  env_range_data = left_join(
-    mean_vpd_gameto,
-    mean_vpd_sporo,
-    range_types,
+  env_range_data = purrr::reduce(
+    list(
+      mean_vpd_gameto,
+      mean_vpd_sporo,
+      range_types),
+    left_join,
     by = "species"
   ),
   
@@ -110,7 +112,7 @@ plan <- drake_plan(
   # - calculate ETRmax by individual
   etr_indiv = calculate_indiv_etr(light_data),
 
-  # Calculate means by species and generation ----
+  # Means by species and generation ----
   # - DT recovery
   recovery_species_means = calculate_mean_recovery(recovery_data),
 
@@ -142,7 +144,8 @@ plan <- drake_plan(
     traits_select = c("recover_mean", "etr_mean", "par_mean")
   ),
   
-  # Generalized linear mixed models ----
+  # GLMMS ----
+  # (Generalized Linear Mixed Models)
   
   # Uses phylogeny for DT only
   glmms = run_glmm(
@@ -150,12 +153,17 @@ plan <- drake_plan(
     traits = traits,
     phy = filmy_phy),
   
-  # Phylogenetic generalized least squares (PGLS) ----
+  # PGLS ----
+  # (Phylogenetic Generalized Least Squares)
   
   # Run PGLS for gametophyte range size vs. desiccation tolerance
-  range_dt_model = run_pgls_range(
-    range_data = range_types, 
+  env_range_recover_data = combine_env_env_range_recover(
     combined_species_means = combined_species_means, 
+    env_range_data = env_range_data
+  ),
+  
+  range_dt_model = run_pgls(
+    env_range_recover_data = env_range_recover_data, 
     phy = filmy_phy),
   
   # Render manuscript ----
