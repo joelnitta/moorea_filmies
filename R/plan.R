@@ -56,24 +56,53 @@ plan <- drake_plan(
   # - community data
   community_matrix_raw = readr::read_csv("data/nitta_2017/all_plots.csv"),
 
-  # - determine which species have widespread gametophytes
-  range_types = analyze_dist_pattern(
-    community_matrix_raw = community_matrix_raw,
-    filmy_species = filmy_species,
-    phy = filmy_phy,
-    moorea_sites = moorea_sites,
-    climate = climate
-  ),
-
   # FIXME: check number of measurements per individual; shouldn't have more than 10 each.
   # Crepidomanes_minutum2 (2834), Crepidomanes_minutum2 (2998), and Hymenophyllum_braithwaitei (Hymenophyllum_sp1_6)
   # have too many
   light_data_raw = readr::read_csv("data/filmy_light_data.csv"),
 
+  # Raw specimen data from specimens spreadsheet
+  specimens_raw = read_csv("data/specimens.csv"),
+  
   # Clean raw data ----
   recovery_data = clean_recovery(recovery_data_raw),
 
   light_data = clean_light(light_data_raw),
+  
+  mean_vpd = calculate_mean_vpd(climate),
+  
+  # - calculate mean VPD per species for gametophytes
+  mean_vpd_gameto = calculate_mean_vpd_gameto(
+    mean_vpd = mean_vpd,
+    specimens_raw = specimens_raw,
+    moorea_sites = moorea_sites,
+    filmy_species = filmy_species
+  ),
+  
+  # - calculate mean VPD per species for sporophytes
+  mean_vpd_sporo = calculate_mean_vpd_sporo(
+    community_matrix_raw = community_matrix_raw,
+    mean_vpd = mean_vpd,
+    traits = traits,
+    moorea_sites = moorea_sites,
+    filmy_species = filmy_species
+  ),
+  
+  # - determine which species have widespread gametophytes
+  range_types = analyze_dist_pattern(
+    community_matrix_raw = community_matrix_raw,
+    filmy_species = filmy_species,
+    phy = filmy_phy,
+    moorea_sites = moorea_sites
+  ),
+  
+  # - combine environmental and range data
+  env_range_data = left_join(
+    mean_vpd_gameto,
+    mean_vpd_sporo,
+    range_types,
+    by = "species"
+  ),
   
   # - calculate PAR95 by individual
   par_indiv = calculate_indiv_par(light_data),

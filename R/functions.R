@@ -191,6 +191,121 @@ combine_mean_phys_traits <- function (recovery_species_means, etr_species_means,
   
 }
 
+#' Calculate mean VPD by site x growth habit
+#'
+#' @param climate Climate data for sites on Moorea;
+#' relative humidity, temperature, and vapor pressure
+#' deficit (VPD) calculated from these once every 15 minutes
+#'
+#' @return Mean VPD by site and growth habit (epiphytic or terrestrial)
+#' 
+calculate_mean_vpd <- function(climate) {
+  climate %>%
+  assert(not_na, vpd) %>%
+  group_by(site, habit) %>%
+  summarize(
+    vpd = mean(vpd),
+    .groups = "drop"
+  )
+}
+
+#' Calculate mean VPD for filmy fern gametophytes
+#'
+#' Treats specimens collected from rock walls ("epipetric") as epiphytic
+#'
+#' @param mean_vpd Mean Vapor Pressure Deficit (VPD) measured with dataloggers
+#' at each site
+#' @param specimens_raw Raw specimen collection data
+#' @param moorea_sites Dataframe of collection sites on Moorea
+#' @param filmy_species Vector of filmy fern species names
+#'
+#' @return Tibble with mean VPD per species observed for gametophytes.
+#' 
+calculate_mean_vpd_gameto <- function(
+  mean_vpd,
+  specimens_raw,
+  moorea_sites,
+  filmy_species
+) {
+  
+  gameto_filmy_specimens <-
+    specimens_raw %>%
+    janitor::clean_names() %>% 
+    # only use needed columns
+    select(starts_with("gameto"), specimen, genus, specific_epithet, is_gametophyte, site = plot) %>%
+    mutate(
+      species = paste(genus, specific_epithet, sep = "_"),
+      # **Important**: treat epipteric as epiphytic
+      gameto_habit = str_to_lower(gameto_habit) %>% str_replace_all("epipetric", "epiphytic")) %>%
+    # subset to filmy fern gametophytes in plots on Moorea
+    filter(
+      species %in% filmy_species, 
+      is_gametophyte == 1,
+      !is.na(gameto_habit),
+      site %in% moorea_sites$site) %>%
+    select(specimen, species, site, habit = gameto_habit)
+  
+  # Calculate mean VPD based on occurrences of gametophytes, including
+  # growth habit (treating epipetric as epiphytic)
+  gameto_filmy_specimens %>%
+    left_join(mean_vpd, by = c("site", "habit")) %>%
+    group_by(species) %>%
+    # there are several sites that are missing a datalogger,
+    # so don't include na values when calculating mean
+    summarize(
+      gameto_vpd = mean(vpd, na.rm = TRUE),
+      .groups = "drop"
+    )
+  
+}
+
+#' Calculate mean VPD for filmy fern sporophytes
+#'
+#' Treats specimens collected on rocks on the ground surface ("saxicolous") as terrestrial
+#'
+#' @param community_matrix_raw Raw community matrix data
+#' @param mean_vpd Mean Vapor Pressure Deficit (VPD) measured with dataloggers
+#' at each site
+#' @param traits Growth habit for each species
+#' @param moorea_sites Dataframe of collection sites on Moorea
+#' @param filmy_species Vector of filmy fern species names
+#'
+#' @return Tibble with mean VPD per species observed for sporophytes
+calculate_mean_vpd_sporo <- function (community_matrix_raw, filmy_species, moorea_sites, traits, mean_vpd) {
+  # Convert community matrix to long form
+  community_matrix_raw %>%
+    rename(site = X1) %>% 
+    gather(species, abundance, -site) %>%
+    filter(species %in% filmy_species) %>%
+    mutate(generation = case_when(
+      str_detect(site, "_S") ~ "sporophyte",
+      str_detect(site, "_G") ~ "gametophyte"
+    )) %>%
+    mutate(site = str_remove_all(site, "_S") %>% str_remove_all("_G")) %>%
+    # Keep only filmy fern sporophytes in sites on Moorea
+    filter(site %in% moorea_sites$site, generation == "sporophyte", abundance > 0) %>%
+    select(-generation) %>%
+    left_join(select(traits, species, habit), by = "species") %>%
+    assert(not_na, habit) %>%
+    # For sporophytes, treat "saxicolous" as "terrestrial"
+    mutate(habit = case_when(
+      str_detect(habit, regex("terr|saxi", ignore_case = TRUE)) ~ "terrestrial",
+      str_detect(habit, regex("epi", ignore_case = TRUE)) ~ "epiphytic",
+      TRUE ~ NA_character_
+    )) %>%
+    assert(not_na, habit) %>%
+    left_join(mean_vpd, by = c("site", "habit")) %>%
+    filter(!is.na(vpd)) %>%
+    # To get mean VPD by species x habit, "uncount" abundances to one occurrence per row
+    # (like gametophytes)
+    uncount(abundance) %>%
+    group_by(species) %>%
+    summarize(
+      sporo_vpd = mean(vpd),
+      .groups = "drop"
+    )
+}
+
 # t-test ----
 
 #' Run a t-test comparing response values between gametophytes and sporophytes.
@@ -730,18 +845,10 @@ make_sporo_dt_plot <- function  (recovery_species_means, traits) {
 #' @param filmy_species Character vector of filmy fern species names
 #' @param phy Phylogeny including filmy ferns of Moorea and Tahiti
 #' @param moorea_sites Site data for plots on Moorea including elevation
-#' @param climate Cleaned climate data for moorea, including columns `site` and `vpd`
-#' (vapor pressure decifit)
 #' 
 #' @return Dataframe
 #' 
-analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moorea_sites, climate) {
-  
-  # Calculate mean VPD at each site from the climate data
-  mean_vpd <-
-  climate %>% group_by(site) %>%
-    summarize(vpd = mean(vpd),
-              .groups = "drop")
+analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moorea_sites) {
   
   # Convert raw community data to long format by sporophyte and gametophyte
   # min and max elevational range.
@@ -759,14 +866,11 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
     filter(site %in% moorea_sites$site) %>%
     left_join(moorea_sites, by = "site") %>%
     filter(abundance > 0) %>%
-    # Add mean VPD for each site (missing for Rotui_800m_ridge)
-    left_join(mean_vpd, by = "site") %>%
     assert(not_na, el) %>%
     group_by(species, generation) %>%
     summarize(
       min_range = min(el),
       max_range = max(el),
-      mean_vpd = mean(vpd, na.rm = TRUE),
       .groups = "drop"
     )
   
@@ -777,13 +881,13 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
       filter(generation == "sporophyte") %>% 
       select(-generation) %>%
       spread(variable, value) %>%
-      rename_at(vars(max_range, min_range, mean_vpd), ~paste("sporo", ., sep = "_")),
+      rename_at(vars(max_range, min_range), ~paste("sporo", ., sep = "_")),
     range_long %>%
       gather(variable, value, -species, -generation) %>%
       filter(generation == "gametophyte") %>% 
       select(-generation) %>%
       spread(variable, value) %>%
-      rename_at(vars(max_range, min_range, mean_vpd), ~paste("gameto", ., sep = "_")),
+      rename_at(vars(max_range, min_range), ~paste("gameto", ., sep = "_")),
     by = "species"
   ) %>%
     assert(is_uniq, species) %>%
