@@ -1,61 +1,64 @@
-# Load packages
-source(here::here("R/packages.R"))
+# Clean gametophyte desiccation tolerance (DT) test raw data
 
-# Custom funcs ---
-source(here("R/functions.R"))
+# Load packages
+library(readxl)
+source("R/packages.R")
+
+# Load functions
+source("R/functions.R")
 
 # Gametophyte 2012 DT data ----
 
 # Read in each excel sheet as a separate dataframe.
 # In 2012 only, there were three replicate measurements taken of each individual
 # per treatment
-gameto_2012_dark <- read_excel("data/2012/all gametos 10-3.xlsx", sheet = "DARK", skip = 2, col_names = FALSE) %>%
+gameto_2012_dark <- read_excel("data_raw/2012/all gametos 10-3.xlsx", sheet = "DARK", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(plot = x1, individual = x2, yield_1 = x5, yield_2 = x9, yield_3 = x13)
 
-gameto_2012_dry <- read_excel("data/2012/all gametos 10-3.xlsx", sheet = "DRY", skip = 2, col_names = FALSE) %>%
+gameto_2012_dry <- read_excel("data_raw/2012/all gametos 10-3.xlsx", sheet = "DRY", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(plot = x1, individual = x2, yield_1 = x5, yield_2 = x10, yield_3 = x15)
 
-gameto_2012_30min <- read_excel("data/2012/all gametos 10-3.xlsx", sheet = "10 MIN", skip = 2, col_names = FALSE) %>%
+gameto_2012_30min <- read_excel("data_raw/2012/all gametos 10-3.xlsx", sheet = "10 MIN", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(plot = x1, individual = x2, yield_1 = x5, yield_2 = x10, yield_3 = x15)
 
-gameto_2012_24hr <- read_excel("data/2012/all gametos 10-3.xlsx", sheet = "24 HR", skip = 2, col_names = FALSE) %>%
+gameto_2012_24hr <- read_excel("data_raw/2012/all gametos 10-3.xlsx", sheet = "24 HR", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(plot = x1, individual = x2, yield_1 = x5, yield_2 = x10, yield_3 = x15)
 
-gameto_2012_48hr <- read_excel("data/2012/all gametos 10-3.xlsx", sheet = "48 HR", skip = 2, col_names = FALSE) %>%
+gameto_2012_48hr <- read_excel("data_raw/2012/all gametos 10-3.xlsx", sheet = "48 HR", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(plot = x1, individual = x2, yield_1 = x5, yield_2 = x10, yield_3 = x15)
 
-gameto_2012_72hr <- read_excel("data/2012/all gametos 10-3.xlsx", sheet = "72 HR", skip = 2, col_names = FALSE) %>%
+gameto_2012_72hr <- read_excel("data_raw/2012/all gametos 10-3.xlsx", sheet = "72 HR", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(plot = x1, individual = x2, yield_1 = x5, yield_2 = x10, yield_3 = x15)
 
 # Do the same for an additional set of data from the 200m terrestrial site
 
-gameto_2012_200m_ter_dark <- read_excel("data/2012/new 200 m ter gameto.xlsx", sheet = "Pre", skip = 2, col_names = FALSE) %>%
+gameto_2012_200m_ter_dark <- read_excel("data_raw/2012/new 200 m ter gameto.xlsx", sheet = "Pre", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(individual = x1, yield_1 = x7, yield_2 = x12, yield_3 = x17)
 
-gameto_2012_200m_ter_dry <- read_excel("data/2012/new 200 m ter gameto.xlsx", sheet = "Dry + 20 min", skip = 2, col_names = FALSE) %>%
+gameto_2012_200m_ter_dry <- read_excel("data_raw/2012/new 200 m ter gameto.xlsx", sheet = "Dry + 20 min", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(individual = x1, yield_1 = x11, yield_2 = x16, yield_3 = x21)
 
-gameto_2012_200m_ter_30min <- read_excel("data/2012/new 200 m ter gameto.xlsx", sheet = "Dry + 20 min", skip = 2, col_names = FALSE) %>%
+gameto_2012_200m_ter_30min <- read_excel("data_raw/2012/new 200 m ter gameto.xlsx", sheet = "Dry + 20 min", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(individual = x1, yield_1 = x11, yield_2 = x10, yield_3 = x15)
 
-gameto_2012_200m_ter_24hr <- read_excel("data/2012/new 200 m ter gameto.xlsx", sheet = "24 hr", skip = 2, col_names = FALSE) %>%
+gameto_2012_200m_ter_24hr <- read_excel("data_raw/2012/new 200 m ter gameto.xlsx", sheet = "24 hr", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(individual = x1, yield_1 = x7, yield_2 = x12, yield_3 = x17)
 
-gameto_2012_200m_ter_48hr <- read_excel("data/2012/new 200 m ter gameto.xlsx", sheet = "48 hr", skip = 2, col_names = FALSE) %>%
+gameto_2012_200m_ter_48hr <- read_excel("data_raw/2012/new 200 m ter gameto.xlsx", sheet = "48 hr", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(individual = x1, yield_1 = x7, yield_2 = x12, yield_3 = x17)
 
-gameto_2012_200m_ter_72hr <- read_excel("data/2012/new 200 m ter gameto.xlsx", sheet = "72 hr", skip = 2, col_names = FALSE) %>%
+gameto_2012_200m_ter_72hr <- read_excel("data_raw/2012/new 200 m ter gameto.xlsx", sheet = "72 hr", skip = 2, col_names = FALSE) %>%
   clean_names() %>%
   select(individual = x1, yield_1 = x4, yield_2 = x9, yield_3 = x14)
 
@@ -112,7 +115,7 @@ gameto_dt_2012 <-
 # but don't fix column names yet
 gameto_dt_2013_all_raw_names <- 
   # List all 2013 gametophyte DT data sets 2-13 files
-  list.files("data/2013", pattern = regex("moorea 2013 gameto"), ignore.case = TRUE, full.names = TRUE) %>%
+  list.files("data_raw/2013", pattern = regex("moorea 2013 gameto"), ignore.case = TRUE, full.names = TRUE) %>%
   # Name by vector of files by the file name, so we can include it when combining the data
   set_names(fs::path_file(.)) %>%
   # Read in the xlsx files as a list
@@ -219,7 +222,7 @@ gameto_dt_2013_long <- left_join(
 #   mutate(condition = factor(condition, levels = c("dark", "dry", "30min", "24hr", "48hr", "72hr"), ordered = TRUE)) %>%
 #   mutate(file_order = 13) %>%
 #   arrange(condition, individual) %>%
-#   write_csv("data/intermediates/gameto_dt_2013_long_fix_add_13.csv")
+#   write_csv("data_raw/intermediates/gameto_dt_2013_long_fix_add_13.csv")
 
 
 ### Read in mini-PAM data
@@ -227,7 +230,7 @@ gameto_dt_2013_long <- left_join(
 # Loop over the files: read them in, process each data frame in the list, then combine
 gameto_fl_2013_long <-
   # List all the 2013 gameto mini pam files
-  list.files("data/2013/minipam", pattern = "miniPAM SET\\d ALL.*\\.pam", full.names = TRUE) %>%
+  list.files("data_raw/2013/minipam", pattern = "miniPAM SET\\d ALL.*\\.pam", full.names = TRUE) %>%
   set_names(fs::path_file(.)) %>%
   # Parse each one in a list
   map(
@@ -255,7 +258,7 @@ gameto_fl_2013_long <-
 
 # Read in data with "fixed" memory values after manually comparing with
 # miniPAM data
-fixed_lookup <- read_excel("data/intermediates/gameto_dt_2013_long_fix.xlsx", na = c("", "NA", "#VALUE!")) %>%
+fixed_lookup <- read_excel("data_raw/intermediates/gameto_dt_2013_long_fix.xlsx", na = c("", "NA", "#VALUE!")) %>%
   select(individual, control, memory, fix, manual_mem, pam_set, note) %>%
   mutate(fix = replace_na(fix, 0)) %>%
   filter(!is.na(memory)) %>%
@@ -325,15 +328,16 @@ gameto_dt_2013 <-
   select(-control)
     
 ### Combine all datasets ----
-gameto_dt <- bind_rows(gameto_dt_2012, gameto_dt_2013)
+gameto_dt <- bind_rows(gameto_dt_2012, gameto_dt_2013) %>%
+  mutate(generation = "gameto")
 
 # read in ppgi
-ppgi <- read_csv("data/ppgi_taxonomy_mod.csv")
+ppgi <- read_csv("data_raw/ppgi_taxonomy_mod.csv")
 
 #### Filter to only filmy ferns ----
 
 # Read in collections
-collections <- read_csv("data/specimens.csv") %>%
+collections <- read_csv("data_raw/specimens.csv") %>%
   clean_names() %>%
   filter(collector_lastname == "Nitta") %>%
   # Manipulate columns
@@ -374,7 +378,7 @@ collections <- read_csv("data/specimens.csv") %>%
 missing <- gameto_dt %>%
   anti_join(collections, by = c(individual = "coll_num"))
 
-read_csv("data/specimens.csv") %>%
+read_csv("data_raw/specimens.csv") %>%
   clean_names() %>%
   filter(collection_number %in% missing$individual) %>%
   select(genus, specific_epithet, collection_number, subcollection_number, date_collected)
@@ -389,4 +393,5 @@ gameto_dt %>%
   filter(family == "Hymenophyllaceae") %>%
   select(-family)
 
-write_csv(filmy_gameto_dt, "filmy_gameto_dt.csv")
+# Write to data/ ----
+write_csv(filmy_gameto_dt, "data/filmy_gameto_dt.csv")

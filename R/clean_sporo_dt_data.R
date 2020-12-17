@@ -1,13 +1,16 @@
-# Load packages
-source(here::here("R/packages.R"))
+# Clean sporophyte desiccation tolerance (DT) test raw data
 
-# Custom funcs ---
-source(here("R/functions.R"))
+# Load packages
+library(readxl)
+source("R/packages.R")
+
+# Load functions
+source("R/functions.R")
 
 # 2012 data ----
 ### Fix column names ###
 # In the original excel file, these are in two rows.
-moorea_filmy_dt_2012_raw_path <- "data/2012/Moorea Filmy DT 2 8-26 (version 1).xlsx"
+moorea_filmy_dt_2012_raw_path <- "data_raw/2012/Moorea Filmy DT 2 8-26 (version 1).xlsx"
 
 headers_1 <- read_excel(moorea_filmy_dt_2012_raw_path) %>% colnames()
 
@@ -26,9 +29,11 @@ headers <- tibble(
   header_2 = colnames(dt_2012_head_2)
 )
 
+# Write out these column headers, then manually edit new column names
 # write.csv(headers, "moorea_filmy_dt_2012_headers.csv")
 
-new_headers <- read_csv("data/intermediates/moorea_filmy_dt_2012_headers.csv")
+# Read in file with new column names
+new_headers <- read_csv("data_raw/intermediates/moorea_filmy_dt_2012_headers.csv")
 
 dt_2012_all_raw <- read_excel(moorea_filmy_dt_2012_raw_path, skip = 2, col_names = FALSE) %>%
   remove_empty(which = "cols", quiet = FALSE) %>%
@@ -122,7 +127,7 @@ filmy_dt_2012 <- bind_rows(
 
 # 2013 data ----
 
-filmy_dt_2013_1_raw <- read_excel("data/2013/Filmy Fern DT 1 Dtah, Ckur, Capi.xlsx", sheet = 1)
+filmy_dt_2013_1_raw <- read_excel("data_raw/2013/Filmy Fern DT 1 Dtah, Ckur, Capi.xlsx", sheet = 1)
 
 filmy_dt_2013_1 <- filmy_dt_2013_1_raw %>%
   clean_names() %>%
@@ -162,7 +167,7 @@ filmy_dt_2013_1 <- filmy_dt_2013_1_raw %>%
   mutate(dataset = "2013_1") %>%
   check_dt_data
 
-filmy_dt_2013_2_raw <- read_excel("data/2013/Filmy Fern DT 2 Pbor.xlsx", sheet = 1)
+filmy_dt_2013_2_raw <- read_excel("data_raw/2013/Filmy Fern DT 2 Pbor.xlsx", sheet = 1)
 
 filmy_dt_2013_2 <- filmy_dt_2013_2_raw %>%
   clean_names() %>%
@@ -200,7 +205,7 @@ filmy_dt_2013_2 <- filmy_dt_2013_2_raw %>%
   mutate(dataset = "2013_2") %>%
   check_dt_data
 
-filmy_dt_2013_3_raw <- read_excel("data/2013/Filmy Fern DT 3 Hmul, Hdig.xlsx", sheet = 1)
+filmy_dt_2013_3_raw <- read_excel("data_raw/2013/Filmy Fern DT 3 Hmul, Hdig.xlsx", sheet = 1)
 
 filmy_dt_2013_3 <- filmy_dt_2013_3_raw %>%
   clean_names() %>%
@@ -239,7 +244,7 @@ filmy_dt_2013_3 <- filmy_dt_2013_3_raw %>%
   mutate(dataset = "2013_3") %>%
   check_dt_data
 
-filmy_dt_2013_4_raw <- read_excel("data/2013/Filmy Fern DT 4 Hpol.xlsx", sheet = 1)
+filmy_dt_2013_4_raw <- read_excel("data_raw/2013/Filmy Fern DT 4 Hpol.xlsx", sheet = 1)
 
 filmy_dt_2013_4 <- filmy_dt_2013_4_raw %>% 
   clean_names() %>%
@@ -278,7 +283,7 @@ filmy_dt_2013_4 <- filmy_dt_2013_4_raw %>%
   mutate(dataset = "2013_4") %>%
   check_dt_data
 
-filmy_dt_2013_5_raw <- read_excel("data/2013/Filmy Fern DT Set 5 DONE.xlsx", sheet = 1)
+filmy_dt_2013_5_raw <- read_excel("data_raw/2013/Filmy Fern DT Set 5 DONE.xlsx", sheet = 1)
 
 filmy_dt_2013_5 <- filmy_dt_2013_5_raw %>%
   clean_names() %>% 
@@ -314,7 +319,7 @@ filmy_dt_2013_5 <- filmy_dt_2013_5_raw %>%
 
 # 2014 data ----
 
-filmy_dt_2014_raw <- read_excel("data/2014/filmyDT2014.xlsx", sheet = 1)
+filmy_dt_2014_raw <- read_excel("data_raw/2014/filmyDT2014.xlsx", sheet = 1)
 
 filmy_dt_2014 <- filmy_dt_2014_raw %>%
   clean_names() %>%
@@ -362,43 +367,8 @@ filmy_sporo_dt <- bind_rows(
   select(
     species, salt, dry_time, individual, dataset, contains("weight"), contains("yield")
   ) %>%
-  mutate(generation == "sporo") %>%
+  mutate(generation = "sporo") %>%
   check_dt_data
 
-### DT recovery ###
-filmy_dt_recovery <-
-  filmy_dt_wide %>%
-  select(species, salt, dry_time, individual, matches("yield")) %>%
-  select(-yield_72hr) %>%
-  pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
-  mutate(
-    rec_time = str_remove_all(rec_time, "yield_"),
-    recovery = yield_recover / yield_pre)
-
-### Weights ###
-no_weight_data <- 
-  filmy_dt_wide %>%
-  select(species, salt, dry_time, individual, matches("weight")) %>%
-  filter(across(matches("weight"), is.na))
-
-filmy_dt_weight <-
-  filmy_dt_wide %>%
-  select(species, salt, dry_time, individual, matches("weight")) %>%
-  anti_join(no_weight_data, by = c("species", "salt", "dry_time", "individual")) %>%
-  mutate(percent_loss_2d =  1 - ((desiccated_weight_2d - oven_dry_weight) / (wet_weight - oven_dry_weight))) %>%
-  mutate(percent_loss_15d =  1 - ((desiccated_weight_15d - oven_dry_weight) / (wet_weight - oven_dry_weight)))
-
-# Visualize the data ----
-filmy_dt_recovery_mean <-
-filmy_dt_recovery %>%
-  mutate(rec_time = factor(rec_time, levels = c("30min", "24hr", "48hr"), ordered = TRUE)) %>%
-  group_by(species, salt, dry_time, rec_time) %>%
-  summarize(
-    recovery = mean(recovery, na.rm = FALSE),
-    n = n(),
-    .groups = "drop")
-
-ggplot(filmy_dt_recovery_mean, aes(x = rec_time, y = recovery, group = interaction(dry_time, salt))) +
-  geom_point(aes(shape = salt, color = salt)) +
-  geom_line(aes(linetype = dry_time)) +
-  facet_wrap(vars(species))
+# Write to data_raw/ ----
+write_csv(filmy_sporo_dt, "data/filmy_sporo_dt.csv")
