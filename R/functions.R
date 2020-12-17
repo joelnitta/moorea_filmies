@@ -1,5 +1,219 @@
 # Define functions used in the analysis
 
+# Raw data cleaning ----
+
+check_dt_data <- function(data) {
+  
+  filmy_species <- c(
+    "Abrodictyum_asaegrayi1",
+    "Abrodictyum_asaegrayi2",
+    "Abrodictyum_caudatum",
+    "Abrodictyum_dentatum",
+    "Callistopteris_apiifolia",
+    "Crepidomanes_bipunctatum",
+    "Crepidomanes_humile",
+    "Crepidomanes_kurzii",
+    "Crepidomanes_minutum1",
+    "Crepidomanes_minutum2",
+    "Crepidomanes_minutum3",
+    "Didymoglossum_tahitense",
+    "Hymenophyllum_braithwaitei",
+    "Hymenophyllum_digitatum",
+    "Hymenophyllum_flabellatum",
+    "Hymenophyllum_javanicum",
+    "Hymenophyllum_multifidum",
+    "Hymenophyllum_pallidum",
+    "Hymenophyllum_polyanthos",
+    "Polyphlebium_borbonicum",
+    "Polyphlebium_endlicherianum",
+    "Vandenboschia_maxima")
+  
+  filmy_salts <- c("Control", "H2O", "LiCl", "MgNO3", "NaCl")
+  
+  data %>%
+    assertr::assert(assertr::in_set(filmy_salts, allow.na = FALSE), salt) %>%
+    assertr::assert(assertr::in_set(filmy_species, allow.na = FALSE), species) %>%
+    assertr::assert(assertr::in_set(2,15), dry_time) %>%
+    assertr::assert(is.factor, dry_time) %>%
+    assertr::assert(is.numeric, matches("yield|weight"))
+  
+}
+
+#' Parse a *.pam file
+#' 
+#' This is file format output by the miniPAM photosynthesis yield analyzer
+#'
+#' @param file Path to *.pam file
+#' @param exclude_lines Lines to exclude from the raw *.pam file (useful if some
+#' of the data got corrupted)
+#' @param ret_type Either "lc" for light-curves, or "fl" for fluorescence
+#' @param recalc_yield Boolean; should the yield (Fv/Fm) be recalculated from 
+#' Fm and F0? (miniPAM returns "-" for the yield if Fm and F0 are low, but we
+#' can recalculate it ourselves). In this case, a boolean "yield_error" column will
+#' be added to the results to indicate if the original yield calculation would have
+#' returned "-".
+#'
+#' @return Dataframe
+parse_pam <- function (file, exclude_lines = NULL, ret_type = "lc", recalc_yield = FALSE) {
+  
+  assertthat::assert_that(is.character(ret_type))
+  
+  assertthat::assert_that(ret_type %in% c("lc", "fl"),
+                          msg = "'ret_type' must be either 'lc' or 'fl'")
+  
+  # The .pam data format is basically tab-delimited text (the delimiter is a semicolon),
+  # but the number and type of column depends on different data types. Each row has a 
+  # single data type. They are as follows:
+  #
+  # V: wincontrol version
+  # C: configuration info
+  # D: device info
+  # F: Fluorescence measurement
+  # FO: Fluorescence measurement, at start of light curve
+  # REG1: data (or warning) at start of light curve
+  # REG2: data (or warning) at start of light curve
+  # SCHS: Chart start
+  # SLCE: Light curve end
+  # SLCS: Light curve start
+  
+  # First read in PAM file as raw character vector
+  data_pam <- read_lines(file)
+  
+  # Exclude lines if applicable
+  if(!is.null(exclude_lines)) data_pam <- data_pam[-exclude_lines]
+  
+  # Extract data types by line
+  data_types <- map_chr(data_pam, ~str_split(., ";") %>% map_chr(3) %>% str_trim)
+  
+  # Fluorescence data columns (data types "F", "FO")
+  fl_cols <- c("date", "time", "type", "no", "x1", "x2", "f", "fm", "par", "yield", "etr", "x3", "x4", "x5")
+  
+  # read_delim will issue some warnings because some rows have extra columns including
+  # (to me) unknown data that can be ignored
+  fl_data <- suppressWarnings(read_delim(data_pam[data_types %in% c("F", "FO")], delim = ";", col_names = fl_cols)) %>%
+    mutate(date_time  = lubridate::ymd(date) + lubridate::hms(time)) %>%
+    select(-date, -time)
+  
+  # The miniPAM automatically sets yield to "-" if there was not enough signal in
+  # fm and f0. Optionally over-ride this and calculate fv/fm ourselves.
+  # In this case, add a flag "yield_error" set to TRUE if the miniPAM measurement
+  # would have been an error
+  if(isTRUE(recalc_yield)) fl_data <- fl_data %>%
+    mutate(yield_recalc = (fm - f)/fm) %>%
+    mutate(yield_error = ifelse(yield == "-", TRUE, FALSE)) %>%
+    # Treat negative yields as zero
+    mutate(yield_recalc = ifelse(yield_recalc < 0, 0, yield_recalc)) %>%
+    mutate(yield = yield_recalc) %>%
+    select(-yield_recalc)
+  
+  # Exit early returning only fluorescence data if return type is "fl"
+  if(ret_type == "fl") return(select(fl_data, type, memory = no, f, fm, par, contains("yield"), etr, date_time)) 
+  
+  # Light curve data columns (data types "SLCS", "SLCE")
+  # - comment (usually) includes the specimen name, but is sometimes missing (NA)
+  lc_cols <- c("date", "time", "type", "status", "comment")
+  
+  # read_delim will issue some warnings because some rows have extra columns including
+  # (to me) unknown data that can be ignored
+  
+  # goal is to reform LC data so we have one row per specimen, with start and end times.
+  lc_data_intermed <- suppressWarnings(read_delim(data_pam[data_types %in% c("SLCS", "SLCE")], delim = ";", col_names = lc_cols)) %>%
+    arrange(date, time) %>%
+    # verify that LC data are a series of starts/ends. Each pair corresponds to measurement of a specimen.
+    verify(.$status == rep(c("Light Curve start", "Light Curve end"), nrow(.)/2)) %>%
+    mutate(date_time  = lubridate::ymd(date) + lubridate::hms(time)) %>%
+    mutate(status = str_remove_all(status, "Light Curve ")) %>%
+    select(status, comment, date_time) %>%
+    mutate(temp_id = rep(1:(nrow(.)/2), 2) %>% sort)
+  
+  specimens <- lc_data_intermed %>%
+    filter(!is.na(comment)) %>%
+    select(specimen = comment, temp_id)
+  
+  lc_data <-
+    lc_data_intermed %>%
+    left_join(specimens, by = "temp_id") %>%
+    mutate(id = ifelse(is.na(specimen), temp_id, specimen)) %>%
+    pivot_wider(id_cols = id, names_from = "status", values_from = "date_time")
+  
+  # Join FL and LC data: now we have the specimen linked to the fl data for each light curve
+  suppressWarnings(
+    fuzzyjoin::fuzzy_left_join(
+      fl_data, lc_data,
+      by = c(
+        "date_time" = "start",
+        "date_time" = "end"
+      ),
+      match_fun = list(`>=`, `<=`)
+    ) %>%
+      select(type, no, f, fm, par, yield, etr, date_time, id) %>%
+      mutate(
+        across(where(is.character) & matches("f|fm|par|yield|etr"), parse_number),
+        across(c(type, id), as.character))
+  )
+}
+
+#' Parse datalogger data for a desiccation chamber
+#'
+#' FIXME: find the name of this type of datalogger
+#'
+#' @param file Path to datalogger data in CSV format
+#'
+#' @return Dataframe
+parse_logger_dat <- function (file) {
+  suppressWarnings(suppressMessages(readr::read_csv(file))) %>%
+    janitor::clean_names() %>%
+    janitor::remove_empty(which = "cols") %>%
+    transmute(
+      time = mdy_hms(time_mm_dd_yyyy_hh_mm_ss),
+      temp = chan_1_deg_c,
+      humidity = chan_2_percent_rh)
+}
+
+#' Standardize column names in gametophyte DT data
+#'
+#'  @param data A dataframe
+#'
+#' @return Dataframe
+fix_gameto_dt_names <- function (data) {
+  
+  data %>%
+    # There are multiple "notes" columns. Combine these into a single column.
+    # "notes" sometimes indicate if a sample was a control!
+    rowwise(.) %>%
+    mutate(notes_combined = jntools::paste3(c_across(matches("note")), collapse = " ")) %>%
+    ungroup() %>%
+    # Standardize column names across files.
+    # "gametophytes" contains the collection number
+    rename_with(., ~"individual", matches("^gametophytes$")) %>%
+    # For some reason, the initial measurement (pre-desiccation) was called "light curve"
+    # e.g., "Light Curve Yield", "Light Curve Memory"
+    rename_with(., ~"memory_pre", matches("light_curve") & matches("_mem")) %>%
+    rename_with(., ~"yield_pre", matches("light_curve") & matches("yield")) %>%
+    # - memory and yield in the dry condition
+    rename_with(., ~"memory_dry", matches("dry") & matches("_mem")) %>%
+    rename_with(., ~"yield_dry", matches("dry") & matches("yield")) %>%
+    # - memory and yield 30 minutes after recovery
+    rename_with(., ~"memory_30min", matches("rewet") & matches("_mem")) %>%
+    rename_with(., ~"yield_30min", matches("rewet") & matches("yield")) %>%
+    # - memory and yield 24 hr after recovery
+    rename_with(., ~"memory_24hr", matches("24_hr") & matches("_mem")) %>%
+    rename_with(., ~"yield_24hr", matches("24_hr") & matches("yield")) %>%
+    # - memory and yield 48 hr after recovery
+    rename_with(., ~"memory_48hr", matches("48_hr") & matches("_mem")) %>%
+    rename_with(., ~"yield_48hr", matches("48_hr") & matches("yield")) %>%
+    # - memory and yield 72 hr after recovery
+    rename_with(., ~"memory_72hr", matches("72_hr") & matches("_mem")) %>%
+    rename_with(., ~"yield_72hr", matches("72_hr") & matches("yield")) %>%
+    select(., individual, notes = notes_combined, matches("^memory_|^yield_"))%>%
+    mutate(., individual = as.character(individual))%>%
+    # Force yield and memory columns to numeric
+    mutate(., across(-c(individual, notes) & where(is.character), parse_number))
+  
+}
+
+# Data wrangling ----
+
 #' Unzip Nitta et al 2017 Ecol Mono data file downloaded
 #' from Dryad (https://datadryad.org/stash/dataset/doi:10.5061/dryad.df59g)
 #' and extract needed data files.
