@@ -351,43 +351,7 @@ process_community_matrix <- function (community_matrix_path, species_list, moore
     spread(site, abundance)
 }
 
-clean_recovery <- function (data) {
-  
-  # Convert any recovery >100% to 1
-  data %>%
-    mutate(recover = case_when(
-      recover > 1 ~ 1,
-      TRUE ~ recover
-    )) %>%
-    rename(
-      specific_epithet = species,
-      species = genus_species)
-  
-}
 
-clean_light <- function (data) {
-  
-  # Exclude outliers
-  data %>%
-    filter(exclude_sample == 0) %>%
-    filter(exclude_points == 0) %>%
-    rename(species = genus_species)
-  
-}
-
-calculate_mean_recovery <- function (data) {
-  
-  # Calculate mean recovery by salt treatment, dry time, recovery time, generation, and species
-  data %>%
-    group_by(salt, drytime, rectime, generation, species) %>%
-    summarize(
-      recover_mean = mean(recover, na.rm = TRUE),
-      recover_sd = sd(recover, na.rm = TRUE),
-      recover_n = n()
-    ) %>%
-    ungroup()
-  
-}
 
 calculate_indiv_etr <- function (data) {
   

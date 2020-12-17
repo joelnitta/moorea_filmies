@@ -56,7 +56,7 @@ plan <- drake_plan(
   filmy_gameto_dt = load_gameto_dt("data/filmy_gameto_dt.csv"),
   
   # - physiological data
-  recovery_data_raw = readr::read_csv("data/filmy_DT_data.csv"),
+  # recovery_data_raw = readr::read_csv("data/filmy_DT_data.csv"),
 
   # - community data
   community_matrix_raw = readr::read_csv("data/nitta_2017/all_plots.csv"),
@@ -64,10 +64,10 @@ plan <- drake_plan(
   # FIXME: check number of measurements per individual; shouldn't have more than 10 each.
   # Crepidomanes_minutum2 (2834), Crepidomanes_minutum2 (2998), and Hymenophyllum_braithwaitei (Hymenophyllum_sp1_6)
   # have too many
-  light_data_raw = readr::read_csv("data/filmy_light_data.csv"),
+  # light_data_raw = readr::read_csv("data/filmy_light_data.csv"),
 
   # Raw specimen data from specimens spreadsheet
-  specimens_raw = read_csv("data/specimens.csv"),
+  # specimens_raw = read_csv("data/specimens.csv"),
   
   # Process data ----
   filmy_gameto_recovery = calc_recovery(filmy_gameto_dt),
@@ -81,12 +81,6 @@ plan <- drake_plan(
   filmy_sporo_recovery_mean = calc_mean_recovery(filmy_sporo_recovery),
   
   filmy_gameto_recovery_mean = calc_mean_recovery(filmy_gameto_recovery),
-  
-  # FIXME: delete unused functions
-  # recovery_data = clean_recovery(recovery_data_raw),
-
-  # FIXME: delete unused functions
-  # light_data = clean_light(light_data_raw),
   
   mean_vpd = calculate_mean_vpd(climate),
   
