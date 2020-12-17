@@ -1,6 +1,8 @@
 # Define functions used in the analysis
 
-# Raw data cleaning ----
+# Data preprocessing ----
+
+# This functions are used for pre-processing raw data (scripts `R/clean_*.R`)
 
 check_dt_data <- function(data) {
   
@@ -212,7 +214,46 @@ fix_gameto_dt_names <- function (data) {
   
 }
 
-# Data wrangling ----
+# Data loading ----
+
+#' Load data from a desiccation tolerance (DT) experiment on sporophytes
+#'
+#' @param file Path to data file (CSV)
+#'
+#' @return Dataframe
+#' 
+load_sporo_dt <- function (file) {
+  readr::read_csv(file) %>%
+    mutate(
+      salt = factor(salt, levels = c("Control", "H2O", "NaCl", "MgNO3", "LiCl")),
+      dry_time = factor(dry_time, levels = c(2, 15))
+    ) %>%
+    mutate(
+      section = case_when(
+        species == "Callistopteris_apiifolia" & dataset == "2012" ~ "si",
+        species == "Callistopteris_apiifolia" & salt == "H2O" ~ "si",
+        species == "Hymenophyllum_polyanthos" & dataset == "2013_4" ~ "si",
+        species == "Polyphlebium_borbonicum" & dataset == "2013_2" ~ "si",
+        salt == "Control" ~ "si",
+        TRUE ~ "main"
+      )
+    )
+}
+
+#' Load data from a desiccation tolerance (DT) experiment on gametophytes
+#'
+#' @param file Path to data file (CSV)
+#'
+#' @return Dataframe
+#' 
+load_gameto_dt <- function (file) {
+  readr::read_csv(file) %>%
+    mutate(
+      salt = factor(salt, levels = c("Control", "H2O", "NaCl", "MgNO3", "LiCl")),
+      dry_time = factor(dry_time, levels = c(2, 15))
+    ) %>%
+    rename(species = taxon)
+}
 
 #' Unzip Nitta et al 2017 Ecol Mono data file downloaded
 #' from Dryad (https://datadryad.org/stash/dataset/doi:10.5061/dryad.df59g)
@@ -254,6 +295,39 @@ unzip_nitta_2017 <- function (zipped_path, unzip_path, ...) {
   # Cleanup
   fs::file_delete(temp_zip)
   
+}
+
+# Data wrangling ----
+
+#' Calculate % recovery from desiccation in a desiccation tolerance (DT) experiment
+#'
+#' @param data Dataframe; data read in from DT experiment
+#'
+#' @return Dataframe
+calc_recovery <- function (data) {
+  data %>%
+    select(species, salt, dry_time, individual, generation, contains("yield")) %>%
+    select(-yield_72hr) %>%
+    pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
+    mutate(
+      rec_time = str_remove_all(rec_time, "yield_"),
+      recovery = yield_recover / yield_pre)
+}
+
+#' Calculate mean % recovery from desiccation in a desiccation tolerance (DT) experiment
+#'
+#' @param data Dataframe; DT data
+#'
+#' @return Dataframe
+calc_mean_recovery <- function (data) {
+  data %>%
+    mutate(rec_time = factor(rec_time, levels = c("30min", "24hr", "48hr"))) %>%
+    group_by(species, salt, dry_time, rec_time) %>%
+    summarize(
+      recovery = mean(recovery, na.rm = TRUE),
+      sd = sd(recovery, na.rm = TRUE),
+      n = n(),
+      .groups = "drop")
 }
 
 #' Process raw community matrix 

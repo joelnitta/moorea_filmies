@@ -27,7 +27,7 @@ plan <- drake_plan(
     junkpaths = TRUE, 
     overwrite = TRUE),
   
-  # Load raw data ----
+  # Load data ----
   
   # - microclimate data
   climate = readr::read_csv(file_in("data/nitta_2020/moorea_climate.csv")),
@@ -38,18 +38,23 @@ plan <- drake_plan(
     col_types = "cnnn") %>%
     filter(str_detect(site, "Aorai", negate = TRUE)),
 
-  # - traits
-  traits = readr::read_csv("data/filmy_trait_data.csv") %>%
-    rename(species = genus_species),
+  # - growth habit
+  filmy_habit = readr::read_csv("data/filmy_growth_habit.csv"),
 
-  filmy_species = traits$species,
+  filmy_species = filmy_habit$species,
   
   # - phylogenetic tree
   filmy_phy = ape::read.tree(
     file_in("data/nitta_2017/treepl_Moorea_Tahiti.tre"
     )) %>%
     ape::keep.tip(filmy_species),
-
+  
+  # - sporophyte desiccation tolerance
+  filmy_sporo_dt = load_sporo_dt("data/filmy_sporo_dt.csv"),
+  
+  # - gametophyte desiccation tolerance
+  filmy_gameto_dt = load_gameto_dt("data/filmy_gameto_dt.csv"),
+  
   # - physiological data
   recovery_data_raw = readr::read_csv("data/filmy_DT_data.csv"),
 
@@ -64,10 +69,24 @@ plan <- drake_plan(
   # Raw specimen data from specimens spreadsheet
   specimens_raw = read_csv("data/specimens.csv"),
   
-  # Clean raw data ----
-  recovery_data = clean_recovery(recovery_data_raw),
+  # Process data ----
+  filmy_gameto_recovery = calc_recovery(filmy_gameto_dt),
+  
+  filmy_sporo_recovery =
+    filmy_sporo_dt %>%
+    # Only include samples that should be presented in the main MS
+    filter(section == "main") %>%
+    calc_recovery(),
+  
+  filmy_sporo_recovery_mean = calc_mean_recovery(filmy_sporo_recovery),
+  
+  filmy_gameto_recovery_mean = calc_mean_recovery(filmy_gameto_recovery),
+  
+  # FIXME: delete unused functions
+  # recovery_data = clean_recovery(recovery_data_raw),
 
-  light_data = clean_light(light_data_raw),
+  # FIXME: delete unused functions
+  # light_data = clean_light(light_data_raw),
   
   mean_vpd = calculate_mean_vpd(climate),
   
@@ -83,7 +102,7 @@ plan <- drake_plan(
   mean_vpd_sporo = calculate_mean_vpd_sporo(
     community_matrix_raw = community_matrix_raw,
     mean_vpd = mean_vpd,
-    traits = traits,
+    traits = filmy_habit,
     moorea_sites = moorea_sites,
     filmy_species = filmy_species
   ),
@@ -150,7 +169,7 @@ plan <- drake_plan(
   # Uses phylogeny for DT only
   glmms = run_glmm(
     combined_species_means = combined_species_means, 
-    traits = traits,
+    traits = filmy_habit,
     phy = filmy_phy),
   
   # PGLS ----
