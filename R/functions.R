@@ -251,8 +251,7 @@ load_gameto_dt <- function (file) {
     mutate(
       salt = factor(salt, levels = c("Control", "H2O", "NaCl", "MgNO3", "LiCl")),
       dry_time = factor(dry_time, levels = c(2, 15))
-    ) %>%
-    rename(species = taxon)
+    )
 }
 
 #' Unzip Nitta et al 2017 Ecol Mono data file downloaded
@@ -385,14 +384,14 @@ calculate_indiv_par <- function (data) {
   
   # Calculate critical PAR value for each individual
   data %>%
-    select(species, generation, individual, PAR, ETR) %>%
-    nest(data = c(PAR, ETR)) %>%
+    select(species, generation, individual, par, etr) %>%
+    nest(data = c(par, etr)) %>%
     mutate(
       nls_mod = map(
         data, 
         # nonlinear least-squares estimates of parameters of the subsetted data
         ~nls(
-          ETR~max(ETR)*(1-exp(-k*PAR)),
+          etr~max(etr)*(1-exp(-k*par)),
           start = list(k = 0.04),
           data =.,
           trace = FALSE,
@@ -402,7 +401,7 @@ calculate_indiv_par <- function (data) {
     ) %>%
     select(species, generation, individual, k_stats) %>%
     unnest(cols = c(k_stats)) %>%
-    # calculate critical PAR (PAR where reach 95% of max ETR)
+    # calculate critical par (par where reach 95% of max etr)
     mutate(par_critical = -log(0.05)/estimate)
   
 }

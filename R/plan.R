@@ -55,9 +55,6 @@ plan <- drake_plan(
   # - gametophyte desiccation tolerance
   filmy_gameto_dt = load_gameto_dt("data/filmy_gameto_dt.csv"),
   
-  # - physiological data
-  # recovery_data_raw = readr::read_csv("data/filmy_DT_data.csv"),
-
   # - community data
   community_matrix_raw = readr::read_csv("data/nitta_2017/all_plots.csv"),
 
