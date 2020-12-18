@@ -13,10 +13,8 @@ specimens <- read_csv("data/fern_specimens.csv")
 
 # Filmy fern sporophytes (lab measurements) ----
 
-# FIXME: check for specimens measured in the field
-
 # Clean voucher data for filmy fern light curves measured in the lab
-# column "sporo_coll_site" provides name of site where the sporophyte sample
+# column "sporo_site" provides name of site where the sporophyte sample
 # was collected, if no voucher was made.
 filmy_lc_lab_voucher_data <-
   read_excel("data_raw/2013/Filmy Fern Light Curves 7_26_13.xlsx", skip = 1) %>%
@@ -24,8 +22,8 @@ filmy_lc_lab_voucher_data <-
   select(genus, specific_epithet = species, notes) %>%
   remove_empty("rows") %>%
   mutate(
-    sporo_coll_site = notes,
-    sporo_coll_site = str_remove_all(sporo_coll_site, ", Nitta 3090"),
+    sporo_site = notes,
+    sporo_site = str_remove_all(sporo_site, ", Nitta 3090"),
     notes = replace_na(notes, "none"),
     genus = ifelse(specific_epithet == "Hymenophyllum sp (3171)", "Hymenophyllum", genus),
     specific_epithet = str_replace_all(specific_epithet, "3178 A", "3178A"),
@@ -36,14 +34,14 @@ filmy_lc_lab_voucher_data <-
   ) %>%
   filter(!is.na(genus)) %>%
   separate(specific_epithet, c("specific_epithet", "coll_num"), extra = "drop", fill = "right") %>%
-  select(genus, specific_epithet, coll_num, sporo_coll_site) %>%
+  select(genus, specific_epithet, coll_num, sporo_site) %>%
   mutate(species_manual = glue("{genus}_{specific_epithet}")) %>%
   left_join(transmute(specimens, species_from_coll_data = str_replace_all(species, " ", "_"), coll_num), by = "coll_num") %>%
   mutate(species = case_when(
     is.na(species_from_coll_data) ~ species_manual,
     TRUE ~ species_from_coll_data
   )) %>%
-  select(species, coll_num, sporo_coll_site)
+  select(species, coll_num, sporo_site)
 
 filmy_sporo_lc_files <- c(
   "data_raw/2013/minipam/Filmy Fern  light curves 8-1-13.pam",
@@ -52,7 +50,7 @@ filmy_sporo_lc_files <- c(
   "data_raw/2013/minipam/Abrodictyum_dentatum light curves 7-31-13.pam"
 )
 
-filmy_sporo_lc_data <- 
+filmy_sporo_lc_lab <- 
   filmy_sporo_lc_files %>%
   set_names(fs::path_file(.)) %>%
   map(~parse_pam(., ret_type = "lc")) %>% 
@@ -64,10 +62,9 @@ filmy_sporo_lc_data <-
   select(-num_only) %>%
   mutate(
     id = id %>%
-      str_remove_all("\\.") %>%
+      str_remove_all("\\.| l-int3") %>%
       str_replace_all("Abrodoctyum_cfasaegrayi", "Abrodictyum_asaegrayi1") %>%
       str_replace_all("C_apiifolia", "Callistopteris_apiifolia") %>%
-      str_replace_all("H_multifidum_9 l-int3", "Hymenophyllum_multifidum") %>%
       str_replace_all("H_multifidum", "Hymenophyllum_multifidum") %>%
       str_replace_all("H_palladum", "Hymenophyllum_pallidum") %>%
       str_replace_all("Hymenophyllum_sp_3171", "Hymenophyllum_braithwaitei") %>%
@@ -86,14 +83,15 @@ filmy_sporo_lc_data <-
   filter(species != "Didymoglossum_tahitense") %>%
   # add voucher data 
   left_join(filmy_lc_lab_voucher_data, by = "species") %>%
-  select(-file)
+  select(-file) %>%
+  mutate(condition = "lab")
 
-# Gametophytes ----
+# Field measurements ----
 
 # Some of the rows in the .pam files have errors (e.g., light curve started
 # but didn't finish), so manually inspect and exclude these
 # so that the data can be read in properly.
-gameto_lc_files <- tribble(
+field_lc_files <- tribble(
   ~file, ~exclude_lines,
   "data_raw/2013/minipam/Atiati 400m 7-4-13.pam", c(360:363, 216:225),
   "data_raw/2013/minipam/Mouaputa 200m 6-8-13.pam", NULL,
@@ -115,24 +113,58 @@ gameto_lc_files <- tribble(
 ) %>%
   mutate(ret_type = "lc")
 
-gameto_lc_data <- pmap_df(gameto_lc_files, parse_pam)
+# Loop over the data files, extract light curves, then
+# combine into a single dataframe including sporo_site and date
+# extracted from file name.
+field_lc_data <-
+field_lc_files %>%
+  mutate(lc_data = pmap(., parse_pam)) %>%
+  mutate(
+    file_short = fs::path_file(file),
+    sporo_site = str_replace_all(file_short, "Three Pines 6-30-13", "Three Pines 200m 6-30-13") %>%
+      str_match("(^.*m) ") %>% 
+      magrittr::extract(,2),
+    date = str_match(file_short, " ([0-9]-.*)\\.pam")%>% 
+      magrittr::extract(,2) %>%
+      mdy) %>%
+  select(lc_data, sporo_site, date) %>%
+  unnest(cols = c(lc_data)) %>%
+  mutate(condition = "field")
 
-# Filter to only filmy fern gametophytes
-filmy_gameto_lc_data <-
-  gameto_lc_data %>%
+# Filter to filmy fern sporophytes
+filmy_genera <- c("Abrodictyum", "Callistopteris", "Crepidomanes", "Didymoglossum", "Hymenophyllum", "Polyphlebium", "Vandenboschia")
+
+filmy_sporo_lc_field <-
+field_lc_data %>%
+  filter(str_detect(id, paste0(filmy_genera, collapse =  "|"))) %>%
+  filter(!str_detect(id, regex("fail", ignore_case = TRUE))) %>%
+  filter(!str_detect(id, regex("gameto", ignore_case = TRUE))) %>%
+  # Exclude Crepidomanes minutum, because didn't record variety and have no way to verify
+  filter(!str_detect(id, "minutum")) %>%
+  mutate(id = str_remove_all(id, "2422_|_sporo")) %>%
+  separate(id, c("genus", "epithet", "individual"), fill = "right", extra = "drop") %>%
+  unite("species", genus, epithet) %>%
+  mutate(generation = "sporo")
+  
+# Filter to filmy fern gametophytes
+filmy_gameto_lc_field <-
+  field_lc_data %>%
   # If the id code is less than 3 digits, it's not a collection number. Filter these out.
   mutate(coll_num = str_split(id, "_") %>% map_chr(1)) %>%
   filter(nchar(coll_num) > 2) %>% 
   # Filter out failures
   filter(!(str_detect(id, regex("fail", ignore_case = TRUE)))) %>% 
+  filter(!is.na(yield)) %>%
   # Join with specimen data by collection number
   left_join(select(specimens, species, family, coll_num, generation), by = "coll_num") %>%
   filter(family == "Hymenophyllaceae") %>%
   filter(generation == "gametophyte") %>%
   rename(individual = id) %>%
-  select(-family)
+  select(-family) 
 
 # Combine data and write out ----
-filmy_lc_data <- bind_rows(filmy_sporo_lc_data, filmy_gameto_lc_data)
+filmy_lc_data <- bind_rows(filmy_sporo_lc_lab, filmy_sporo_lc_field, filmy_gameto_lc_field) %>% 
+  assert(not_na, type:generation, condition) %>%
+  mutate(date = date(date_time))
 
 write_csv(filmy_lc_data, "data/filmy_light_curves.csv")
