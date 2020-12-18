@@ -11,6 +11,11 @@ source("R/functions.R")
 # (requires clean_specimen_data.R to be run first)
 specimens <- read_csv("data/fern_specimens.csv") 
 
+# Read in "official" filmy species names (from growth habit data)
+filmy_names <- read_csv("data/filmy_growth_habit.csv") %>% 
+  select(species) %>%
+  separate(species, c("genus", "specific_epithet"), remove = FALSE)
+
 # Filmy fern sporophytes (lab measurements) ----
 
 # Clean voucher data for filmy fern light curves measured in the lab
@@ -84,7 +89,9 @@ filmy_sporo_lc_lab <-
   # add voucher data 
   left_join(filmy_lc_lab_voucher_data, by = "species") %>%
   select(-file) %>%
-  mutate(condition = "lab")
+  mutate(condition = "lab") %>%
+  # time stamp should always be unique
+  assert(is_uniq, date_time)
 
 # Field measurements ----
 
@@ -116,23 +123,40 @@ field_lc_files <- tribble(
 # Loop over the data files, extract light curves, then
 # combine into a single dataframe including sporo_site and date
 # extracted from file name.
-field_lc_data <-
+# This includes some duplicates (in Three Pines 200m 6-28-13.pam and Three Pines 200m 6-29-13.pam)
+field_lc_data_with_dups <-
 field_lc_files %>%
   mutate(lc_data = pmap(., parse_pam)) %>%
   mutate(
     file_short = fs::path_file(file),
     sporo_site = str_replace_all(file_short, "Three Pines 6-30-13", "Three Pines 200m 6-30-13") %>%
       str_match("(^.*m) ") %>% 
-      magrittr::extract(,2),
-    date = str_match(file_short, " ([0-9]-.*)\\.pam")%>% 
-      magrittr::extract(,2) %>%
-      mdy) %>%
-  select(lc_data, sporo_site, date) %>%
+      magrittr::extract(,2)) %>%
+  select(lc_data, sporo_site) %>%
   unnest(cols = c(lc_data)) %>%
-  mutate(condition = "field")
+  mutate(condition = "field") %>%
+  unique()
+
+# Pull out the duplicates, and make them unique
+de_duplicated_samples <-
+  field_lc_data_with_dups %>%
+  filter(!is_uniq(date_time)) %>%
+  arrange(date_time, id) %>%
+  mutate(is_dup = duplicated(date_time)) %>%
+  filter(!is_dup) %>%
+  select(-is_dup) %>%
+  assert(is_uniq, date_time)
+  
+# Remove any duplicated data, and add back in the de-duplicated version
+field_lc_data <-
+field_lc_data_with_dups %>%
+  filter(is_uniq(date_time)) %>%
+  bind_rows(de_duplicated_samples) %>%
+  # time stamp should always be unique
+  assert(is_uniq, date_time)
 
 # Filter to filmy fern sporophytes
-filmy_genera <- c("Abrodictyum", "Callistopteris", "Crepidomanes", "Didymoglossum", "Hymenophyllum", "Polyphlebium", "Vandenboschia")
+filmy_genera <- filmy_names %>% pull(genus) %>% unique()
 
 filmy_sporo_lc_field <-
 field_lc_data %>%
@@ -141,10 +165,11 @@ field_lc_data %>%
   filter(!str_detect(id, regex("gameto", ignore_case = TRUE))) %>%
   # Exclude Crepidomanes minutum, because didn't record variety and have no way to verify
   filter(!str_detect(id, "minutum")) %>%
-  mutate(id = str_remove_all(id, "2422_|_sporo")) %>%
+  mutate(id = str_remove_all(id, "2422_|_sporo|2507_")) %>%
   separate(id, c("genus", "epithet", "individual"), fill = "right", extra = "drop") %>%
+  assert(in_set(filmy_genera), genus) %>%
   unite("species", genus, epithet) %>%
-  mutate(generation = "sporo")
+  mutate(generation = "sporophyte")
   
 # Filter to filmy fern gametophytes
 filmy_gameto_lc_field <-
@@ -160,11 +185,29 @@ filmy_gameto_lc_field <-
   filter(family == "Hymenophyllaceae") %>%
   filter(generation == "gametophyte") %>%
   rename(individual = id) %>%
-  select(-family) 
+  select(-family) %>%
+  # Convert "individual" to a number code that is unique within each combination 
+  # of species + collection number
+  assert(not_na, coll_num, species) %>%
+  group_by(coll_num) %>%
+  mutate(individual = factor(individual) %>% numberify) %>%
+  ungroup %>%
+  mutate(individual = as.character(individual))
 
 # Combine data and write out ----
 filmy_lc_data <- bind_rows(filmy_sporo_lc_lab, filmy_sporo_lc_field, filmy_gameto_lc_field) %>% 
+  mutate(species = str_replace_all(species, " ", "_")) %>%
+  # Check not missing data
   assert(not_na, type:generation, condition) %>%
+  # Check species names formatted correctly
+  assert(in_set(filmy_names$species), species) %>%
+  # Check generation formatted correctly
+  assert(in_set("sporophyte", "gametophyte"), generation) %>%
+  # Check measurement condition formatted correctly
+  assert(in_set("field", "lab"), condition) %>%
+  # Check that no measurements are duplicated using time stamp
+  assert(is_uniq, date_time) %>%
+  # Add date
   mutate(date = date(date_time))
 
 write_csv(filmy_lc_data, "data/filmy_light_curves.csv")

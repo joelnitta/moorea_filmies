@@ -4,6 +4,31 @@
 
 # This functions are used for pre-processing raw data (scripts `R/clean_*.R`)
 
+
+#' Convert a factor to numbers
+#'
+#' @param factor 
+#'
+#' @return factor, with all levels replaced with numbers
+#' @export
+#'
+#' @examples
+#' numberify(
+#' factor(c("a", "a", "b"), levels = c("a", "b", "c"))
+#' )
+numberify <- function (factor) {
+  assertthat::assert_that(is.factor(factor))
+  levels(factor) <- 1:length(levels(factor))
+  factor
+}
+
+
+#' Verify that filmy fern desiccation tolerance test data are valid
+#'
+#' @param data Dataframe; filmy fern desiccation tolerance test data 
+#'
+#' @return dataframe
+#' 
 check_dt_data <- function(data) {
   
   filmy_species <- c(
