@@ -442,6 +442,21 @@ combine_mean_phys_traits <- function (recovery_species_means, etr_species_means,
   
 }
 
+
+#' Calculate mean VPD from climate data
+#'
+#' @param climate Dataframe with climate data including
+#' relative humidity, temperature, and VPD calculated from these measured
+#' once every 15 minutes by site and growth habit (terrestrial or epiphytic)
+#'
+#' @return Tibble with mean VPD by site and growth habit 
+calculate_mean_vpd <- function (climate) {
+  climate %>% 
+    group_by(site, habit) %>% 
+    summarize(vpd = mean(vpd)) %>% 
+    assert(not_na, vpd)
+}
+
 #' Calculate mean VPD for filmy fern gametophytes
 #'
 #' Treats specimens collected from rock walls ("epipetric") as epiphytic
@@ -917,6 +932,39 @@ run_pgls <- function (env_range_recover_data, phy) {
     gameto_range_model = caper::pgls(recover_gameto ~ gameto_range_breadth, env_range_recover_data_comp)
     )
   
+}
+
+#' Extract fitted values from a PGLS model
+#'
+#' @param model The PGLS model (list of class "pgls")
+#'
+#' @return Tibble, with two columns: species and the predicted value
+#' 
+predict_pgls <- function(model) {
+  model$fitted %>%
+    as.data.frame() %>%
+    rownames_to_column("species") %>%
+    rename(predicted = V1) %>%
+    as_tibble()
+}
+
+#' Summarize statistics of a PGLS model
+#'
+#' @param model The PGLS model (list of class "pgls")
+#'
+#' @return Tibble, with various columns for model statistics (r_squared, p-value, etc)
+#' 
+tidy_pgls <- function (model) {
+  model_sum <- summary(model)
+  tibble(
+    sigma = model_sum$sigma,
+    df = model_sum$df %>% paste(collapse = ","),
+    r_squared = model_sum$r.squared,
+    f_value = model_sum[["fstatistic"]][["value"]],
+    adj_r_squared = model_sum$adj.r.squared[,1],
+    # Need to run anova() to get p-value
+    p_value = anova(model) %>% filter(!is.na(`F value`)) %>% pull(`Pr(>F)`)
+  )
 }
 
 # Etc ----

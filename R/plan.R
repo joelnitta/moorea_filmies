@@ -172,9 +172,11 @@ plan <- drake_plan(
     env_range_data = env_range_data
   ),
   
-  range_dt_model = run_pgls(
+  env_range_dt_model = run_pgls(
     env_range_recover_data = env_range_recover_data, 
     phy = filmy_phy),
+  
+  env_range_dt_model_summary = map_df(env_range_dt_model, tidy_pgls, .id = "model"),
   
   # Render manuscript ----
   
