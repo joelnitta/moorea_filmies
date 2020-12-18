@@ -7,31 +7,86 @@ source("R/packages.R")
 # Load functions
 source("R/functions.R")
 
-# Filmy fern sporophytes ----
-filmy_lc_files <- c(
+# Read in specimen collection data
+# (requires clean_specimen_data.R to be run first)
+specimens <- read_csv("data/fern_specimens.csv") 
+
+# Filmy fern sporophytes (lab measurements) ----
+
+# FIXME: check for specimens measured in the field
+
+# Clean voucher data for filmy fern light curves measured in the lab
+# column "sporo_coll_site" provides name of site where the sporophyte sample
+# was collected, if no voucher was made.
+filmy_lc_lab_voucher_data <-
+  read_excel("data_raw/2013/Filmy Fern Light Curves 7_26_13.xlsx", skip = 1) %>%
+  clean_names %>%
+  select(genus, specific_epithet = species, notes) %>%
+  remove_empty("rows") %>%
+  mutate(
+    sporo_coll_site = notes,
+    sporo_coll_site = str_remove_all(sporo_coll_site, ", Nitta 3090"),
+    notes = replace_na(notes, "none"),
+    genus = ifelse(specific_epithet == "Hymenophyllum sp (3171)", "Hymenophyllum", genus),
+    specific_epithet = str_replace_all(specific_epithet, "3178 A", "3178A"),
+    specific_epithet = ifelse(specific_epithet == "Hymenophyllum sp (3171)", "sp (3171)", specific_epithet),
+    # Crepidomanes minutum from Aorai 1700m Nitta '3090' was in error: should be 3190
+    specific_epithet = ifelse(str_detect(notes, "Nitta 3090"), glue("{specific_epithet} (3190)"), specific_epithet),
+    specific_epithet = str_remove_all(specific_epithet, "cf |-")
+  ) %>%
+  filter(!is.na(genus)) %>%
+  separate(specific_epithet, c("specific_epithet", "coll_num"), extra = "drop", fill = "right") %>%
+  select(genus, specific_epithet, coll_num, sporo_coll_site) %>%
+  mutate(species_manual = glue("{genus}_{specific_epithet}")) %>%
+  left_join(transmute(specimens, species_from_coll_data = str_replace_all(species, " ", "_"), coll_num), by = "coll_num") %>%
+  mutate(species = case_when(
+    is.na(species_from_coll_data) ~ species_manual,
+    TRUE ~ species_from_coll_data
+  )) %>%
+  select(species, coll_num, sporo_coll_site)
+
+filmy_sporo_lc_files <- c(
   "data_raw/2013/minipam/Filmy Fern  light curves 8-1-13.pam",
   "data_raw/2013/minipam/Filmy Fern  light curves 8-6-13.pam",
   "data_raw/2013/minipam/Filmy Fern  light curves 8-8-13.pam",
   "data_raw/2013/minipam/Abrodictyum_dentatum light curves 7-31-13.pam"
 )
 
-filmy_lc_data <- map_df(filmy_lc_files, ~parse_pam(., ret_type = "lc")) %>% 
+filmy_sporo_lc_data <- 
+  filmy_sporo_lc_files %>%
+  set_names(fs::path_file(.)) %>%
+  map(~parse_pam(., ret_type = "lc")) %>% 
+  imap(~mutate(.x, file = .y)) %>%
+  bind_rows() %>%
   # Filter out non-labeled data, standardize names
   mutate(num_only = str_detect(id, "[a-z]|[A-Z]", negate = TRUE)) %>%
   filter(!is.na(id), !num_only) %>%
-  select(-num_only) %>% 
+  select(-num_only) %>%
   mutate(
-    id = str_remove_all(id, "3090_|3171_| l-int3|\\.") %>%
-      str_replace_all("Abrodoctyum_cfasaegrayi", "Abrodictyum_asaegrayi") %>% # FIXME: Need to check which one
+    id = id %>%
+      str_remove_all("\\.") %>%
+      str_replace_all("Abrodoctyum_cfasaegrayi", "Abrodictyum_asaegrayi1") %>%
       str_replace_all("C_apiifolia", "Callistopteris_apiifolia") %>%
+      str_replace_all("H_multifidum_9 l-int3", "Hymenophyllum_multifidum") %>%
       str_replace_all("H_multifidum", "Hymenophyllum_multifidum") %>%
       str_replace_all("H_palladum", "Hymenophyllum_pallidum") %>%
-      str_replace_all("Hymenophyllum_sp", "Hymenophyllum_braithwaitei") %>%
-      str_replace_all("V_maxima", "Vandenboschia_maxima")
-    ) %>%
-  separate(id, c("genus", "epithet", "individual"), remove = FALSE) %>%
+      str_replace_all("Hymenophyllum_sp_3171", "Hymenophyllum_braithwaitei") %>%
+      str_replace_all("V_maxima", "Vandenboschia_maxima") %>%
+      # Crepidomanes_minutum_3090 is in error for Crepidomanes_minutum_3190
+      str_replace_all("Crepidomanes_minutum_3090", "Crepidomanes_minutum3") %>%
+      str_replace_all("Crepidomanes_minutum_", "Crepidomanes_minutum2_")
+    ) %>% 
+  separate(id, c("genus", "epithet", "individual"), remove = FALSE, fill = "right") %>%
   unite("species", genus:epithet) %>%
-  select(-id)
+  select(-id) %>%
+  mutate(generation = "sporophyte") %>%
+  # exclude an extra light curve for C. humile
+  filter(!(species == "Crepidomanes_humile" & file == "Filmy Fern  light curves 8-1-13.pam")) %>%
+  # exclude D. tahitense, which only had 1 replicate
+  filter(species != "Didymoglossum_tahitense") %>%
+  # add voucher data 
+  left_join(filmy_lc_lab_voucher_data, by = "species") %>%
+  select(-file)
 
 # Gametophytes ----
 
@@ -61,3 +116,23 @@ gameto_lc_files <- tribble(
   mutate(ret_type = "lc")
 
 gameto_lc_data <- pmap_df(gameto_lc_files, parse_pam)
+
+# Filter to only filmy fern gametophytes
+filmy_gameto_lc_data <-
+  gameto_lc_data %>%
+  # If the id code is less than 3 digits, it's not a collection number. Filter these out.
+  mutate(coll_num = str_split(id, "_") %>% map_chr(1)) %>%
+  filter(nchar(coll_num) > 2) %>% 
+  # Filter out failures
+  filter(!(str_detect(id, regex("fail", ignore_case = TRUE)))) %>% 
+  # Join with specimen data by collection number
+  left_join(select(specimens, species, family, coll_num, generation), by = "coll_num") %>%
+  filter(family == "Hymenophyllaceae") %>%
+  filter(generation == "gametophyte") %>%
+  rename(individual = id) %>%
+  select(-family)
+
+# Combine data and write out ----
+filmy_lc_data <- bind_rows(filmy_sporo_lc_data, filmy_gameto_lc_data)
+
+write_csv(filmy_lc_data, "data/filmy_light_curves.csv")
