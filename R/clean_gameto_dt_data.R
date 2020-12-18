@@ -331,63 +331,27 @@ gameto_dt_2013 <-
 gameto_dt <- bind_rows(gameto_dt_2012, gameto_dt_2013) %>%
   mutate(generation = "gameto")
 
-# read in ppgi
-ppgi <- read_csv("data_raw/ppgi_taxonomy_mod.csv")
-
 #### Filter to only filmy ferns ----
 
-# Read in collections
-collections <- read_csv("data_raw/specimens.csv") %>%
-  clean_names() %>%
-  filter(collector_lastname == "Nitta") %>%
-  # Manipulate columns
-  mutate(coll_num = paste3(collection_number, subcollection_number, sep = "")) %>%
-  mutate(specimen = paste3(collector_lastname, coll_num)) %>%
-  mutate(collector = paste(collector_firstname, collector_lastname)) %>%
-  rename(elevation = elevation_m, other_collectors = collectors_other) %>%
-  mutate(species = paste3(genus, specific_epithet)) %>%
-  mutate(taxon = paste3(genus, specific_epithet, infraspecific_name)) %>%
-  mutate(notes = replace_na(notes, "")) %>%
-  # Format collection date YYYY-MM-DD
-  mutate(
-    date_collected = date_collected %>%
-      str_remove_all("^[:alpha:]+ ") %>% 
-      str_remove_all("00:00:00 [:alpha:]+ ") %>%
-      mdy() %>%
-      as_date(),
-    year = year(date_collected),
-    month = month(date_collected) %>% str_pad(side = "left", pad = "0", width = 2),
-    day = day(date_collected) %>% str_pad(side = "left", pad = "0", width = 2),
-    date_collected = paste(year, month, day, sep = "-")
-  ) %>%
-  # Select variables
-  select(specimen_id, specimen, coll_num,
-         genus, specific_epithet, infraspecific_rank, infraspecific_name, certainty,
-         # species, taxon, scientific_name, author, var_author,
-         country, locality, site, observations,
-         elevation, latitude, longitude,
-         collector, other_collectors,
-         herbaria,
-         date_collected) %>%
-  mutate(taxon = paste3(genus, specific_epithet, infraspecific_name)) %>%
-  left_join(ppgi, by = "genus")
+# Read in specimen collection data
+# (requires clean_specimen_data.R to be run first)
+specimens <- read_csv("data/fern_specimens.csv") 
 
-# Note that when joining collection data to DT data based on individual, some
-# records are dropped because these had collection numbers + subcollection numbers,
+# Note that when joining collection data to DT data based on individual,
+# seven records are dropped because these had collection numbers + subcollection numbers,
 # but there is no record of what subcollection number was used in th DT test.
 missing <- gameto_dt %>%
-  anti_join(collections, by = c(individual = "coll_num"))
+  anti_join(specimens, by = c(individual = "coll_num"))
 
-read_csv("data_raw/specimens.csv") %>%
-  clean_names() %>%
-  filter(collection_number %in% missing$individual) %>%
-  select(genus, specific_epithet, collection_number, subcollection_number, date_collected)
+specimens %>%
+  filter(str_detect(coll_num, paste(missing$individual, collapse = "|"))) %>%
+  select(genus, specific_epithet, coll_num, date_collected)
 
-# Add taxon and family, filter to only filmy ferns
+# Add species and family, filter to only filmy ferns
 filmy_gameto_dt <-
 gameto_dt %>%
   left_join(
-    select(collections, coll_num, taxon, family),
+    select(specimens, coll_num, species, family),
     by = c(individual = "coll_num")
   ) %>%
   filter(family == "Hymenophyllaceae") %>%
