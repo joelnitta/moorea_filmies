@@ -248,7 +248,25 @@ fix_gameto_dt_names <- function (data) {
 #' @return Dataframe
 #' 
 load_sporo_dt <- function (file) {
-  readr::read_csv(file) %>%
+  readr::read_csv(file, col_types = cols(
+    species = col_character(),
+    salt = col_character(),
+    dry_time = col_double(),
+    individual = col_character(),
+    dataset = col_character(),
+    weight_pre = col_double(),
+    weight_dry = col_double(),
+    weight_desiccated = col_double(),
+    weight_30min = col_double(),
+    weight_24hr = col_double(),
+    weight_48hr = col_double(),
+    yield_pre = col_double(),
+    yield_30min = col_double(),
+    yield_24hr = col_double(),
+    yield_48hr = col_double(),
+    yield_72hr = col_double(),
+    generation = col_character()
+  )) %>%
     mutate(
       salt = factor(salt, levels = c("Control", "H2O", "NaCl", "MgNO3", "LiCl")),
       dry_time = factor(dry_time, levels = c(2, 15))
@@ -272,7 +290,27 @@ load_sporo_dt <- function (file) {
 #' @return Dataframe
 #' 
 load_gameto_dt <- function (file) {
-  readr::read_csv(file) %>%
+  readr::read_csv(
+    file, 
+    col_types = cols(
+      individual = col_character(),
+      yield_24hr = col_double(),
+      yield_48hr = col_double(),
+      yield_72hr = col_double(),
+      yield_dry = col_double(),
+      yield_pre = col_double(),
+      salt = col_character(),
+      dry_time = col_double(),
+      yield_30min = col_double(),
+      time_pre = col_datetime(format = ""),
+      time_dry = col_datetime(format = ""),
+      time_30min = col_datetime(format = ""),
+      time_24hr = col_datetime(format = ""),
+      time_48hr = col_datetime(format = ""),
+      time_72hr = col_datetime(format = ""),
+      generation = col_character(),
+      species = col_character()
+    )) %>%
     mutate(
       salt = factor(salt, levels = c("Control", "H2O", "NaCl", "MgNO3", "LiCl")),
       dry_time = factor(dry_time, levels = c(2, 15))
@@ -330,12 +368,15 @@ unzip_nitta_2017 <- function (zipped_path, unzip_path, ...) {
 #' @return Dataframe
 calc_recovery <- function (data) {
   data %>%
+    # Pre-treatment yield must be greater than zero, or recovery will be Inf
+    verify(yield_pre > 0) %>%
     select(species, salt, dry_time, individual, generation, contains("yield")) %>%
-    select(-yield_72hr) %>%
+    select(-yield_72hr, -contains("yield_dry")) %>%
     pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
     mutate(
       rec_time = str_remove_all(rec_time, "yield_"),
-      recovery = yield_recover / yield_pre)
+      recovery = yield_recover / yield_pre) %>%
+    select(-contains("yield"))
 }
 
 #' Calculate mean % recovery from desiccation in a desiccation tolerance (DT) experiment
@@ -346,11 +387,11 @@ calc_recovery <- function (data) {
 calc_mean_recovery <- function (data) {
   data %>%
     mutate(rec_time = factor(rec_time, levels = c("30min", "24hr", "48hr"))) %>%
-    group_by(species, salt, dry_time, rec_time) %>%
+    group_by(species, salt, dry_time, rec_time, generation) %>%
     summarize(
-      recovery = mean(recovery, na.rm = TRUE),
-      sd = sd(recovery, na.rm = TRUE),
-      n = n(),
+      recovery_mean = mean(recovery, na.rm = TRUE),
+      recovery_sd = sd(recovery, na.rm = TRUE),
+      recovery_n = n(),
       .groups = "drop")
 }
 
@@ -381,10 +422,10 @@ calculate_indiv_etr <- function (data) {
   
   # Calculate maximum ETR for each individual
   data %>%
-    assert(not_na, ETR) %>%
+    assert(not_na, etr) %>%
     group_by(species, generation, individual) %>%
     summarize(
-      etr_max = max(ETR),
+      etr_max = max(etr),
       .groups = "drop"
     )
   
@@ -451,9 +492,9 @@ combine_mean_phys_traits <- function (recovery_species_means, etr_species_means,
     recovery_species_means %>%
     mutate(
       keep = case_when(
-        species == "Callistopteris_apiifolia" & generation == "sporo" & salt == "NaCl" & drytime == "2d" & rectime == "48hr" ~ TRUE,
-        species == "Abrodictyum_dentatum" & generation == "sporo" & salt == "NaCl" & drytime == "2d" & rectime == "48hr" ~ TRUE,
-        salt == "MgNO3" & drytime == "2d" & rectime == "48hr" ~ TRUE,
+        species == "Callistopteris_apiifolia" & generation == "sporo" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
+        species == "Abrodictyum_dentatum" & generation == "sporo" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
+        salt == "MgNO3" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
         TRUE ~ FALSE
       )
     ) %>%
@@ -478,7 +519,7 @@ combine_mean_phys_traits <- function (recovery_species_means, etr_species_means,
 calculate_mean_vpd <- function (climate) {
   climate %>% 
     group_by(site, habit) %>% 
-    summarize(vpd = mean(vpd)) %>% 
+    summarize(vpd = mean(vpd), .groups = "drop") %>% 
     assert(not_na, vpd)
 }
 
@@ -503,9 +544,8 @@ calculate_mean_vpd_gameto <- function(
   
   gameto_filmy_specimens <-
     specimens_raw %>%
-    janitor::clean_names() %>% 
     # only use needed columns
-    select(starts_with("gameto"), specimen, genus, specific_epithet, is_gametophyte, site = plot) %>%
+    select(starts_with("gameto"), specimen, genus, specific_epithet, generation, site) %>%
     mutate(
       species = paste(genus, specific_epithet, sep = "_"),
       # **Important**: treat epipteric as epiphytic
@@ -513,7 +553,7 @@ calculate_mean_vpd_gameto <- function(
     # subset to filmy fern gametophytes in plots on Moorea
     filter(
       species %in% filmy_species, 
-      is_gametophyte == 1,
+      generation == "gametophyte",
       !is.na(gameto_habit),
       site %in% moorea_sites$site) %>%
     select(specimen, species, site, habit = gameto_habit)
@@ -592,9 +632,9 @@ calculate_mean_vpd_sporo <- function (community_matrix_raw, filmy_species, moore
 combine_env_env_range_recover <- function (combined_species_means, env_range_data) {
 
   combined_species_means %>%
-  filter(!is.na(recover_mean)) %>%
-  select(species, generation, recover = recover_mean) %>%
-  pivot_wider(names_from = "generation", values_from = "recover", names_prefix = "recover_") %>%
+  filter(!is.na(recovery_mean)) %>%
+  select(species, generation, recovery = recovery_mean) %>%
+  pivot_wider(names_from = "generation", values_from = "recovery", names_prefix = "recovery_") %>%
   left_join(
     select(env_range_data, 
            species, 
@@ -626,17 +666,17 @@ run_t_test_gs <- function (data) {
   data %>%
     # Count number of samples per species per generation
     mutate(
-      n_gameto = map_dbl(gameto, length),
-      n_sporo = map_dbl(sporo, length)
+      n_gameto = map_dbl(gametophyte, length),
+      n_sporo = map_dbl(sporophyte, length)
     ) %>%
     # Only keep those with multiple samples
     filter(n_gameto > 1, n_sporo > 1) %>%
     # Run two-sided t-test, looping over species
     # see https://cran.r-project.org/web/packages/broom/vignettes/broom_and_dplyr.html
     # for more info
-    nest(data = c(gameto, sporo)) %>%
+    nest(data = c(gametophyte, sporophyte)) %>%
     mutate(
-      t_test_res = map(data, ~t.test(x = .$sporo[[1]], y = .$gameto[[1]], paired = FALSE)),
+      t_test_res = map(data, ~t.test(x = .$sporophyte[[1]], y = .$gametophyte[[1]], paired = FALSE)),
       tidy_res = map(t_test_res, broom::tidy)
     ) %>%
     select(species, tidy_res) %>%
@@ -649,7 +689,7 @@ run_t_test_gs <- function (data) {
 #' for DT recovery, PAR95, and ETRmax
 #'
 #' @param recovery_data Data with recovery from desiccation treatment with
-#' one value per individual. Includes columns `species`, `salt`, `drytime`, `rectime`,
+#' one value per individual. Includes columns `species`, `salt`, `dry_time`, `rec_time`,
 #' `recover`, and `generation`.
 #' @param par_indiv Data with critical PAR (PAR where reach 95% of max ETR). One row
 #' per individual. Includes columns `species`, `generation`, and `par_critical`
@@ -670,13 +710,15 @@ run_t_test <- function (recovery_data, par_indiv, etr_indiv) {
   dt_t_test <-
     recovery_data %>%
     # Only compare recovery after 48hr between sporos and gametos dried using MgNO3 
-    filter(salt == "MgNO3", rectime == "48hr", drytime == "2d") %>%
-    select(species, recover, generation) %>%
+    filter(salt == "MgNO3", rec_time == "48hr", dry_time == "2") %>%
+    select(species, recovery, generation) %>%
+    # Remove NA values
+    filter(!is.na(recovery), !is.infinite(recovery)) %>%
     # Convert to wide format. Values in columns are now a list of numeric vectors
     # (recovery values)
-    pivot_wider(names_from = "generation", values_from = "recover", values_fn = list) %>%
+    pivot_wider(names_from = "generation", values_from = "recovery", values_fn = list) %>% 
     run_t_test_gs() %>%
-    mutate(response = "recover")
+    mutate(response = "recovery")
   
   # Run t-test for PAR95 between sporophytes and gametophytes
   par_t_test <-
@@ -753,23 +795,23 @@ analyze_cont_phylosig <- function (selected_trait, traits, phy) {
 #'
 #' @return Dataframe
 #' 
-analyze_phylosig_by_generation <- function(combined_species_means, phy, traits_select = c("recover_mean", "etr_mean", "par_mean")) {
+analyze_phylosig_by_generation <- function(combined_species_means, phy, traits_select = c("recovery_mean", "etr_mean", "par_mean")) {
   
   # Subset to only gametophytes
   gameto_traits <- combined_species_means %>%
-    filter(generation == "gameto")
+    filter(generation == "gametophyte")
   
   # Analyze phylogenetic signal
   gameto_phylosig <- map_df(traits_select, ~analyze_cont_phylosig(., gameto_traits, phy)) %>%
-    mutate(generation = "gameto")
+    mutate(generation = "gametophyte")
   
   # Subset to only sporophytes
   sporo_traits <- combined_species_means %>%
-    filter(generation == "sporo")
+    filter(generation == "sporophyte")
   
   # Analyze phylogenetic signal
   sporo_phylosig <- map_df(traits_select, ~analyze_cont_phylosig(., sporo_traits, phy)) %>%
-    mutate(generation = "sporo")
+    mutate(generation = "sporophyte")
   
   # Combine results
   bind_rows(sporo_phylosig, gameto_phylosig)
@@ -801,34 +843,33 @@ run_glmm <- function(combined_species_means, traits, phy) {
   # - first combine DT and light response data 
   # and set habit, generation, range, and species as factors
   dt_light_data <-
-    select(combined_species_means, species, generation, recover = recover_mean, etr = etr_mean, par = par_mean) %>%
+    select(combined_species_means, species, generation, recovery = recovery_mean, etr = etr_mean, par = par_mean) %>%
     left_join(traits, by = "species") %>%
     mutate(
       habit = as.factor(habit),
       generation = as.factor(generation),
-      range = as.factor(range),
       species = as.factor(species))
   
   # then split each into a separate dataset with zero missing data
   # and drop unused levels
   dt_data <- dt_light_data %>%
-    select(species, generation, habit, range, recover) %>%
-    remove_missing %>%
+    select(species, generation, habit, recovery) %>%
+    remove_missing(na.rm = TRUE) %>%
     mutate_if(is.factor, droplevels)
   
   etr_data <- dt_light_data %>%
-    select(species, generation, habit, range, etr) %>%
-    remove_missing %>%
+    select(species, generation, habit, etr) %>%
+    remove_missing(na.rm = TRUE) %>%
     mutate_if(is.factor, droplevels)
   
   par_data <- dt_light_data %>%
-    select(species, generation, habit, range, par) %>%
-    remove_missing %>%
+    select(species, generation, habit, par) %>%
+    remove_missing(na.rm = TRUE) %>%
     mutate_if(is.factor, droplevels)
   
   # finally, put these into a tibble for looping later over mcmcGLMM
   data_tibble <- tibble(
-    response = c("etr", "par", "recover"),
+    response = c("etr", "par", "recovery"),
     data = list(etr_data, par_data, dt_data))
   
   # format phylogeny (only for DT) ---
@@ -886,7 +927,7 @@ run_glmm <- function(combined_species_means, traits, phy) {
   phylo_models <-
     list(
       fixed_effects = c("habit", "generation", "both", "intersect", "null"),
-      response = c("recover")
+      response = c("recovery")
     ) %>%
     cross_df() %>%
     mutate(formula = case_when(
@@ -951,10 +992,10 @@ run_pgls <- function (env_range_recover_data, phy) {
   
   # Run PGLS for each combination of generation x vpd or range breadth vs. recovery
   res <- list(
-    sporo_vpd_model = caper::pgls(recover_sporo ~ sporo_vpd, env_range_recover_data_comp),
-    gameto_vpd_model = caper::pgls(recover_gameto ~ gameto_vpd, env_range_recover_data_comp),
-    sporo_range_model = caper::pgls(recover_sporo ~ sporo_range_breadth, env_range_recover_data_comp),
-    gameto_range_model = caper::pgls(recover_gameto ~ gameto_range_breadth, env_range_recover_data_comp)
+    sporo_vpd_model = caper::pgls(recovery_sporophyte ~ sporo_vpd, env_range_recover_data_comp),
+    gameto_vpd_model = caper::pgls(recovery_gametophyte ~ gameto_vpd, env_range_recover_data_comp),
+    sporo_range_model = caper::pgls(recovery_sporophyte ~ sporo_range_breadth, env_range_recover_data_comp),
+    gameto_range_model = caper::pgls(recovery_gametophyte ~ gameto_range_breadth, env_range_recover_data_comp)
     )
   
 }
@@ -1127,8 +1168,8 @@ make_sporo_dt_plot <- function  (recovery_species_means, traits) {
   pd <- position_dodge(.3)
   
   # Make plot
-  ggplot(data = plot_data, aes(x = rectime, y = recover, group = interaction(drytime, salt), shape = salt, fill = salt)) +
-    geom_line(position = pd, aes(linetype = drytime)) +
+  ggplot(data = plot_data, aes(x = rec_time, y = recover, group = interaction(dry_time, salt), shape = salt, fill = salt)) +
+    geom_line(position = pd, aes(linetype = dry_time)) +
     geom_errorbar(
       aes(ymin = recover - sd, ymax = recover + sd), 
       colour = "grey50", width = 0, 

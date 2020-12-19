@@ -329,7 +329,7 @@ gameto_dt_2013 <-
     
 ### Combine all datasets ----
 gameto_dt <- bind_rows(gameto_dt_2012, gameto_dt_2013) %>%
-  mutate(generation = "gameto")
+  mutate(generation = "gametophyte")
 
 #### Filter to only filmy ferns ----
 
@@ -355,7 +355,11 @@ gameto_dt %>%
     by = c(individual = "coll_num")
   ) %>%
   filter(family == "Hymenophyllaceae") %>%
-  select(-family)
+  select(-family) %>%
+  mutate(
+    species = str_replace_all(species, " ", "_"),
+    dry_time = factor(dry_time)) %>%
+  check_dt_data
 
 # Write to data/ ----
 write_csv(filmy_gameto_dt, "data/filmy_gameto_dt.csv")

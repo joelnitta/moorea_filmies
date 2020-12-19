@@ -367,7 +367,7 @@ filmy_sporo_dt <- bind_rows(
   select(
     species, salt, dry_time, individual, dataset, contains("weight"), contains("yield")
   ) %>%
-  mutate(generation = "sporo") %>%
+  mutate(generation = "sporophyte") %>%
   check_dt_data
 
 # Write to data_raw/ ----

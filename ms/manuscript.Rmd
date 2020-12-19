@@ -310,14 +310,14 @@ Daily variation in temperature and RH was much greater, and mean RH much lower, 
 ### Phylogenetic signal
 
 ```{r phy-sig-stats}
-sporo_recover_k <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(kval) %>% jntools::round_t(2)
-sporo_recover_k_pval <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(k_pval) %>% jntools::round_t(3)
-sporo_recover_lambda <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(lambda) %>% jntools::round_t(2)
-sporo_recover_lambda_pval <- phylosig %>% filter(generation == "sporo", trait == "recover_mean") %>% pull(lambda_pval) %>% jntools::round_t(3)
+sporo_recover_k <- phylosig %>% filter(generation == "sporophyte", trait == "recovery_mean") %>% pull(kval) %>% round_t(2)
+sporo_recover_k_pval <- phylosig %>% filter(generation == "sporophyte", trait == "recovery_mean") %>% pull(k_pval) %>% round_t(3)
+sporo_recover_lambda <- phylosig %>% filter(generation == "sporophyte", trait == "recovery_mean") %>% pull(lambda) %>% round_t(2)
+sporo_recover_lambda_pval <- phylosig %>% filter(generation == "sporophyte", trait == "recovery_mean") %>% pull(lambda_pval) %>% round_t(3)
 
 # Make sure that all ETRmax and PAR have pval > 0.05
 phylosig %>% 
-  filter(trait != "recover_mean") %>%
+  filter(trait != "recovery_mean") %>%
   verify(all(k_pval > 0.05)) %>%
   verify(all(lambda_pval > 0.05), success_fun = success_logical, error_fun = error_stop)
 ```
@@ -329,23 +329,23 @@ Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* w
 ```{r dt-stats}
 # Count number of species included in DT test by generation
 n_dt_species_sporo <- combined_species_means %>% 
-  filter(!is.na(recover_mean)) %>% 
+  filter(!is.na(recovery_mean)) %>% 
   count(species, generation) %>% 
   count(generation) %>% 
-  filter(generation == "sporo") %>% 
+  filter(generation == "sporophyte") %>% 
   pull(n) %>% 
   english2
 
 n_dt_species_gameto <- combined_species_means %>% 
-  filter(!is.na(recover_mean)) %>%
+  filter(!is.na(recovery_mean)) %>%
   count(species, generation) %>% 
   count(generation) %>% 
-  filter(generation == "gameto") %>% 
+  filter(generation == "gametophyte") %>% 
   pull(n) %>% 
   english2
 
 n_dt_species_both <- combined_species_means %>% 
-  filter(!is.na(recover_mean)) %>% 
+  filter(!is.na(recovery_mean)) %>% 
   count(species, generation) %>% 
   group_by(species) %>% 
   summarize(n_generation = n_distinct(generation), .groups = "drop") %>%
@@ -388,7 +388,7 @@ Most of the high elevation epiphytes could recover from 2 d treatments regardles
 Interestingly, *C. minutum* var. 2, *Hymenophyllum multifidum* (G. Forst.) Sw., and *Hymenophyllum polyanthos* (Sw.) Sw. could recover from desiccation at --86 or --282 MPa for 15 d, but not --38 MPa.
 
 Gametophytes of low elevation epiphytes had the highest DT (\circa{ }80% recovery), followed by high elevation epiphytes and saxicolous species (both with recovery from \circa{ }25% to 75%), with terrestrial species essentially non-tolerant (less than 20% recovery; Fig. 5).
-DT of gametophytes did not significantly exceed that of sporophytes for any species except for saxicolous *P. endlicherianum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Polyphlebium_endlicherianum", "recover")`), and was significantly lower in gametophytes than sporophytes of some high elevation epiphytic species including *C. minutum* var. 2, *H.* *digitatum*, *H. polyanthos*, and *P. borbonicum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Crepidomanes_minutum2", "recover")`, `r ttest_pval("Hymenophyllum_digitatum", "recover")`, `r ttest_pval("Hymenophyllum_polyanthos", "recover")`, and `r ttest_pval("Polyphlebium_borbonicum", "recover")`, respectively).
+<!-- FIXME: check on these numbers DT of gametophytes did not significantly exceed that of sporophytes for any species except for saxicolous *P. endlicherianum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Polyphlebium_endlicherianum", "recovery")`), and was significantly lower in gametophytes than sporophytes of some high elevation epiphytic species including *C. minutum* var. 2, *H.* *digitatum*, *H. polyanthos*, and *P. borbonicum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Crepidomanes_minutum2", "recovery")`, `r ttest_pval("Hymenophyllum_digitatum", "recovery")`, `r ttest_pval("Hymenophyllum_polyanthos", "recovery")`, and `r ttest_pval("Polyphlebium_borbonicum", "recovery")`, respectively). -->
 
 The GLMM showed that both generation and the interaction of generation and growth habit, but not growth habit alone, have a significant effect on DT while controlling for phylogeny (Table 3).
 In contrast, range type (gametophytes widespread beyond sporophytes or not) has no significant effect on DT (Table 3).
@@ -401,7 +401,7 @@ n_light_species_sporo <- combined_species_means %>%
   filter(!is.na(etr_mean), !is.na(par_mean)) %>%
   count(species, generation) %>% 
   count(generation) %>% 
-  filter(generation == "sporo") %>% 
+  filter(generation == "sporophyte") %>% 
   pull(n) %>% 
   english2
 
@@ -409,7 +409,7 @@ n_light_species_gameto <- combined_species_means %>%
   filter(!is.na(etr_mean), !is.na(par_mean)) %>%
   count(species, generation) %>% 
   count(generation) %>% 
-  filter(generation == "gameto") %>% 
+  filter(generation == "gametophyte") %>% 
   pull(n) %>% 
   english2
 
@@ -442,10 +442,10 @@ combined_species_means %>%
   )
 
 # Extract values by response and generation for citing in MS
-mean_par_sporo <- light_overall_means %>% filter(generation == "sporo") %>% pull(par_pretty)
-mean_par_gameto <- light_overall_means %>% filter(generation == "gameto") %>% pull(par_pretty)
-mean_etr_sporo <- light_overall_means %>% filter(generation == "sporo") %>% pull(etr_pretty)
-mean_etr_gameto <- light_overall_means %>% filter(generation == "gameto") %>% pull(etr_pretty)
+mean_par_sporo <- light_overall_means %>% filter(generation == "sporophyte") %>% pull(par_pretty)
+mean_par_gameto <- light_overall_means %>% filter(generation == "gametophyte") %>% pull(par_pretty)
+mean_etr_sporo <- light_overall_means %>% filter(generation == "sporophyte") %>% pull(etr_pretty)
+mean_etr_gameto <- light_overall_means %>% filter(generation == "gametophyte") %>% pull(etr_pretty)
 ```
 
 Light responses were measured in sporophytes of `r n_light_species_sporo` species and gametophytes of `r n_light_species_gameto` species, including `r n_light_species_both` species with both life phases (Appendix S4).

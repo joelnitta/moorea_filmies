@@ -61,24 +61,29 @@ plan <- drake_plan(
   # FIXME: check number of measurements per individual; shouldn't have more than 10 each.
   # Crepidomanes_minutum2 (2834), Crepidomanes_minutum2 (2998), and Hymenophyllum_braithwaitei (Hymenophyllum_sp1_6)
   # have too many
-  # light_data_raw = readr::read_csv("data/filmy_light_data.csv"),
+  light_data = read_csv("data/filmy_light_curves.csv"),
 
   # Raw specimen data from specimens spreadsheet
-  # specimens_raw = read_csv("data/specimens.csv"),
+  specimens_raw = read_csv("data/fern_specimens.csv"),
   
   # Process data ----
-  filmy_gameto_recovery = calc_recovery(filmy_gameto_dt),
   
-  filmy_sporo_recovery =
-    filmy_sporo_dt %>%
-    # Only include samples that should be presented in the main MS
-    filter(section == "main") %>%
+  # - calculate recovery during DT test per individual
+  gameto_recovery_indiv = filmy_gameto_dt %>%
+    # Filter out individuals with low pre-treatment yields
+    filter(yield_pre > 400) %>%
     calc_recovery(),
   
-  filmy_sporo_recovery_mean = calc_mean_recovery(filmy_sporo_recovery),
+  sporo_recovery_indiv = filmy_sporo_dt %>%
+    # Only include samples that should be presented in the main MS
+    filter(section == "main") %>%
+    # Filter out individuals with low pre-treatment yields
+    filter(yield_pre > 400) %>%
+    calc_recovery(),
   
-  filmy_gameto_recovery_mean = calc_mean_recovery(filmy_gameto_recovery),
+  recovery_indiv = bind_rows(gameto_recovery_indiv, sporo_recovery_indiv),
   
+  # - calculate mean VPD per datalogger
   mean_vpd = calculate_mean_vpd(climate),
   
   # - calculate mean VPD per species for gametophytes
@@ -123,9 +128,10 @@ plan <- drake_plan(
   etr_indiv = calculate_indiv_etr(light_data),
 
   # Means by species and generation ----
+  
   # - DT recovery
-  recovery_species_means = calculate_mean_recovery(recovery_data),
-
+  recovery_species_means = calc_mean_recovery(recovery_indiv),
+  
   # - ETR max
   etr_species_means = calculate_mean_etr(etr_indiv),
 
@@ -143,7 +149,7 @@ plan <- drake_plan(
   
   # Perform two-sided t-test on DT and light responses across generations
   t_test_results = run_t_test(
-    recovery_data = recovery_data, 
+    recovery_data = recovery_indiv, 
     par_indiv = par_indiv, 
     etr_indiv = etr_indiv),
 
@@ -151,7 +157,7 @@ plan <- drake_plan(
   phylosig = analyze_phylosig_by_generation(
     combined_species_means = combined_species_means,
     phy = filmy_phy,
-    traits_select = c("recover_mean", "etr_mean", "par_mean")
+    traits_select = c("recovery_mean", "etr_mean", "par_mean")
   ),
   
   # GLMMS ----
@@ -165,25 +171,25 @@ plan <- drake_plan(
   
   # PGLS ----
   # (Phylogenetic Generalized Least Squares)
-  
+
   # Run PGLS for gametophyte range size vs. desiccation tolerance
   env_range_recover_data = combine_env_env_range_recover(
-    combined_species_means = combined_species_means, 
+    combined_species_means = combined_species_means,
     env_range_data = env_range_data
   ),
-  
+
   env_range_dt_model = run_pgls(
-    env_range_recover_data = env_range_recover_data, 
+    env_range_recover_data = env_range_recover_data,
     phy = filmy_phy),
-  
+
   env_range_dt_model_summary = map_df(env_range_dt_model, tidy_pgls, .id = "model"),
-  
+
   # Render manuscript ----
-  
+
   # Track bibliography files
   refs = target("ms/references.bib", format = "file"),
   refs_other = target("ms/references_other.yaml", format = "file"),
-  
+
   # First render to PDF, keeping the latex
   ms_pdf = render_tracked(
     input = knitr_in("ms/manuscript.Rmd"),
@@ -193,7 +199,7 @@ plan <- drake_plan(
     dep1 = refs,
     dep2 = refs_other
   ),
-  
+
   # Next use the latex to convert to docx with pandoc
   ms_docx = latex2docx(
     latex = file_in("results/manuscript.tex"),
