@@ -8,10 +8,80 @@ source("R/functions.R")
 
 # Read in Pteridophyte Phylogeny Group I taxonomic system
 # (to add family level taxonomy)
-ppgi <- read_csv("data_raw/ppgi_taxonomy_mod.csv")
+ppgi <- read_csv("data_raw/ppgi_taxonomy_mod.csv", col_types = cols(
+  class = col_character(),
+  order = col_character(),
+  suborder = col_character(),
+  family = col_character(),
+  subfamily = col_character(),
+  genus = col_character(),
+  notes = col_character()
+))
 
-# Read in collections
-fern_specimens_gps_raw <- read_csv("data_raw/specimens.csv") %>%
+# Specify column types for specimen data ----
+specimens_raw_col_spec <- 
+  cols(
+    specimenID = col_double(),
+    collector_firstname = col_character(),
+    collector_lastname = col_character(),
+    collector_fullname = col_logical(),
+    collectors_other = col_character(),
+    collection_number = col_double(),
+    subcollection_number = col_character(),
+    chromosome_voucher = col_character(),
+    coll_no_as_text = col_character(),
+    specimen = col_character(),
+    genus = col_character(),
+    specific_epithet = col_character(),
+    infraspecific_rank = col_character(),
+    infraspecific_name = col_character(),
+    informal_taxon = col_character(),
+    morphospecies = col_character(),
+    certainty = col_character(),
+    country = col_character(),
+    county = col_character(),
+    province = col_character(),
+    locality = col_character(),
+    site = col_character(),
+    site_full = col_logical(),
+    plot = col_character(),
+    `Loc Summary` = col_double(),
+    observations = col_character(),
+    elevation_m = col_double(),
+    elevation_error = col_character(),
+    elevation_unit = col_double(),
+    latitude = col_double(),
+    longitude = col_double(),
+    date_collected = col_character(),
+    date_determined = col_double(),
+    determined_by = col_character(),
+    created = col_logical(),
+    notes = col_character(),
+    notes2 = col_character(),
+    edits = col_character(),
+    modified = col_logical(),
+    herbaria = col_character(),
+    `Sent To` = col_logical(),
+    number_of_sheets = col_character(),
+    number_of_duplicates = col_double(),
+    `Gameto DT` = col_double(),
+    `Gameto Habit` = col_character(),
+    `Gameto Net Location` = col_character(),
+    `Gameto Square` = col_character(),
+    hybrid_formula = col_logical(),
+    id_method = col_character(),
+    in_plot = col_double(),
+    is_gametophyte = col_double(),
+    missing_sample = col_double(),
+    no_voucher_remaining = col_double(),
+    not_a_fern = col_double(),
+    `Preserve Type` = col_character(),
+    spore_voucher = col_double()
+  )
+
+
+# Read in collections ----
+fern_specimens_gps_raw <- read_csv("data_raw/specimens.csv", col_types = specimens_raw_col_spec) %>%
   clean_names() %>%
   # Filter to Moorea or Tahiti collections of ferns by Nitta
   filter(
@@ -56,11 +126,11 @@ fern_specimens_gps_raw <- read_csv("data_raw/specimens.csv") %>%
          family, genus, specific_epithet, infraspecific_rank, infraspecific_name, certainty,
          species, taxon, 
          # scientific_name, author, var_author,
-         country, county, locality, site,
+         country, county, locality, site = plot,
          elevation, latitude, longitude,
          observations,
          generation,
-         gameto_net_location, gameto_square,
+         gameto_net_location, gameto_square, gameto_habit,
          date_collected,
          other_collectors,
          herbaria)
