@@ -1,70 +1,51 @@
-# Plan the analysis
+source("R/packages.R")
+source("R/functions.R")
 
-plan <- drake_plan(
-
-  # Unzip raw data ----
-  
-  # Unzip data from Nitta et al. 2017 Ecol. Monographs from Dryad
-  # The dataset must be downloaded first by going to
-  # https://datadryad.org/stash/dataset/doi:10.5061/dryad.df59g, clicking on
-  # "Download dataset", and saving to the "data" folder in this project.
-  nitta_2017_data = unzip_nitta_2017(
-    zipped_path = file_in("data/doi_10.5061_dryad.df59g__v1.zip"),
-    unzip_path = "data/nitta_2017",
-    # Track data files used as input in analyses
-    out1 = file_out("data/nitta_2017/sites.csv"),
-    out2 = file_out("data/nitta_2017/treepl_Moorea_Tahiti.tre"),
-    out3 = file_out("data/nitta_2017/all_plots.csv")),
-
-  # Unzip data from Nitta et al. 2020 New Phyt. from Dryad
-  # The dataset must be downloaded first by going to
-  # https://datadryad.org/stash/dataset/doi:10.5061/dryad.fqz612jps, clicking on
-  # "Download dataset", and saving to the "data" folder in this project.
-  climate_unzipped = unzip(
-    zipfile = file_in("data/doi_10.5061_dryad.fqz612jps__v4.zip"), 
-    files = "moorea_climate.csv", 
-    exdir = file_out("data/nitta_2020/"), 
-    junkpaths = TRUE, 
-    overwrite = TRUE),
+tar_plan(
   
   # Load data ----
   
   # - microclimate data
-  climate = readr::read_csv(file_in("data/nitta_2020/moorea_climate.csv")),
-
+  tar_file(climate_file, "data/nitta_2020/moorea_climate.csv"),
+  climate = read_csv(climate_file),
+  
   # - site data
-  moorea_sites = readr::read_csv(
-    file_in("data/nitta_2017/sites.csv"),
+  tar_file(moorea_sites_file, "data/nitta_2017/sites.csv"),
+  moorea_sites = read_csv(
+    moorea_sites_file,
     col_types = "cnnn") %>%
     filter(str_detect(site, "Aorai", negate = TRUE)),
-
+  
   # - growth habit
-  filmy_habit = readr::read_csv("data/filmy_growth_habit.csv"),
-
+  tar_file(filmy_habit_file, "data/filmy_growth_habit.csv"),
+  filmy_habit = read_csv(filmy_habit_file),
+  
   filmy_species = filmy_habit$species,
   
   # - phylogenetic tree
-  filmy_phy = ape::read.tree(
-    file_in("data/nitta_2017/treepl_Moorea_Tahiti.tre"
-    )) %>%
+  tar_file(filmy_phy_file, "data/nitta_2017/treepl_Moorea_Tahiti.tre"),
+  filmy_phy = ape::read.tree(filmy_phy_file) %>%
     ape::keep.tip(filmy_species),
   
   # - sporophyte desiccation tolerance
-  filmy_sporo_dt = load_sporo_dt("data/filmy_sporo_dt.csv"),
+  tar_file(filmy_sporo_dt_file, "data/filmy_sporo_dt.csv"),
+  filmy_sporo_dt = load_sporo_dt(filmy_sporo_dt_file),
   
   # - gametophyte desiccation tolerance
-  filmy_gameto_dt = load_gameto_dt("data/filmy_gameto_dt.csv"),
+  tar_file(filmy_gameto_dt_file, "data/filmy_gameto_dt.csv"),
+  filmy_gameto_dt = load_gameto_dt(filmy_gameto_dt_file),
   
   # - community data
-  community_matrix_raw = readr::read_csv("data/nitta_2017/all_plots.csv"),
+  tar_file(community_matrix_raw_file, "data/nitta_2017/all_plots.csv"),
+  community_matrix_raw = read_csv(community_matrix_raw_file),
 
-  # FIXME: check number of measurements per individual; shouldn't have more than 10 each.
-  # Crepidomanes_minutum2 (2834), Crepidomanes_minutum2 (2998), and Hymenophyllum_braithwaitei (Hymenophyllum_sp1_6)
-  # have too many
-  light_data = read_csv("data/filmy_light_curves.csv"),
-
-  # Raw specimen data from specimens spreadsheet
-  specimens_raw = read_csv("data/fern_specimens.csv"),
+  # - light responses
+  tar_file(light_data_file, "data/filmy_light_curves.csv"),
+  light_data = read_csv(light_data_file),
+  
+  # - specimen data
+  tar_file(specimens_raw_file, "data/fern_specimens.csv"),
+  specimens_raw = read_csv(specimens_raw_file),
   
   # Process data ----
   
@@ -126,19 +107,17 @@ plan <- drake_plan(
   
   # - calculate ETRmax by individual
   etr_indiv = calculate_indiv_etr(light_data),
-
-  # Means by species and generation ----
   
-  # - DT recovery
+  # - calculate mean DT recovery by species and generation
   recovery_species_means = calc_mean_recovery(recovery_indiv),
   
-  # - ETR max
+  # - calculate mean ETR max by species and generation
   etr_species_means = calculate_mean_etr(etr_indiv),
-
-  # - PAR95
+  
+  # - calculate mean PAR95 by species and generation
   par_species_means = calculate_mean_par(par_indiv),
-
-  # - Combine the means into a single df
+  
+  # - combine the species means into a single df
   combined_species_means = combine_mean_phys_traits(
     recovery_species_means = recovery_species_means,
     etr_species_means = etr_species_means,
@@ -152,7 +131,7 @@ plan <- drake_plan(
     recovery_data = recovery_indiv, 
     par_indiv = par_indiv, 
     etr_indiv = etr_indiv),
-
+  
   # Phylogenetic signal ----
   phylosig = analyze_phylosig_by_generation(
     combined_species_means = combined_species_means,
@@ -171,41 +150,35 @@ plan <- drake_plan(
   
   # PGLS ----
   # (Phylogenetic Generalized Least Squares)
-
+  
   # Run PGLS for gametophyte range size vs. desiccation tolerance
   env_range_recover_data = combine_env_env_range_recover(
     combined_species_means = combined_species_means,
     env_range_data = env_range_data
   ),
-
+  
   env_range_dt_model = run_pgls(
     env_range_recover_data = env_range_recover_data,
     phy = filmy_phy),
-
+  
   env_range_dt_model_summary = map_df(env_range_dt_model, tidy_pgls, .id = "model"),
-
+  
   # Render manuscript ----
-
+  
   # Track bibliography files
-  refs = target("ms/references.bib", format = "file"),
-  refs_other = target("ms/references_other.yaml", format = "file"),
+  tar_file(refs, "ms/references.bib"),
+  tar_file(refs_other, "ms/references_other.yaml"),
 
-  # First render to PDF, keeping the latex
-  ms_pdf = render_tracked(
-    input = knitr_in("ms/manuscript.Rmd"),
-    quiet = TRUE,
-    output_dir = here::here("results"),
-    tracked_output = file_out("results/manuscript.tex"),
-    dep1 = refs,
-    dep2 = refs_other
-  ),
-
-  # Next use the latex to convert to docx with pandoc
+  # Render PDF
+  tar_render(manuscript_pdf, "ms/manuscript.Rmd", output_dir = here::here("results")),
+  
+  # Render MS Word
   ms_docx = latex2docx(
-    latex = file_in("results/manuscript.tex"),
-    docx = file_out("results/manuscript.docx"),
-    template = file_in("ms/journal-of-plant-research.docx"),
-    wd = here::here("results")
+    latex = "results/manuscript.tex",
+    docx = "results/manuscript.docx",
+    template = "ms/journal-of-plant-research.docx",
+    wd = here::here("results"),
+    depends = manuscript_pdf
   )
-
+  
 )

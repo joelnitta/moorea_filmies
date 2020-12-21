@@ -34,8 +34,10 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, results = 
 ```
 
 ```{r load-data}
-loadd(
-  list = c(
+tar_load(
+  names = c(
+    "refs",
+    "refs_other",
     "climate",
     "filmy_species",
     "moorea_sites",
@@ -376,6 +378,13 @@ ttest_pval <- function(species_select, response_select, data = t_test_results, p
     ) %>% 
     pull(p_value)
 }
+
+# FIXME: double check on these p-values
+# ttest_pval("Polyphlebium_endlicherianum", "recovery")
+# ttest_pval("Crepidomanes_minutum2", "recovery")
+# ttest_pval("Hymenophyllum_digitatum", "recovery")
+# ttest_pval("Hymenophyllum_polyanthos", "recovery")
+# ttest_pval("Polyphlebium_borbonicum", "recovery")
 ```
 
 Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases (Appendix S3).
@@ -387,8 +396,9 @@ Most low elevation epiphytes could not tolerate long periods (15 d) of desiccati
 Most of the high elevation epiphytes could recover from 2 d treatments regardless of desiccation intensity (except for *H.* *pallidum* and *P.* *borbonicum*, which failed to recover from 2 d at --282 MPa), and many could withstand desiccation for 15 d.
 Interestingly, *C. minutum* var. 2, *Hymenophyllum multifidum* (G. Forst.) Sw., and *Hymenophyllum polyanthos* (Sw.) Sw. could recover from desiccation at --86 or --282 MPa for 15 d, but not --38 MPa.
 
+DT of gametophytes did not significantly exceed that of sporophytes for any species except for saxicolous *P. endlicherianum* (Fig. 5; *t*-test, *P* = ), and was significantly lower in gametophytes than sporophytes of some high elevation epiphytic species including *C. minutum* var. 2, *H.* *digitatum*, *H. polyanthos*, and *P. borbonicum* (Fig. 5; *t*-test, *P* = XXX, XXX, XXX, and XXX, respectively).
+
 Gametophytes of low elevation epiphytes had the highest DT (\circa{ }80% recovery), followed by high elevation epiphytes and saxicolous species (both with recovery from \circa{ }25% to 75%), with terrestrial species essentially non-tolerant (less than 20% recovery; Fig. 5).
-<!-- FIXME: check on these numbers DT of gametophytes did not significantly exceed that of sporophytes for any species except for saxicolous *P. endlicherianum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Polyphlebium_endlicherianum", "recovery")`), and was significantly lower in gametophytes than sporophytes of some high elevation epiphytic species including *C. minutum* var. 2, *H.* *digitatum*, *H. polyanthos*, and *P. borbonicum* (Fig. 5; *t*-test, *P* = `r ttest_pval("Crepidomanes_minutum2", "recovery")`, `r ttest_pval("Hymenophyllum_digitatum", "recovery")`, `r ttest_pval("Hymenophyllum_polyanthos", "recovery")`, and `r ttest_pval("Polyphlebium_borbonicum", "recovery")`, respectively). -->
 
 The GLMM showed that both generation and the interaction of generation and growth habit, but not growth habit alone, have a significant effect on DT while controlling for phylogeny (Table 3).
 In contrast, range type (gametophytes widespread beyond sporophytes or not) has no significant effect on DT (Table 3).
@@ -561,6 +571,8 @@ Evan Zeng helped with analysis of microclimatic data.
 Weston Testo provided advice on settings for the DT test.
 Staff at the University of California Berkeley's Richard B. Gump South Pacific Research Station, Moorea, French Polynesia, in particular Valentine Brotherson, Neil Davies, Hinano Teavai-Murphy, and Frank Murphy, provided logistical support for fieldwork.
 Funding provided in part by the National Science Foundation (Doctoral Dissertation Improvement Grant DEB-1311169 to JHN and CCD), Setup Funds from Harvard University to CCD, American Society of Plant Taxonomists (Research Grant for Graduate Students to JHN), Garden Club of America (Award in Tropical Botany to JHN), Harvard University Herbaria (Fernald Fieldwork Fellowship to JHN), Society of Systematic Biologists (Graduate Student Research Award to JHN), and Systematics Association (Systematics Research Fund to JHN).
+
+## Figures
 
 ## References
 

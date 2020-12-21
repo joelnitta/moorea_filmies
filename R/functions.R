@@ -1282,11 +1282,12 @@ render_tracked <- function (tracked_output, dep1 = NULL, dep2 = NULL, ...) {
 #' @param template Path to template docx file.
 #' @param wd Working directory to run conversion. Should be same as
 #' directory containing any files needed to render latex to pdf.
+#' @param ... Other arguments; not used by this function, but for tracking dependencies.
 #'
 #' @return List including STDOUT of pandoc; externally, the
 #' docx file will be rendered in `wd`.
 #' 
-latex2docx <- function (latex, docx, template = NULL, wd = getwd()) {
+latex2docx <- function (latex, docx, template = NULL, wd = getwd(), ...) {
   
   assertthat::assert_that(assertthat::is.readable(latex))
   
