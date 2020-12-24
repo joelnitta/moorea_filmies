@@ -4,6 +4,62 @@
 
 # This functions are used for pre-processing raw data (scripts `R/clean_*.R`)
 
+#' Read in data from a hobo datalogger.
+#' 
+#' Hobo dataloggers (Onset Corp.) store data in properietary ".hobo" format.
+#' This needs to be convert to CSV first by opening the .hobo file with
+#' HOBOware software (https://www.onsetcomp.com/hoboware-free-download/),
+#' then exporting as CSV.
+#'
+#' @param file Path to CSV file exported from HOBOware
+#'
+#' @return Dataframe including columns:
+#' - temperature: temperature (degrees celsius)
+#' - rh: relative humidity (percent)
+#' - serial_no: serial number
+#' 
+read_hobo <- function(file) {
+  
+  # Get original column names
+  # these contain the serial number, so will be different for each file
+  col_names <-
+    suppressMessages(suppressWarnings(readr::read_csv(file))) %>%
+    janitor::clean_names() %>%
+    colnames()
+  
+  # Extract serial number 
+  serial_no <- col_names %>%
+    magrittr::extract(3) %>%
+    stringr::str_match("s_n_([0-9]+)") %>%
+    magrittr::extract(,2)
+  
+  # Make a vector of clean column names that can be used
+  # for any hobo csv file
+  clean_col_names <-
+    col_names %>%
+    str_match("date|time|temp|rh|coupler_detached|coupler_attached|stopped|host_connected|end_of_file") %>%
+    magrittr::extract(,1)
+  
+  # Read in the csv file using the clean column names
+  readr::read_csv(
+    file,
+    skip = 1,
+    col_names = clean_col_names,
+    col_types = cols(
+      date = col_character(),
+      time = col_time(format = ""),
+      temp = col_double(),
+      rh = col_double(),
+      .default = col_character()
+    )) %>%
+    # parse date_time
+    dplyr::mutate(date_time = paste(date, time) %>% lubridate::ymd_hms()) %>%
+    # only include date_time, temperature, rel. humidity, and serial number
+    dplyr::select(date_time, temp, rh) %>%
+    ggplot2::remove_missing(na.rm = TRUE) %>%
+    dplyr::mutate(serial_no = serial_no)
+  
+}
 
 #' Convert a factor to numbers
 #'
