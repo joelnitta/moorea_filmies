@@ -644,6 +644,18 @@
       "Repository": "CRAN",
       "Hash": "b3209c62052922b6c629544d94c8fa8a"
     },
+    "patchwork": {
+      "Package": "patchwork",
+      "Version": "1.1.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "thomasp85",
+      "RemoteRepo": "patchwork",
+      "RemoteRef": "master",
+      "RemoteSha": "79223d3002e7bd7e715a270685c6507d684b2622",
+      "Hash": "bb0351006f85f2c68810f8202d74e2d1"
+    },
     "phangorn": {
       "Package": "phangorn",
       "Version": "2.5.5",
