@@ -7,6 +7,33 @@ source("R/packages.R")
 # Load functions
 source("R/functions.R")
 
+# Read in mini-PAM data ----
+
+# Loop over the files: read them in, process each data frame in the list, then combine
+minipam_2013_long <-
+  # List all the 2013 gameto mini pam files
+  list.files("data_raw/2013/minipam", pattern = "miniPAM SET\\d ALL.*\\.pam", full.names = TRUE) %>%
+  set_names(fs::path_file(.)) %>%
+  # Parse each one in a list
+  map(
+    ~parse_pam(., ret_type = "fl", recalc_yield = TRUE) %>%
+      select(memory, yield, date_time, yield_error)) %>%
+  # Add a column for "file"
+  imap(~mutate(.x, file = .y)) %>%
+  # Combine into single df
+  bind_rows %>%
+  # Add column for "pam set" (sets 1-5)
+  mutate(pam_set = str_match(file, "SET(\\d)") %>% magrittr::extract(,2) %>% paste0("set", .)) %>%
+  assert(not_na, pam_set) %>%
+  select(-file) %>%
+  filter(
+    # Exclude rows with corrupted times (all should be 2013)
+    date_time > lubridate::ymd_hms("2013-01-01 01:00:00"),
+    date_time < lubridate::ymd_hms("2014-01-01 01:00:00")) %>%
+  # Exclude some corrupted data in set 1
+  filter(!(memory %in% c(1963, 1969:2001) & pam_set == "set1")) %>%
+  arrange(date_time)
+
 # 2012 sporophyte DT data ----
 ### Fix column names ###
 # In the original excel file, these are in two rows.
@@ -402,7 +429,7 @@ filmy_dt_2014 <- filmy_dt_2014_raw %>%
   check_dt_data
 
 # Combine sporophyte data from different years ----
-filmy_sporo_dt <- bind_rows(
+filmy_sporo_dt_raw_yield <- bind_rows(
   filmy_dt_2012, 
   filmy_dt_2013_1, 
   filmy_dt_2013_2, 
@@ -411,9 +438,11 @@ filmy_sporo_dt <- bind_rows(
   filmy_dt_2013_5, 
   filmy_dt_2014) %>%
   select(
-    species, salt, dry_time, individual, dataset, contains("weight"), contains("yield"), contains("memory")
+    species, salt, dry_time, individual, dataset, matches("yield|memory|weight")
   ) %>%
-  mutate(generation = "sporophyte") %>%
+  mutate(
+    generation = "sporophyte",
+    individual = as.character(individual)) %>%
   check_dt_data
 
 # 2012 gametophyte DT data ----
@@ -522,7 +551,7 @@ gameto_dt_2012 <-
 
 # Read in all gametophyte DT data as a list,
 # but don't fix column names yet
-gameto_dt_2013_all_raw_names <- 
+gameto_dt_2013_raw_names <- 
   # List all 2013 gametophyte DT data sets 2-13 files
   list.files("data_raw/2013", pattern = regex("moorea 2013 gameto"), ignore.case = TRUE, full.names = TRUE) %>%
   # Name by vector of files by the file name, so we can include it when combining the data
@@ -532,8 +561,8 @@ gameto_dt_2013_all_raw_names <-
   map(clean_names)
 
 # Manually fix some column names that fix_gameto_dt_names() wouldn't handle properly
-gameto_dt_2013_all_raw_names[["Moorea 2013 gametophyte DT set1.xlsx"]] <-
-  gameto_dt_2013_all_raw_names[["Moorea 2013 gametophyte DT set1.xlsx"]] %>%
+gameto_dt_2013_raw_names[["Moorea 2013 gametophyte DT set1.xlsx"]] <-
+  gameto_dt_2013_raw_names[["Moorea 2013 gametophyte DT set1.xlsx"]] %>%
   select(
     individual = gametophytes,
     memory_pre = wet_memory,
@@ -546,8 +575,8 @@ gameto_dt_2013_all_raw_names[["Moorea 2013 gametophyte DT set1.xlsx"]] <-
   remove_empty("rows") %>%
   mutate(individual = make.unique(as.character(individual)))
 
-gameto_dt_2013_all_raw_names[["Moorea 2013 Gameto DT Set 13 DONE.xlsx"]] <-
-  gameto_dt_2013_all_raw_names[["Moorea 2013 Gameto DT Set 13 DONE.xlsx"]] %>%
+gameto_dt_2013_raw_names[["Moorea 2013 Gameto DT Set 13 DONE.xlsx"]] <-
+  gameto_dt_2013_raw_names[["Moorea 2013 Gameto DT Set 13 DONE.xlsx"]] %>%
   select(
     individual = gametophytes,
     memory_pre = memory,
@@ -570,8 +599,8 @@ gameto_dt_2013_all_raw_names[["Moorea 2013 Gameto DT Set 13 DONE.xlsx"]] <-
 # DT set 7, 8 is missing memory for pre-treatment
 # DT set 6 is missing memory for dry state
 # DT set 3 is missing memory and yield for dry state
-gameto_dt_2013_all <- 
-  gameto_dt_2013_all_raw_names %>%
+gameto_dt_2013_raw_yield <- 
+  gameto_dt_2013_raw_names %>%
   map(fix_gameto_dt_names) %>%
   # Add a column for "file"
   imap(~mutate(.x, file = .y)) %>%
@@ -603,161 +632,28 @@ gameto_dt_2013_all <-
     )) %>%
   mutate(across(contains("memory"), ~ifelse(. < 1, NA, .))) %>%
   assert(within_bounds(0, 1000), contains("yield")) %>%
-  assert(within_bounds(1, 4000), contains("memory"))
-
-# Convert to long format
-gameto_dt_2013_long <- left_join(
-  gameto_dt_2013_all %>%
-    select(individual, control, file, contains("yield")) %>%
-    pivot_longer(names_to = "condition", values_to = "yield", contains("yield")) %>%
-    mutate(condition = str_remove_all(condition, "yield_")),
-  gameto_dt_2013_all %>%
-    select(individual, control, file, contains("memory")) %>%
-    pivot_longer(names_to = "condition", values_to = "memory", contains("memory")) %>%
-    mutate(condition = str_remove_all(condition, "memory_")),
-  by = c("individual", "control", "file", "condition")
-)
-
-# Write out the data in long format for manual comparison with
-# miniPAM data to fix errors in the "memory" columns
-# gameto_dt_2013_long %>% 
-#   select(individual, file, condition, yield = fvfm, memory, control) %>%
-#   write_csv("intermediates/gameto_dt_2013_long.csv")
-# 
-# gameto_dt_2013_long %>%
-#   filter(file == "Moorea 2013 Gameto DT Set 13 DONE.xlsx") %>%
-#   select(individual, file, condition, yield, memory, control) %>%
-#   mutate(condition = str_replace_all(condition, "pre", "dark")) %>%
-#   mutate(condition = factor(condition, levels = c("dark", "dry", "30min", "24hr", "48hr", "72hr"), ordered = TRUE)) %>%
-#   mutate(file_order = 13) %>%
-#   arrange(condition, individual) %>%
-#   write_csv("data_raw/intermediates/gameto_dt_2013_long_fix_add_13.csv")
-
-### Read in mini-PAM data
-
-# Loop over the files: read them in, process each data frame in the list, then combine
-gameto_fl_2013_long <-
-  # List all the 2013 gameto mini pam files
-  list.files("data_raw/2013/minipam", pattern = "miniPAM SET\\d ALL.*\\.pam", full.names = TRUE) %>%
-  set_names(fs::path_file(.)) %>%
-  # Parse each one in a list
-  map(
-    ~parse_pam(., ret_type = "fl", recalc_yield = TRUE) %>%
-      select(memory, yield, date_time, yield_error)) %>%
-  # Add a column for "file"
-  imap(~mutate(.x, file = .y)) %>%
-  # Combine into single df
-  bind_rows %>%
-  # Add column for "pam set" (sets 1-5)
-  mutate(pam_set = str_match(file, "SET(\\d)") %>% magrittr::extract(,2) %>% paste0("set", .)) %>%
-  assert(not_na, pam_set) %>%
-  select(-file) %>%
-  filter(
-    # Exclude rows with corrupted times (all should be 2013)
-    date_time > lubridate::ymd_hms("2013-01-01 01:00:00"),
-    date_time < lubridate::ymd_hms("2014-01-01 01:00:00")) %>%
-  # Exclude some corrupted data in set 1
-  filter(!(memory %in% c(1963, 1969:2001) & pam_set == "set1")) %>%
-  arrange(date_time)
-
-# Write out the data in long format for manual comparison with
-# miniPAM data to fix errors in the "memory" columns
-# write_csv(gameto_fl_2013_long, "intermediates/gameto_fl_2013_long.csv")
-
-# Read in data with "fixed" memory values after manually comparing with
-# miniPAM data
-fixed_lookup <- read_excel("data_raw/intermediates/gameto_dt_2013_long_fix.xlsx", na = c("", "NA", "#VALUE!")) %>%
-  select(individual, control, memory, fix, manual_mem, pam_set, note) %>%
-  mutate(fix = replace_na(fix, 0)) %>%
-  filter(!is.na(memory)) %>%
-  mutate(corrected_mem = ifelse(is.na(manual_mem), memory + fix, manual_mem)) %>%
-  assert(not_na, corrected_mem) %>%
-  select(individual, control, memory, corrected_mem, pam_set, note)
-
-# Map the values from the miniPAM data to the manually entered yield data,
-# convert to wide format
-gameto_dt_2013 <-
-  gameto_dt_2013_long %>%
-  # Exclude values with no manually entered yield or memory
-  filter(!(is.na(yield) & is.na(memory))) %>%
-  rename(yield_manual_entry = yield) %>%
-  # Add corrected memory numbers
-  left_join(fixed_lookup, by = c("individual", "control", "memory")) %>%
-  # DT set 1 is not included in "fixed_lookup" because it was already correct.
-  # Fill in 'corrected_mem' for Set 1 as the original memory
-  mutate(
-    corrected_mem = ifelse(file == "Moorea 2013 gametophyte DT set1.xlsx", memory, corrected_mem),
-    pam_set = ifelse(file == "Moorea 2013 gametophyte DT set1.xlsx", "set1", pam_set)) %>%
-  select(-memory) %>%
-  # Now convert 'corrected_mem' to 'memory'
-  rename(memory = corrected_mem) %>%
-  # Join PAM yields based on memory and pam set
-  left_join(
-    rename(gameto_fl_2013_long, yield_pam = yield), 
-    by = c("memory", "pam_set")) %>%
-  # Convert yield to how it appears on the miniPAM (1000*actual yield)
-  mutate(
-    yield_pam = 1000*yield_pam,
-    note = replace_na(note, "none")) %>%
-  filter(str_detect(note, "exclude", negate = TRUE)) %>%
-  # Check for problems in yield differences between 
-  # manual entry and values matched from miniPAM
-  mutate(yield_diff = abs(yield_pam - yield_manual_entry)) %>%
-  # flag the check as FALSE if there is a large difference
-  # between values entered manually and looked up from miniPAM,
-  # and if the note doesn't say to use the miniPAM value.
-  mutate(
-    pass_check = ifelse(yield_diff > 20 & note != "use pam", FALSE, TRUE) %>%
-      replace_na(TRUE)) %>%
-  assert(isTRUE, pass_check) %>%
-  select(-yield_error, -yield_diff, -pass_check) %>%
-  # Select the final value to use for yield (manual or miniPAM)
-  mutate(yield = case_when(
-    # - use manual when indicated in notes
-    str_detect(note, "use manual") ~ yield_manual_entry,
-    # - use miniPAM when indicated in notes
-    str_detect(note, "use pam") ~ yield_pam,
-    # - some values only have manual entry, with no memory entered
-    !is.na(yield_manual_entry) & is.na(yield_pam) ~ yield_manual_entry,
-    # - use the miniPAM otherwise
-    TRUE ~ yield_pam
-  )) %>%
-  select(-yield_manual_entry, -yield_pam) %>%
-  # Check all rows have a yield entry
-  assert(not_na, yield) %>%
-  select(-file, -memory, -pam_set, -note) %>%
-  rename(time = date_time) %>%
-  # Convert to wide format
-  pivot_wider(names_from = "condition", values_from = c("yield", "time")) %>%
-  # Add column for desiccation treatment and dry time
-  mutate(
-    salt = ifelse(isTRUE(control), "Control", "MgNO3"),
-    dry_time = 2) %>%
-  select(-control)
-    
-### Combine all datasets ----
-gameto_dt <- bind_rows(gameto_dt_2012, gameto_dt_2013) %>%
+  assert(within_bounds(1, 4000), contains("memory")) %>%
   mutate(generation = "gametophyte")
 
-#### Filter to only filmy ferns ----
+# Combine gametophyte data from different years ----
+# Also add species names and filter to only filmy ferns
 
-# Read in specimen collection data
+# Read in specimen collection data, which contains species IDs based on
+# DNA barcode
 # (requires clean_specimen_data.R to be run first)
 specimens <- read_csv("data/fern_specimens.csv") 
 
 # Note that when joining collection data to DT data based on individual,
 # seven records are dropped because these had collection numbers + subcollection numbers,
-# but there is no record of what subcollection number was used in th DT test.
-missing <- gameto_dt %>%
-  anti_join(specimens, by = c(individual = "coll_num"))
+# but there is no record of what subcollection number was used in the DT test.
+# missing <- bind_rows(gameto_dt_2012, gameto_dt_2013_raw_yield) %>%
+#   anti_join(specimens, by = c(individual = "coll_num"))
+# 
+# specimens %>%
+#   filter(str_detect(coll_num, paste(missing$individual, collapse = "|"))) %>%
+#   select(genus, specific_epithet, coll_num, date_collected)
 
-specimens %>%
-  filter(str_detect(coll_num, paste(missing$individual, collapse = "|"))) %>%
-  select(genus, specific_epithet, coll_num, date_collected)
-
-# Add species and family, filter to only filmy ferns
-filmy_gameto_dt <-
-gameto_dt %>%
+gameto_dt_raw_yield <- bind_rows(gameto_dt_2012, gameto_dt_2013_raw_yield) %>% 
   left_join(
     select(specimens, coll_num, species, family),
     by = c(individual = "coll_num")
@@ -765,9 +661,99 @@ gameto_dt %>%
   filter(family == "Hymenophyllaceae") %>%
   select(-family) %>%
   mutate(
-    species = str_replace_all(species, " ", "_"),
-    dry_time = factor(dry_time)) %>%
-  check_dt_data
+    generation = "gametophyte",
+    control = replace_na(control, FALSE),
+    salt = ifelse(control == TRUE, "Control", "MgNO3"),
+    dry_time = factor(2, levels = c(2, 15)),
+    species = str_replace_all(species, " ", "_")) %>%
+  check_dt_data %>%
+  # `control` and `file` only apply to gametophyte data
+  # - `control`: was this individual used as a control?
+  # - `file`: name of file where the raw data come from
+  select(
+    control, file, species, salt, dry_time, individual, generation, matches("yield|memory|weight")
+  )
 
-# Write to data/ ----
-write_csv(filmy_gameto_dt, "data/filmy_gameto_dt.csv")
+# Join miniPAM data ----
+
+filmy_dt_raw_yield <-
+bind_rows(
+  gameto_dt_raw_yield,
+  filmy_sporo_dt_raw_yield
+)
+
+# Read in data with "fixed" memory values after manually comparing with
+# miniPAM data
+
+# This was originally produced by writing out gameto_dt_2013_long: 
+# gameto_dt_2013_long %>% 
+#   select(individual, file, condition, yield = fvfm, memory, control) %>%
+#   write_csv("intermediates/gameto_dt_2013_long.csv")
+# and combining with miniPam data as the second sheet to fix errors in 
+# the "memory" columns:
+# write_csv(minipam_2013_long, "intermediates/minipam_2013_long.csv")
+gameto_fixed_lookup <- read_excel("data_raw/intermediates/gameto_dt_2013_long_fix.xlsx", na = c("", "NA", "#VALUE!")) %>%
+  select(individual, control, memory, fix, manual_mem, pam_set, note) %>%
+  mutate(fix = replace_na(fix, 0)) %>%
+  filter(!is.na(memory)) %>%
+  mutate(corrected_mem = ifelse(is.na(manual_mem), memory + fix, manual_mem)) %>%
+  assert(not_na, corrected_mem) %>%
+  select(individual, control, memory, corrected_mem, pam_set, note) %>%
+  mutate(generation = "gametophyte")
+
+sporo_fixed_lookup <- read_excel(
+  "data_raw/intermediates/sporo_dt_long_fix.xlsx", 
+  na = c("", "NA", "#VALUE!")) %>%
+  mutate(dry_time = factor(dry_time, levels = c(2, 15))) %>%
+  select(species:condition, memory, fix, manual_mem, pam_set, note) %>%
+  mutate(fix = replace_na(fix, 0)) %>%
+  filter(!is.na(memory)) %>%
+  mutate(corrected_mem = ifelse(is.na(manual_mem), memory + fix, manual_mem)) %>%
+  assert(not_na, corrected_mem) %>%
+  select(species:condition, memory, corrected_mem, pam_set, note) %>%
+  mutate(generation = "sporophyte", individual = as.character(individual))
+
+fixed_lookup <- bind_rows(gameto_fixed_lookup, sporo_fixed_lookup)
+
+### Join to miniPAM data to add yield and timestamp ###
+# convert to long format
+filmy_dt_raw_yield_long <-
+filmy_dt_raw_yield %>%
+  pivot_longer(names_to = "var_condition", values_to = "value", matches("yield|memory|weight")) %>%
+  separate(var_condition, c("var", "condition"))
+
+# Add pam data: gametophytes (do separately from sporophytes because conditions
+# for joining are different)
+gameto_dt_pam_yield <-
+filmy_dt_raw_yield_long %>%
+  filter(var == "memory", generation == "gametophyte", !is.na(value)) %>%
+  left_join(
+    select(fixed_lookup, generation, individual, control, memory, corrected_mem, pam_set),
+    by = c("generation", "individual", "control", value = "memory")) %>%
+  rename(memory = corrected_mem) %>%
+  # Join PAM yields based on memory and pam set
+  left_join(
+    rename(minipam_2013_long, yield_pam = yield), 
+    by = c("memory", "pam_set")) %>%
+  select(species, salt, dry_time, individual, generation, condition, yield_pam, date_time, note) %>%
+  # Make sure no rows got duplicated during the join
+  assert_rows(col_concat, is_uniq, individual, salt, condition)
+
+# Add pam data: sporophytes
+sporo_dt_pam_yield <-
+filmy_dt_raw_yield_long %>%
+  filter(var == "memory", generation == "sporophyte", !is.na(value)) %>%
+  select(-control, -file) %>%
+  left_join(
+    select(fixed_lookup, -control, -dataset),
+    by = c("generation", "species", "individual", "salt", "dry_time", "condition", value = "memory")) %>%
+  rename(memory = corrected_mem) %>%
+  # Join PAM yields based on memory and pam set
+  left_join(
+    rename(minipam_2013_long, yield_pam = yield), 
+    by = c("memory", "pam_set")) %>%
+  select(species, salt, dry_time, individual, generation, condition, yield_pam, date_time, note) %>%
+  # Make sure no rows got dupliated during the join
+  assert_rows(col_concat, is_uniq, species, salt, dry_time, individual, condition)
+
+# NEXT STEPS: combine pam yields with raw yields, choose the right one, write out

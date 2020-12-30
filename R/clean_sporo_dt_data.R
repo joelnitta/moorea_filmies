@@ -171,7 +171,12 @@ filmy_dt_2013_1 <- filmy_dt_2013_1_raw %>%
   mutate(
     yield_pre = ifelse(salt != "Control", 1000*yield_pre, yield_pre),
     dataset = "2013_1",
-    across(contains("memory") & where(is.character), parse_number)) %>%
+    across(contains("memory") & where(is.character), parse_number),
+    # In a subset of yields, value was recorded as a decimal instead of whole number
+    yield_30min = case_when(
+      dry_time == "2" & salt != "H2O" ~ yield_30min*1000,
+      TRUE ~ yield_30min
+    ) ) %>%
   check_dt_data
 
 filmy_dt_2013_2_raw <- read_excel("data_raw/2013/Filmy Fern DT 2 Pbor.xlsx", sheet = 1)
@@ -215,8 +220,12 @@ filmy_dt_2013_2 <- filmy_dt_2013_2_raw %>%
   select(-c(weight_desiccated_2d, weight_desiccated_15d)) %>%
   mutate(
     dataset = "2013_2",
-    across(contains("memory") & where(is.character), parse_number)) %>%
-  check_dt_data
+    across(contains("memory") & where(is.character), parse_number))
+
+# P. borbonicum 15d control was missing numbers for individual. Fill these in.
+filmy_dt_2013_2$individual[filmy_dt_2013_2$"individual" %>% is.na() %>% which()] <- 1:8
+
+check_dt_data(filmy_dt_2013_2)
 
 filmy_dt_2013_3_raw <- read_excel("data_raw/2013/Filmy Fern DT 3 Hmul, Hdig.xlsx", sheet = 1)
 
@@ -409,19 +418,16 @@ filmy_sporo_dt <- bind_rows(
 
 # Join with PAM data to add timestamps ----
 # Convert to long format
+
 filmy_sporo_dt %>%
-  select(-contains("yield")) %>%
-  pivot_longer(names_to = "condition", values_to = "memory", contains("memory")) %>%
-  filter(!is.na(memory)) %>%
-  mutate(condition = str_remove_all(condition, "memory_") %>% 
-           factor(levels = c("pre", "30min", "24hr", "48hr", "72hr"))
-  ) %>%
-  arrange(dry_time, condition, salt, species, individual) %>%
-  mutate(pam_set = case_when(
-    dry_time == 15 & condition %in% c("30min", "24hr", "48hr", "72hr") ~ "set2",
-    TRUE ~ "set1"
-  )) %>%
-  assert_rows(col_concat, is_uniq, pam_set, memory)
+  select(-matches("weight")) %>%
+  pivot_longer(names_to = "condition", values_to = "value", matches("yield|memory")) %>%
+  separate(condition, c("meas", "condition")) %>%
+  pivot_wider(names_from = "meas", values_from = "value") %>%
+  filter(str_detect(dataset, "2013")) %>%
+  arrange(dataset, memory) %>%
+  mutate(pam_set = "") %>%
+  write_csv("filmy_dt_long_fix.csv")
 
 
 # Write to data_raw/ ----
