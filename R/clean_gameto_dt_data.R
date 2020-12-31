@@ -728,7 +728,7 @@ gameto_dt_pam_yield <-
 filmy_dt_raw_yield_long %>%
   filter(var == "memory", generation == "gametophyte", !is.na(value)) %>%
   left_join(
-    select(fixed_lookup, generation, individual, control, memory, corrected_mem, pam_set),
+    select(fixed_lookup, generation, individual, control, memory, corrected_mem, pam_set, note),
     by = c("generation", "individual", "control", value = "memory")) %>%
   rename(memory = corrected_mem) %>%
   # Join PAM yields based on memory and pam set
@@ -742,18 +742,62 @@ filmy_dt_raw_yield_long %>%
 # Add pam data: sporophytes
 sporo_dt_pam_yield <-
 filmy_dt_raw_yield_long %>%
-  filter(var == "memory", generation == "sporophyte", !is.na(value)) %>%
+  filter(var == "memory", generation == "sporophyte", !is.na(value)) %>% # removes 2012 data, which had no memory values recorded
   select(-control, -file) %>%
   left_join(
-    select(fixed_lookup, -control, -dataset),
-    by = c("generation", "species", "individual", "salt", "dry_time", "condition", value = "memory")) %>%
+    select(fixed_lookup, -control),
+    by = c("generation", "species", "individual", "salt", "dry_time", "condition", "dataset", value = "memory")) %>%
   rename(memory = corrected_mem) %>%
   # Join PAM yields based on memory and pam set
   left_join(
     rename(minipam_2013_long, yield_pam = yield), 
     by = c("memory", "pam_set")) %>%
-  select(species, salt, dry_time, individual, generation, condition, yield_pam, date_time, note) %>%
+  select(species, salt, dry_time, individual, generation, condition, yield_pam, date_time, note, dataset) %>%
   # Make sure no rows got dupliated during the join
   assert_rows(col_concat, is_uniq, species, salt, dry_time, individual, condition)
 
-# NEXT STEPS: combine pam yields with raw yields, choose the right one, write out
+filmy_dt_pam_yield <- bind_rows(sporo_dt_pam_yield, gameto_dt_pam_yield)
+
+# Select final yields, write out ----
+filmy_dt_wide <-
+filmy_dt_raw_yield_long %>%
+  pivot_wider(names_from = "var", values_from = "value") %>%
+  select(-control, -file) %>%
+  rename(yield_manual_entry = yield) %>%
+  left_join(filmy_dt_pam_yield) %>%
+  filter(!(is.na(yield_manual_entry) & is.na(yield_pam) & is.na(memory))) %>%
+  # Convert yield to how it appears on the miniPAM (1000*actual yield)
+  mutate(
+    yield_pam = 1000*yield_pam,
+    note = replace_na(note, "none")) %>%
+  filter(str_detect(note, "exclude", negate = TRUE)) %>%
+  # Check for problems in yield differences between 
+  # manual entry and values matched from miniPAM
+  mutate(yield_diff = abs(yield_pam - yield_manual_entry)) %>%
+  # flag the check as FALSE if there is a large difference
+  # between values entered manually and looked up from miniPAM,
+  # and if the note doesn't say to use the miniPAM value.
+  mutate(
+    pass_check = ifelse(yield_diff > 20 & str_detect(note, "use manual|use pam", negate = TRUE), FALSE, TRUE) %>%
+      replace_na(TRUE)) %>%
+  assert(isTRUE, pass_check) %>%
+  select(-yield_diff, -pass_check) %>%
+  # Select the final value to use for yield (manual or miniPAM)
+  mutate(yield = case_when(
+    # - use manual when indicated in notes
+    str_detect(note, "use manual") ~ yield_manual_entry,
+    # - use miniPAM when indicated in notes
+    str_detect(note, "use pam") ~ yield_pam,
+    # - some values only have manual entry, with no memory entered
+    !is.na(yield_manual_entry) & is.na(yield_pam) ~ yield_manual_entry,
+    # - use the miniPAM otherwise
+    TRUE ~ yield_pam
+  )) %>%
+  select(-yield_manual_entry, -yield_pam) %>%
+  # Check all rows have a yield entry
+  assert(not_na, yield) %>%
+  select(-memory, -note) %>%
+  rename(time = date_time) %>%
+  # Convert to wide format
+  pivot_wider(names_from = "condition", values_from = c("yield", "time", "weight"))
+  
