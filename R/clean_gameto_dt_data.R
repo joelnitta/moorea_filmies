@@ -760,21 +760,23 @@ filmy_dt_pam_yield <- bind_rows(sporo_dt_pam_yield, gameto_dt_pam_yield)
 
 # Select final yields, write out ----
 filmy_dt_wide <-
-filmy_dt_raw_yield_long %>%
+  filmy_dt_raw_yield_long %>%
   pivot_wider(names_from = "var", values_from = "value") %>%
   select(-control, -file) %>%
   rename(yield_manual_entry = yield) %>%
-  left_join(filmy_dt_pam_yield) %>%
-  filter(!(is.na(yield_manual_entry) & is.na(yield_pam) & is.na(memory))) %>%
-  # Convert yield to how it appears on the miniPAM (1000*actual yield)
-  mutate(
-    yield_pam = 1000*yield_pam,
-    note = replace_na(note, "none")) %>%
+  left_join(
+    filmy_dt_pam_yield, 
+    by = c("species", "salt", "dry_time", "individual", "generation", "dataset", "condition")) %>%
+  mutate(note = replace_na(note, "none")) %>% # so str_detect works
+  # Remove rows with no yield or weight at all
+  filter(!(is.na(yield_manual_entry) & is.na(yield_pam) & is.na(weight))) %>%
   filter(str_detect(note, "exclude", negate = TRUE)) %>%
+  # Convert yield to how it appears on the miniPAM (1000*actual yield)
+  mutate(yield_pam = 1000*yield_pam) %>%
   # Check for problems in yield differences between 
   # manual entry and values matched from miniPAM
   mutate(yield_diff = abs(yield_pam - yield_manual_entry)) %>%
-  # flag the check as FALSE if there is a large difference
+  # Flag the check as FALSE if there is a large difference
   # between values entered manually and looked up from miniPAM,
   # and if the note doesn't say to use the miniPAM value.
   mutate(
@@ -793,11 +795,35 @@ filmy_dt_raw_yield_long %>%
     # - use the miniPAM otherwise
     TRUE ~ yield_pam
   )) %>%
-  select(-yield_manual_entry, -yield_pam) %>%
-  # Check all rows have a yield entry
-  assert(not_na, yield) %>%
-  select(-memory, -note) %>%
+  select(-yield_manual_entry, -yield_pam, -memory, -note) %>%
   rename(time = date_time) %>%
   # Convert to wide format
-  pivot_wider(names_from = "condition", values_from = c("yield", "time", "weight"))
+  pivot_wider(names_from = "condition", values_from = c("yield", "time", "weight")) %>%
+  # Rearrange columns
+  select(
+    species:dataset,
+    yield_pre,
+    yield_desiccated,
+    yield_30min,
+    yield_24hr,
+    yield_48hr,
+    yield_72hr,
+    yield_dry,
+    weight_pre,
+    weight_desiccated,
+    weight_30min,
+    weight_24hr,
+    weight_48hr,
+    weight_72hr,
+    weight_dry,
+    time_pre,
+    time_desiccated,
+    time_30min,
+    time_24hr,
+    time_48hr,
+    time_72hr,
+    time_dry) %>%
+  janitor::remove_empty("cols")
+
+write_csv(filmy_dt_wide, "data/filmy_dt.csv")
   
