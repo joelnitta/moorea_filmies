@@ -20,6 +20,7 @@ tar_plan(
   tar_file(filmy_habit_file, "data/filmy_growth_habit.csv"),
   filmy_habit = read_csv(filmy_habit_file),
   
+  # - vector of filmy fern species
   filmy_species = filmy_habit$species,
   
   # - phylogenetic tree
@@ -27,13 +28,9 @@ tar_plan(
   filmy_phy = ape::read.tree(filmy_phy_file) %>%
     ape::keep.tip(filmy_species),
   
-  # - sporophyte desiccation tolerance
-  tar_file(filmy_sporo_dt_file, "data/filmy_sporo_dt.csv"),
-  filmy_sporo_dt = load_sporo_dt(filmy_sporo_dt_file),
-  
-  # - gametophyte desiccation tolerance
-  tar_file(filmy_gameto_dt_file, "data/filmy_gameto_dt.csv"),
-  filmy_gameto_dt = load_gameto_dt(filmy_gameto_dt_file),
+  # - desiccation tolerance
+  tar_file(filmy_dt_file, "data/filmy_dt.csv"),
+  filmy_dt = load_filmy_dt(filmy_dt_file),
   
   # - community data
   tar_file(community_matrix_raw_file, "data/nitta_2017/all_plots.csv"),
@@ -50,19 +47,12 @@ tar_plan(
   # Process data ----
   
   # - calculate recovery during DT test per individual
-  gameto_recovery_indiv = filmy_gameto_dt %>%
-    # Filter out individuals with low pre-treatment yields
-    filter(yield_pre > 400) %>%
-    calc_recovery(),
-  
-  sporo_recovery_indiv = filmy_sporo_dt %>%
+  recovery_indiv = filmy_dt %>%
     # Only include samples that should be presented in the main MS
     filter(section == "main") %>%
     # Filter out individuals with low pre-treatment yields
-    filter(yield_pre > 400) %>%
+    filter(!is.na(yield_pre), yield_pre > 400) %>%
     calc_recovery(),
-  
-  recovery_indiv = bind_rows(gameto_recovery_indiv, sporo_recovery_indiv),
   
   # - calculate mean VPD per datalogger
   mean_vpd = calculate_mean_vpd(climate),

@@ -297,36 +297,39 @@ fix_gameto_dt_names <- function (data) {
 
 # Data loading ----
 
-#' Load data from a desiccation tolerance (DT) experiment on sporophytes
+#' Load data from a desiccation tolerance (DT) experiment
 #'
 #' @param file Path to data file (CSV)
 #'
 #' @return Dataframe
 #' 
-load_sporo_dt <- function (file) {
+load_filmy_dt <- function (file) {
   readr::read_csv(file, col_types = cols(
     species = col_character(),
-    salt = col_character(),
-    dry_time = col_double(),
+    salt = col_factor(),
+    dry_time = col_factor(),
     individual = col_character(),
     dataset = col_character(),
-    weight_pre = col_double(),
-    weight_dry = col_double(),
-    weight_desiccated = col_double(),
-    weight_30min = col_double(),
-    weight_24hr = col_double(),
-    weight_48hr = col_double(),
+    generation = col_character(),
     yield_pre = col_double(),
     yield_30min = col_double(),
     yield_24hr = col_double(),
     yield_48hr = col_double(),
     yield_72hr = col_double(),
-    generation = col_character()
+    yield_dry = col_double(),
+    weight_pre = col_double(),
+    weight_desiccated = col_double(),
+    weight_30min = col_double(),
+    weight_24hr = col_double(),
+    weight_48hr = col_double(),
+    weight_dry = col_double(),
+    time_pre = col_datetime(format = ""),
+    time_30min = col_datetime(format = ""),
+    time_24hr = col_datetime(format = ""),
+    time_48hr = col_datetime(format = ""),
+    time_72hr = col_datetime(format = ""),
+    time_dry = col_datetime(format = "")
   )) %>%
-    mutate(
-      salt = factor(salt, levels = c("Control", "H2O", "NaCl", "MgNO3", "LiCl")),
-      dry_time = factor(dry_time, levels = c(2, 15))
-    ) %>%
     mutate(
       section = case_when(
         species == "Callistopteris_apiifolia" & dataset == "2012" ~ "si",
@@ -336,41 +339,8 @@ load_sporo_dt <- function (file) {
         salt == "Control" ~ "si",
         TRUE ~ "main"
       )
-    )
-}
-
-#' Load data from a desiccation tolerance (DT) experiment on gametophytes
-#'
-#' @param file Path to data file (CSV)
-#'
-#' @return Dataframe
-#' 
-load_gameto_dt <- function (file) {
-  readr::read_csv(
-    file, 
-    col_types = cols(
-      individual = col_character(),
-      yield_24hr = col_double(),
-      yield_48hr = col_double(),
-      yield_72hr = col_double(),
-      yield_dry = col_double(),
-      yield_pre = col_double(),
-      salt = col_character(),
-      dry_time = col_double(),
-      yield_30min = col_double(),
-      time_pre = col_datetime(format = ""),
-      time_dry = col_datetime(format = ""),
-      time_30min = col_datetime(format = ""),
-      time_24hr = col_datetime(format = ""),
-      time_48hr = col_datetime(format = ""),
-      time_72hr = col_datetime(format = ""),
-      generation = col_character(),
-      species = col_character()
-    )) %>%
-    mutate(
-      salt = factor(salt, levels = c("Control", "H2O", "NaCl", "MgNO3", "LiCl")),
-      dry_time = factor(dry_time, levels = c(2, 15))
-    )
+    ) %>%
+    check_dt_data
 }
 
 #' Unzip Nitta et al 2017 Ecol Mono data file downloaded
@@ -424,8 +394,9 @@ unzip_nitta_2017 <- function (zipped_path, unzip_path, ...) {
 #' @return Dataframe
 calc_recovery <- function (data) {
   data %>%
-    # Pre-treatment yield must be greater than zero, or recovery will be Inf
+    # Make sure pre-treatment yield must be greater than zero, or recovery will be Inf
     verify(yield_pre > 0) %>%
+    assert(not_na, yield_pre) %>%
     select(species, salt, dry_time, individual, generation, contains("yield")) %>%
     select(-yield_72hr, -contains("yield_dry")) %>%
     pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
