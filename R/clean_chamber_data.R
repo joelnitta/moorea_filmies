@@ -15,14 +15,14 @@ sporo_2012_chamber <- bind_rows(
   parse_logger_dat("data_raw/2012/filmyDT2_MgNO3.csv") %>% mutate(salt = "MgNO3"),
   parse_logger_dat("data_raw/2012/filmyDT2_NaCl.csv") %>% mutate(salt = "NaCl")
 ) %>%
-  mutate(generation = "sporophyte", year = 2012)
+  mutate(generation = "sporophyte", year = 2012, species = "mixed")
   
 # 2012 gametophytes
 gameto_2012_chamber <-
   bind_rows(
     parse_logger_dat("data_raw/2012/gameto1_7-14.csv"),
     parse_logger_dat("data_raw/2012/gameto2_7-24.csv")
-  ) %>% mutate(salt = "MgNO3", generation = "gametophyte", year = 2012)
+  ) %>% mutate(salt = "MgNO3", generation = "gametophyte", year = 2012, species = "mixed")
 
 # 2013 load metadata for hobo loggers
 hobo_metadata <- read_csv(
@@ -50,7 +50,7 @@ hobo_chamber_data <-
   unnest(data) %>%
   # Exclude data not marked "keep" in metadata
   filter(use_status == "keep") %>%
-  select(-use_status, -file, -note) %>%
+  select(-use_status, -note) %>%
   # modify generation for Hobo s/n 10140659, which was used partly for sporos, partly for gametos
   mutate(
     generation = case_when(
@@ -62,6 +62,6 @@ hobo_chamber_data <-
 
 # Combine and write out
 combined_chamber_data <- bind_rows(sporo_2012_chamber, gameto_2012_chamber, hobo_chamber_data) %>%
-  assert(not_na, date_time, temp, rh, salt, generation, year)
+  assert(not_na, date_time, temp, rh, salt, generation, year, species)
 
 write_csv(combined_chamber_data, "data/filmy_dt_chamber.csv")
