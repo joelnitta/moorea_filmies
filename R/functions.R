@@ -248,9 +248,9 @@ parse_logger_dat <- function (file) {
     janitor::clean_names() %>%
     janitor::remove_empty(which = "cols") %>%
     transmute(
-      time = mdy_hms(time_mm_dd_yyyy_hh_mm_ss),
+      date_time = mdy_hms(time_mm_dd_yyyy_hh_mm_ss),
       temp = chan_1_deg_c,
-      humidity = chan_2_percent_rh)
+      rh = chan_2_percent_rh)
 }
 
 #' Standardize column names in gametophyte DT data
@@ -341,6 +341,20 @@ load_filmy_dt <- function (file) {
       )
     ) %>%
     check_dt_data
+}
+
+load_filmy_dt_chamber <- function (file) {
+  readr::read_csv(file,
+  col_types = cols(
+    date_time = col_datetime(format = ""),
+    temp = col_double(),
+    rh = col_double(),
+    salt = col_character(),
+    generation = col_character(),
+    year = col_double(),
+    serial_no = col_character()
+  )
+  )
 }
 
 #' Unzip Nitta et al 2017 Ecol Mono data file downloaded

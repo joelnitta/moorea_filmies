@@ -28,9 +28,13 @@ tar_plan(
   filmy_phy = ape::read.tree(filmy_phy_file) %>%
     ape::keep.tip(filmy_species),
   
-  # - desiccation tolerance
+  # - desiccation tolerance yields
   tar_file(filmy_dt_file, "data/filmy_dt.csv"),
   filmy_dt = load_filmy_dt(filmy_dt_file),
+  
+  # - desiccation tolerance chamber temp and RH
+  tar_file(filmy_dt_chamber_file, "data/filmy_dt_chamber.csv"),
+  filmy_dt_chamber = load_filmy_dt_chamber(filmy_dt_chamber_file),
   
   # - community data
   tar_file(community_matrix_raw_file, "data/nitta_2017/all_plots.csv"),
