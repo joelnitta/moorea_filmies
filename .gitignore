@@ -11,3 +11,4 @@ results/
 .drake/
 working
 _targets/
+*_cache/

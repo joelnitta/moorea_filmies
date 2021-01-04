@@ -173,6 +173,9 @@ tar_plan(
     template = "ms/journal-of-plant-research.docx",
     wd = here::here("results"),
     depends = manuscript_pdf
-  )
+  ),
+  
+  # SI
+  tar_render(si_pdf, "ms/si.Rmd", output_dir = here::here("results"))
   
 )

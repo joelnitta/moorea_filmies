@@ -401,6 +401,22 @@ unzip_nitta_2017 <- function (zipped_path, unzip_path, ...) {
 
 # Data wrangling ----
 
+#' Cluster rows of a dataframe based on a single column
+#' 
+#' For example, start times in a dataframe of desiccation tolerance
+#' start and end times.
+#'
+#' @param data Data to cluster
+#' @param col Column to use for clustering
+#' @param k Number of clusters to generate
+#'
+#' @return Dataframe with column "cluster" added
+#' 
+add_clusters <- function(data, col, k) {
+  kmeans_uni_groups <- Ckmeans.1d.dp::Ckmeans.1d.dp(as.numeric(data[[col]]), k = k)
+  mutate(data, cluster = kmeans_uni_groups$cluster)
+}
+
 #' Calculate % recovery from desiccation in a desiccation tolerance (DT) experiment
 #'
 #' @param data Dataframe; data read in from DT experiment
