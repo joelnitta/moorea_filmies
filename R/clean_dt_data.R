@@ -753,7 +753,16 @@ filmy_dt_raw_yield_long %>%
     rename(minipam_2013_long, yield_pam = yield), 
     by = c("memory", "pam_set")) %>%
   select(species, salt, dry_time, individual, generation, condition, yield_pam, date_time, note, dataset) %>%
-  # Make sure no rows got dupliated during the join
+  # Manually specify times for 2014 data (as per excel sheet)
+  mutate(date_time = case_when(
+    dry_time == "15" & condition == "pre" & dataset == "2014" ~ as_datetime("2014-06-17 00:10:00"),
+    dry_time == "15" & condition == "30min" & dataset == "2014" ~ as_datetime("2014-07-02 18:00:00"),
+    dry_time == "2" & condition == "pre" & dataset == "2014" ~ as_datetime("2014-07-06 16:30:00"),
+    dry_time == "2" & condition == "30min" & dataset == "2014" ~ as_datetime("2014-07-08 17:00:00"),
+    TRUE ~ date_time
+  )
+  ) %>%
+  # Make sure no rows got duplicated during the join
   assert_rows(col_concat, is_uniq, species, salt, dry_time, individual, condition)
 
 filmy_dt_pam_yield <- bind_rows(sporo_dt_pam_yield, gameto_dt_pam_yield)
