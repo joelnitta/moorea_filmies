@@ -16,6 +16,13 @@
       "Repository": "RSPM",
       "Hash": "8f9ce74c6417d61f0782cbae5fd2b7b0"
     },
+    "Ckmeans.1d.dp": {
+      "Package": "Ckmeans.1d.dp",
+      "Version": "4.3.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "532df5cd0adb87d037c0d0d3b45eb6df"
+    },
     "DBI": {
       "Package": "DBI",
       "Version": "1.1.0",
@@ -64,6 +71,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "125dc7a0ed375eb68c0ce533b48d291f"
+    },
+    "Rdpack": {
+      "Package": "Rdpack",
+      "Version": "2.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f44bc6ad37ae5171d42fe2e7465a9ac3"
     },
     "RefManageR": {
       "Package": "RefManageR",
@@ -372,6 +386,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "24af5fc67dbeaac6d776a8e6630aacd9"
+    },
+    "gbRd": {
+      "Package": "gbRd",
+      "Version": "0.4-11",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "dd324973735626ce23e950a5f2d3d8ee"
     },
     "generics": {
       "Package": "generics",
@@ -760,6 +781,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "5f919ae5e7f83a6f91dcf2288943370d"
+    },
+    "rbibutils": {
+      "Package": "rbibutils",
+      "Version": "2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7d9d967e4064739de11e50b108c1b894"
     },
     "readr": {
       "Package": "readr",
