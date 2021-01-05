@@ -430,16 +430,16 @@ ggplot(rel_water_species_means_desic, aes(x = rel_water, y = species, group = sa
 # Plot sporophyte DT controls
 
 # Prepare data for plotting
-sporo_control_plot_data <-
+dt_control_plot_data <-
   # Start with DT data
   filmy_dt %>%
-  filter(salt == "Control", generation == "sporophyte") %>%
+  filter(salt == "Control") %>%
   # Filter out individuals with low pre-treatment yields
   filter(!is.na(yield_pre), yield_pre > 400) %>%
   # Calculate recovery by individual
   verify(yield_pre > 0) %>%
   assert(not_na, yield_pre) %>%
-  select(species, salt, dry_time, individual, dataset, contains("yield")) %>%
+  select(species, salt, dry_time, individual, dataset, generation, contains("yield")) %>%
   select(-yield_72hr, -contains("yield_dry")) %>%
   pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
   mutate(
@@ -448,7 +448,7 @@ sporo_control_plot_data <-
   select(-contains("yield")) %>%
   # Calculate mean recovery by species and dataset
   mutate(rec_time = factor(rec_time, levels = c("30min", "24hr", "48hr"))) %>%
-  group_by(species, salt, dry_time, rec_time, dataset) %>%
+  group_by(species, salt, dry_time, rec_time, generation, dataset) %>%
   summarize(
     recovery_mean = mean(recovery, na.rm = TRUE),
     sd = sd(recovery, na.rm = TRUE),
@@ -470,13 +470,47 @@ sporo_control_plot_data <-
     species = glue("*{species}*")) %>%
   # Add year to species names with multiple datasets
   add_count(species, name = "n_species") %>%
-  mutate(species = ifelse(n_species > 6, paste(species, year), species)) %>%
+  mutate(species = ifelse(n_species > 6 & generation == "sporophyte", paste(species, year), species)) %>%
   select(-n_species) %>%
   # Only keep rows with recovery
   filter(!is.na(recovery))
 
-# Make plot
-ggplot(sporo_control_plot_data, aes(x = rec_time, y = recovery, shape = dry_time, fill = salt)) +
+# Make plot: sporophyte controls
+a <-
+  dt_control_plot_data %>% 
+  filter(generation == "sporophyte") %>%
+  ggplot(aes(x = rec_time, y = recovery, shape = dry_time, fill = salt)) +
+  geom_point(position = pd, size = 1.5, fill = "white") +
+  geom_errorbar(
+    aes(ymin = recovery - sd, ymax = recovery + sd), 
+    colour = "grey50", width = 0, 
+    position = pd) +
+  facet_wrap(vars(habit, species)) +
+  scale_shape_manual(name = "Desiccation Time",
+                     values = c(24, 21),
+                     breaks = c("15", "2"),
+                     labels = c("15 days", "2 days")) +
+  scale_y_continuous(label = label_percent(accuracy = 1)) +
+  scale_x_discrete(limits = c("30min","24hr","48hr"),
+                   labels = c("0.5", "24", "48")) +
+  xlab("Recovery Time (hr)") +
+  ylab("Recovery (%)") +
+  theme_bw() +
+  legend_theme +
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(), 
+    panel.grid.major.x = element_blank(),
+    strip.text = element_markdown(),
+    axis.title.x = element_blank()
+  )
+
+
+# Make plot: gametophyte controls
+b <-
+  dt_control_plot_data %>% 
+  filter(generation == "gametophyte") %>% 
+  ggplot(aes(x = rec_time, y = recovery, shape = dry_time, fill = salt)) +
   geom_point(position = pd, size = 1.5, fill = "white") +
   geom_errorbar(
     aes(ymin = recovery - sd, ymax = recovery + sd), 
@@ -493,12 +527,18 @@ ggplot(sporo_control_plot_data, aes(x = rec_time, y = recovery, shape = dry_time
   xlab("Recovery Time (hr)") +
   ylab("Recovery (%)") +
   theme_bw() +
-  legend_theme +
-  theme(legend.position ="bottom",
+  theme(
         panel.grid.minor = element_blank(), 
         panel.grid.major.x = element_blank(),
         strip.text = element_markdown()
-)
+) +
+  # Use guides to make the legend go away
+  # otherwise it will be duplicated by patchwork
+  # https://github.com/thomasp85/patchwork/issues/170#issuecomment-641310103
+  guides(shape = "none")
+
+a + b + plot_layout(guides = "collect", ncol = 1, heights = c(85, 15)) + plot_annotation(tag_levels = "a") &
+  theme(legend.position='bottom')
 ```
 
-**Figure SXX**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation treatment (see Methods). Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%).
+**Figure SXX**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy fern sporophytes (**a**) and gametophytes (**b**) from Moorea, French Polynesia. Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation treatment (see Methods). Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%). Gametophytes only included a single individual per species thus lack error bars.
