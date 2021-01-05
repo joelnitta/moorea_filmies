@@ -676,6 +676,48 @@ calculate_mean_vpd_sporo <- function (community_matrix_raw, filmy_species, moore
     )
 }
 
+#' Calculate relative water content for sporophytes at the individual level
+#'
+#' @param data Filmy fern desiccation tolerance test data
+#'
+#' @return Dataframe
+#' 
+calculate_indiv_water <- function (data) {
+  data %>%
+    filter(generation == "sporophyte") %>%
+    select(-generation) %>% 
+    select(species:dataset, contains("weight")) %>%
+    pivot_longer(names_to = "rec_time", values_to = "weight", weight_desiccated:weight_48hr) %>%
+    mutate(rel_water_content =  (weight - weight_dry) / (weight_pre - weight_dry)) %>%
+    filter(!is.na(rel_water_content)) %>%
+    mutate(
+      rec_time = str_remove_all(rec_time, "weight_") %>%
+        factor(levels = c("desiccated", "30min", "24hr", "48hr"))) %>%
+    # Exclude outliers (presumably due to measurement error)
+    # rel water content should be between 0 to 100%
+    filter(rel_water_content < 1.25) %>%
+    filter(rel_water_content > -0.25) %>%
+    select(-weight_pre, -weight_dry)
+}
+
+#' Calculate relative water content for sporophytes at the species level
+#'
+#' @param data Filmy fern relative water content data at the individual level
+#' from desiccation tolerance test
+#'
+#' @return Dataframe
+#' 
+calculate_mean_water <- function (data) {
+  
+  data %>%
+    group_by(salt, species, rec_time, dry_time) %>%
+    summarize(
+      rel_water = mean(rel_water_content),
+      sd = sd(rel_water_content),
+      .groups = "drop"
+    )
+  
+}
 
 #' Make a dataframe combining range size, vpd, and recovery
 #' 
@@ -1189,6 +1231,11 @@ match_comm_and_tree <- function (comm, phy, return = c("comm", "tree")) {
 
 # Plots ----
 
+# Format legend (include title, but get rid of boxes)
+legend_theme <- theme (legend.background = element_rect(colour = "transparent", fill = "transparent", size = 0.5),
+                       legend.key = element_rect(colour = "white", fill = "white", size = 0.5),
+                       legend.text = element_text(size = 12))
+
 make_sporo_dt_plot <- function  (recovery_species_means, traits) {
   # Define color-blind palette
   cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
@@ -1212,12 +1259,7 @@ make_sporo_dt_plot <- function  (recovery_species_means, traits) {
   percent_formatter <- function(x) {
     lab <- x*100
   }
-  
-  # Format legend (include title, but get rid of boxes)
-  legend_theme <- theme (legend.background = element_rect(colour = "transparent", fill = "transparent", size = 0.5),
-                         legend.key = element_rect(colour = "white", fill = "white", size = 0.5),
-                         legend.text = element_text(size = 12))
-  
+
   # Set colors for desiccation intensity
   col <- c(cbPalette[7], cbPalette[5], cbPalette[6])
   

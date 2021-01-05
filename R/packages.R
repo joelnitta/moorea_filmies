@@ -13,6 +13,7 @@ library(here)
 library(lubridate)
 library(patchwork)
 library(scales)
+library(ggtext)
 library(tidyverse)
 
 conflict_prefer("col_factor", "readr")

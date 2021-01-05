@@ -58,6 +58,9 @@ tar_plan(
     filter(!is.na(yield_pre), yield_pre > 400) %>%
     calc_recovery(),
   
+  # - calculate water content during DT test per individual
+  rel_water_indiv = calculate_indiv_water(filmy_dt),
+  
   # - calculate mean VPD per datalogger
   mean_vpd = calculate_mean_vpd(climate),
   
@@ -104,6 +107,9 @@ tar_plan(
   
   # - calculate mean DT recovery by species and generation
   recovery_species_means = calc_mean_recovery(recovery_indiv),
+  
+  # - calculate relative water content by species (sporophytes only)
+  rel_water_species_means = calculate_mean_water(rel_water_indiv),
   
   # - calculate mean ETR max by species and generation
   etr_species_means = calculate_mean_etr(etr_indiv),

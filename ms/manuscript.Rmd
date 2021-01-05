@@ -218,10 +218,10 @@ The dataset includes `r climate_n_days` days of data from `r climate_n_sites` si
 ### Desiccation tolerance
 
 Samples were collected in the field and stored in plastic bags with a small amount of water to keep them fresh during transport to the lab.
-For sporophytes, 8--16 individuals (one individual = single whole frond including a \circa{ }2 cm section of rhizome) were used per treatment, and all individuals for each species came from a single population.
+For sporophytes, 8 individuals (one individual = single whole frond including a \circa{ }2 cm section of rhizome) were used per treatment, and all individuals for each species came from a single population.
 We did not attempt to differentiate genotypes between fronds in species with long-creeping rhizomes, which often form clonal mats; hence, in some cases, individuals may be genetically identical ramets.
 All experiments were initiated within 48 h of collection.
-Pre-treatment chlorophyll fluorescence (F~v~/F~m~) was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM fluorometer (Walz Gmbh, Effeltrich, Germany).
+Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitajima1975] was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM fluorometer (Walz Gmbh, Effeltrich, Germany).
 Plants were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100% RH), and water withheld for either a short (2 d) or long (15 d) interval [@Testo2013].
 Conditions inside the desiccation chambers were monitored during the experiment using Hobo ProV2 dataloggers.
 The desiccation chambers were kept in an air-conditioned room, and temperature inside the chambers ranged from 22°C to 25°C.
@@ -229,8 +229,8 @@ Salts used for desiccation and their corresponding mean water potentials are as 
 Because field-collected gametophytes could not be identified to species prior to DNA extraction, no planned replication by species was possible; we therefore used the same treatment for all gametophytes (2 d at -86 MPa), and verified species of each individual after the experiment using the DNA barcode approach described below.
 Thus, experiments involving gametophytes were sampled many times for some species whereas other species were not.
 Following the desiccation treatment, plants were rewetted using water from a local stream.
-Plants were allowed to rehydrate, and chlorophyll fluorescence was again measured at 0.5 h, 24 h, and 48 h following rewetting.
-Ability to recover from desiccation was quantified by comparing pre- and post-treatment chlorophyll fluorescence yield [@WatkinsJr.2007c].
+Plants were allowed to rehydrate, and F~v~/F~m~ was again measured at 0.5 h, 24 h, and 48 h following rewetting.
+Ability to recover from desiccation was quantified by comparing pre- and post-treatment F~v~/F~m~ [@WatkinsJr.2007c].
 
 ### Light responses
 

@@ -15,7 +15,7 @@ output:
     toc: no
     number_sections: no
     fig_caption: yes
-    keep_tex: yes
+    keep_tex: no
     latex_engine: xelatex
     pandoc_args: [ "--csl", "journal-of-plant-research.csl"]
     includes:
@@ -35,16 +35,19 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, results = 
 # source("_targets.R")
 ```
 
-```{r load-data}
+```{r load-data, cache = FALSE}
 tar_load(
   names = c(
     "filmy_dt_chamber",
-    "filmy_dt"
+    "filmy_dt",
+    "filmy_habit",
+    "rel_water_indiv",
+    "rel_water_species_means"
   )
 )
 ```
 
-```{r load-functions}
+```{r load-functions, cache = FALSE}
 # Define functions specific to this file
 plot_chamber_rh <- function (data, time_limits) {
   ggplot(data, aes(x = date_time, y = 0.01*rh)) +
@@ -148,7 +151,7 @@ cluster_sporo_times <- function (sporo_time_data, salt_select, k_select) {
 
 ```
 
-```{r gametophyte-dt-2013, fig.cap = ""}
+```{r gametophyte-dt-2013, fig.height = 4.5, fig.width = 7, fig.cap = ""}
 # Calculate mean start/end times for gametophyte DT groups
 gameto_mean_times <-
   filmy_dt %>%
@@ -197,10 +200,12 @@ chamber_gameto_2013_temp_plot <-
 
 chamber_gameto_2013_temp_plot + chamber_gameto_2013_rh_plot + dt_times_gameto_2013_plot + plot_layout(ncol = 1)
 
-ggsave(here::here("results/S1_fig.pdf"))
+# ggsave(here::here("results/S1_fig.png"))
 ```
 
-**Figure S1**. Conditions inside desiccation chamber and duration of desiccation treatment for gametophytes. MgNO3 was used to maintain constant humidity at \circa{ }58%. All gametophytes were treated to desiccation for 2 days, except for group 8, which was treated for four days by accident.
+**Figure S1**. Conditions inside desiccation chamber and duration of desiccation treatment for gametophytes. MgNO~3~ was used to maintain constant humidity at \circa{ }58%. All gametophytes were treated to desiccation for 2 days, except for group 8, which was treated for four days unintentionally.
+
+\clearpage
 
 ```{r sporophyte-dt-2013-prep}
 # Extract pre- and post-DT treatment times for sporophytes
@@ -220,7 +225,7 @@ sporo_times <-
   pivot_wider(names_from = "condition", values_from = "date_time")
 ```
 
-```{r sporophyte-dt-2013-LiCl, fig.cap = ""}
+```{r sporophyte-dt-2013-LiCl, fig.height = 4.5, fig.width = 7, fig.cap = ""}
 # Get mean times of each cluster of DT test samples for the selected drying salt
 sporo_clusters_2013 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2013")), "LiCl", 3)
 sporo_clusters_2014 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2014")), "LiCl", 1)
@@ -289,7 +294,211 @@ temp_plot_2013 + temp_plot_2014 +
   time_plot_2013 + time_plot_2014 + 
   plot_layout(ncol = 2)
 
-ggsave(here::here("results/S2_fig.pdf"))
+# ggsave(here::here("results/S2_fig.png"))
 ```
 
 **Figure S2**. Conditions inside desiccation chamber and duration of desiccation treatment for sporophytes at most intense desiccation level. LiCl was used to maintain constant humidity at \circa{ }18%.
+
+\clearpage
+
+```{r water-content-prep}
+# Define color-blind palette
+cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
+               green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
+               red = "#D55E00", purple = "#CC79A7")
+
+# Set colors, shapes for desiccation intensity
+salt_cols <- c(
+  "NaCl" = cbPalette[["blue"]], 
+  "MgNO3" = cbPalette[["yellow"]], 
+  "LiCl" = cbPalette[["red"]], 
+  "Control" = "white")
+
+salt_shapes <- c(
+  "NaCl" = 21, # circle
+  "MgNO3" = 24, # triangle
+  "LiCl" = 23, # diamond
+  "Control" = 22 # square
+  )
+```
+
+```{r water-content-full, fig.height = 4.5, fig.width = 7, fig.cap = ""}
+# Plot only species with weights recorded during recovery
+species_with_rec <-
+  rel_water_species_means %>%
+  filter(rec_time %in% c("30min", "24hr", "48hr")) %>%
+  pull(species) %>%
+  unique()
+
+rel_water_species_means_with_rec <-
+  rel_water_species_means %>%
+  filter(species %in% species_with_rec)
+
+pd <- position_dodge(.5)
+
+# Define color-blind palette
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+# Set colors for desiccation intensity
+salt_cols <- c("NaCl" = cbPalette[7], "MgNO3" = cbPalette[5], "LiCl" = cbPalette[6], "Control" = "white")
+
+ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group = interaction(dry_time, salt))) +
+  geom_errorbar(
+    aes(ymin = rel_water - sd, ymax = rel_water + sd),
+    color = "grey50",
+    width = 0,
+    position = pd) +
+  geom_line(position = pd, aes(linetype = dry_time), color = "grey30") +
+  geom_point(aes(shape = salt, fill = salt), position = pd) +
+  scale_linetype_manual(name = "Desiccation Time",
+                        values = c("solid", "dashed"),
+                        breaks = c("15", "2"),
+                        labels = c("15 days", "2 days")) +
+  scale_shape_manual(name = "Desiccation Intensity",
+                     values = salt_shapes,
+                     breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
+                     labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) + 
+  scale_fill_manual(name = "Desiccation Intensity",
+                    values = salt_cols, 
+                    breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
+                    labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) +
+  scale_y_continuous(label = scales::percent) +
+  facet_wrap(vars(species)) +
+  labs(x = "Condition",
+       y = "Relative water content") +
+  theme_bw() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    legend.position = "bottom",
+    legend.box="vertical", 
+    legend.margin=margin()
+  )
+  
+# ggsave(here::here("results/S_fig_water_content_full.png"))
+```
+
+**Figure SXX**. Relative water content (RWC) of sporophytes during desiccation tolerance test. RWC was not measured for all combinations of species and desiccation treatments; only species with complete data shown.
+
+\clearpage
+
+```{r water-content-desiccated, fig.height = 4.5, fig.width = 7, fig.cap = ""}
+# Plot relative water content in desiccated state for all species
+rel_water_species_means_desic <<-
+rel_water_species_means %>%
+  filter(rec_time == "desiccated") %>%
+  select(-rec_time)
+
+# Set dodge spacing, colors
+pd <- position_dodge(.7)
+
+ggplot(rel_water_species_means_desic, aes(x = rel_water, y = species, group = salt)) +
+  geom_errorbar(
+    aes(xmin = rel_water - sd, xmax = rel_water + sd),
+    color = "grey80",
+    width = 0.2,
+    position=position_dodge(width=0.5)) +
+  geom_point(aes(fill = salt, shape = salt), size = 1.25, position=position_dodge(width=0.5)) +
+  scale_x_continuous(label = scales::percent) +
+  scale_shape_manual(name = "Desiccation Intensity",
+                     values = salt_shapes,
+                     breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
+                     labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) + 
+  scale_fill_manual(name = "Desiccation Intensity",
+                    values = salt_cols, 
+                    breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
+                    labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) +
+  labs(
+    x = "Relative Water Content",
+    y = "Species",
+    color = "Desiccation\nintensity") +
+  theme_bw() +
+  theme(
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.y = element_blank(),
+    legend.position = "bottom"
+  ) +
+  facet_grid(vars(dry_time), labeller = as_labeller(c(`2` = "2 days", `15` = "15 days")))
+
+# ggsave(here::here("results/S_fig_water_content_desic.pdf"))
+```
+
+**Figure SXX**. Relative water content (RWC) of sporophytes after desiccation by duration of desiccation treatment (2 or 15 days). RWC was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not RWC of zero).
+
+\clearpage
+
+```{r sporo-dt-controls, fig.height = 8, fig.width = 7, fig.cap = ""}
+# Plot sporophyte DT controls
+
+# Prepare data for plotting
+sporo_control_plot_data <-
+  # Start with DT data
+  filmy_dt %>%
+  filter(salt == "Control", generation == "sporophyte") %>%
+  # Filter out individuals with low pre-treatment yields
+  filter(!is.na(yield_pre), yield_pre > 400) %>%
+  # Calculate recovery by individual
+  verify(yield_pre > 0) %>%
+  assert(not_na, yield_pre) %>%
+  select(species, salt, dry_time, individual, dataset, contains("yield")) %>%
+  select(-yield_72hr, -contains("yield_dry")) %>%
+  pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
+  mutate(
+    rec_time = str_remove_all(rec_time, "yield_"),
+    recovery = yield_recover / yield_pre) %>%
+  select(-contains("yield")) %>%
+  # Calculate mean recovery by species and dataset
+  mutate(rec_time = factor(rec_time, levels = c("30min", "24hr", "48hr"))) %>%
+  group_by(species, salt, dry_time, rec_time, dataset) %>%
+  summarize(
+    recovery_mean = mean(recovery, na.rm = TRUE),
+    sd = sd(recovery, na.rm = TRUE),
+    n = n(),
+    .groups = "drop") %>%
+  rename(recovery = recovery_mean) %>%
+  # Add growth habit data
+  left_join(filmy_habit, by = "species") %>%
+  assert(not_na, habit) %>%
+  mutate(
+    habit = str_replace_all(habit, "_", " ") %>% 
+      str_to_sentence() %>%
+      factor(levels = c("Terrestrial", "Saxicolous", "Low epiphyte", "High epiphyte"))) %>%
+  # Add dataset year
+  mutate(year = str_split(dataset, "_") %>% map_chr(1)) %>%
+  # Abbreviate species names to "G. species"
+  mutate(
+    species = str_replace_all(species, "[a-z]+_", ". "),
+    species = glue("*{species}*")) %>%
+  # Add year to species names with multiple datasets
+  add_count(species, name = "n_species") %>%
+  mutate(species = ifelse(n_species > 6, paste(species, year), species)) %>%
+  select(-n_species) %>%
+  # Only keep rows with recovery
+  filter(!is.na(recovery))
+
+# Make plot
+ggplot(sporo_control_plot_data, aes(x = rec_time, y = recovery, shape = dry_time, fill = salt)) +
+  geom_point(position = pd, size = 1.5, fill = "white") +
+  geom_errorbar(
+    aes(ymin = recovery - sd, ymax = recovery + sd), 
+    colour = "grey50", width = 0, 
+    position = pd) +
+  facet_wrap(vars(habit, species)) +
+  scale_shape_manual(name = "Desiccation Time",
+                        values = c(24, 21),
+                        breaks = c("15", "2"),
+                        labels = c("15 days", "2 days")) +
+  scale_y_continuous(label = label_percent(accuracy = 1)) +
+  scale_x_discrete(limits = c("30min","24hr","48hr"),
+                   labels = c("0.5", "24", "48")) +
+  xlab("Recovery Time (hr)") +
+  ylab("Recovery (%)") +
+  theme_bw() +
+  legend_theme +
+  theme(legend.position ="bottom",
+        panel.grid.minor = element_blank(), 
+        panel.grid.major.x = element_blank(),
+        strip.text = element_markdown()
+)
+```
+
+**Figure SXX**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation treatment (see Methods). Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%).
