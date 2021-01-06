@@ -188,11 +188,9 @@ We follow the taxonomic system of @Ebihara2006.
 ### Field survey
 
 We surveyed filmy ferns on Moorea as part of a larger study including all ferns of Moorea and Tahiti [@Nitta2017].
-During this study, `r n_distinct(moorea_sites$site)` sampling sites were established from \circa{ }200 m to 1200 m primarily along trails to the summits of three large peaks on Moorea: Mt. Rotui (899 m), Mt. Mouaputa (880 m), and Mt. Tohiea (1206 m; Fig. 2).
+During this study, `r n_distinct(moorea_sites$site)` sampling sites were established from \circa{ }200 m to 1200 m primarily along trails to the summits of three large peaks on Moorea: Mt. Rotui (899 m), Mt. Mouaputa (880 m), and Mt. Tohiea (1206 m).
 At each site, sporophytes were sampled in a single 10 m × 10 m plot, and gametophytes sampled in two to three 50 cm × 50 cm subplots located within the sporophyte plot.
 Epiphytes were sampled to a maximum height of \circa{ }2 m on their host plants.
-Unlike many other fern species, filmy fern gametophytes have unique morphologies that allow them to be identified to family [\eg, filamentous, ribbon with round gemmae; @Nayar1971].
-This allowed us to specifically use field-collected filmy fern gametophytes for physiological tests, which we later identified to species using DNA barcoding (see below).
 We scored growth habit of each species based on field observations as terrestrial, saxicolous, low elevation epiphyte (mostly occurring outside of cloud forest, \ie, below \circa{ }500 m), or high elevation epiphyte (mostly occurring in cloud forest, \ie, above \circa{ }500 m).
 
 ### Microclimate
@@ -249,6 +247,7 @@ Chloroplast *rbcL* and *trnH--psbA* were amplified and sequenced using primers a
 For each marker, a reference library was constructed from sporophyte sequences using the makeblastDB command in BLAST [@Altschul1997].
 Field-collected gametophytes were identified by a local BLAST query against the reference library.
 Gametophytes matching >99.5% with a single reference sequence and no others were identified as that species; those that did not match any reference sequence or matched >99.5% with multiple reference sequences were not identified and excluded from further analysis.
+For this study, only gametophytes that could be identified as belonging to Hymenophyllaceae were used, and others were excluded from analysis.
 
 ### Statistical analysis and phylogenetic comparative methods
 
@@ -570,8 +569,118 @@ Weston Testo provided advice on settings for the DT test.
 Staff at the University of California Berkeley's Richard B. Gump South Pacific Research Station, Moorea, French Polynesia, in particular Valentine Brotherson, Neil Davies, Hinano Teavai-Murphy, and Frank Murphy, provided logistical support for fieldwork.
 Funding provided in part by the National Science Foundation (Doctoral Dissertation Improvement Grant DEB-1311169 to JHN and CCD), Setup Funds from Harvard University to CCD, American Society of Plant Taxonomists (Research Grant for Graduate Students to JHN), Garden Club of America (Award in Tropical Botany to JHN), Harvard University Herbaria (Fernald Fieldwork Fellowship to JHN), Society of Systematic Biologists (Graduate Student Research Award to JHN), and Systematics Association (Systematics Research Fund to JHN).
 
-## Figures
-
 ## References
 
 <!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
+<div id="refs"></div>
+
+## Figure Captions
+
+**Fig. 1** Results of sporophyte desiccation tolerance test on filmy fern sporophytes from Moorea, French Polynesia.
+Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation at three different intensities for either 2 or 15 days (see Methods).
+Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%).
+Error bars indicate standard deviation.
+Growth habit indicated in parentheses after each species: T, terrestrial; S, saxicolous; LE, low elevation epiphyte; HE, high elevation epiphyte
+
+## Figures
+
+```{r sporo-dt, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
+### Set up plotting variables ###
+
+# Define color-blind palette
+cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
+               green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
+               red = "#D55E00", purple = "#CC79A7")
+
+# Set colors, shapes for desiccation intensity
+salt_cols <- c(
+  "NaCl" = cbPalette[["blue"]], 
+  "MgNO3" = cbPalette[["yellow"]], 
+  "LiCl" = cbPalette[["red"]])
+
+salt_shapes <- c(
+  "NaCl" = 21, # circle
+  "MgNO3" = 24, # triangle
+  "LiCl" = 23 # diamond
+)
+
+# Set offset of datapoints (dodge)
+pd <- position_dodge(.3)
+
+### Format data for plotting ###
+plot_data <-
+  recovery_species_means %>%
+  # Use only sporophytes
+  filter(generation == "sporophyte") %>%
+  # Add growth habit data
+  left_join(filmy_habit, by = "species") %>%
+  assert(not_na, habit) %>%
+  # Abbreviate growth habit, set as factor and specify levels
+  mutate(
+    habit = case_when(
+      habit == "High_Epiphyte" ~ "HE",
+      habit == "Low_Epiphyte" ~ "LE",
+      habit == "Saxicolous" ~ "S",
+      habit == "Terrestrial" ~ "T"
+    ) %>% factor(., levels = c("T", "S", "LE", "HE"))) %>%
+  # Format labels:
+  # - abbreviate species names to "G. species", make italic, add growth habit
+  mutate(
+    label = str_replace_all(species, "[a-z]+_", ". "),
+    label = glue("*{label}*"),
+    label = glue("{label} ({habit})")
+  ) %>%
+  # - order by alphabetical species within growth habit
+  arrange(habit, species) %>%
+  mutate(
+    order = 1:nrow(.),
+    # fct_reorder must reorder based on a numeric vector
+    label = fct_reorder(label, order)) %>%
+  # Tweak variable names
+  rename(recovery = recovery_mean, sd = recovery_sd, n = recovery_n)
+
+### Make plot ###
+ggplot(data = plot_data, aes(x = rec_time, y = recovery, group = interaction(dry_time, salt), shape = salt, fill = salt)) +
+  geom_line(position = pd, aes(linetype = dry_time)) +
+  geom_errorbar(
+    aes(ymin = recovery - sd, ymax = recovery + sd), 
+    colour = "grey50", width = 0, 
+    position = pd) +
+  geom_point(position = pd, size = 1.5) +
+  scale_linetype_manual(name = "Desiccation Time",
+                        values = c("solid", "dashed"),
+                        breaks = c("15", "2"),
+                        labels = c("15 days", "2 days")) +
+  scale_shape_manual(name = "Desiccation Intensity",
+                     values = salt_shapes,
+                     breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
+                     labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) + 
+  scale_fill_manual(name = "Desiccation Intensity",
+                    values = salt_cols, 
+                    breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
+                    labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) +
+  scale_y_continuous(label = label_percent(accuracy = 1), limits = c(-0.1,1.1), expand = c(0,0), breaks=c(0,.2,.4,.6,.8,1.0)) +
+  scale_x_discrete(limits = c("30min","24hr","48hr"),
+                   labels = c("0.5", "24", "48")) +
+  xlab("Recovery Time (hr)") +
+  ylab("Recovery (%)") +
+  theme_bw() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(), 
+    panel.grid.major.x = element_blank(),
+    # Use markdown to format facet strip labels
+    strip.text = element_markdown(),
+    # Wrap legend parts into multiple lines
+    legend.box = "vertical", 
+    legend.margin = margin()
+  ) + 
+  facet_wrap(~label)
+
+# For JPR:
+# 39 mm, 84 mm, 129 mm, or 174 mm wide
+# not higher than 234 mm
+ggsave(here::here("results/ms/fig_1_sporo_dt.eps"), width = 6.85, height = 7.5)
+```
+
+**Fig. 1**
