@@ -198,6 +198,18 @@
       "Repository": "CRAN",
       "Hash": "4f45f4d5b5d5c2da19decbf62fd50b17"
     },
+    "captioner": {
+      "Package": "captioner",
+      "Version": "2.2.3.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "adletaw",
+      "RemoteRepo": "captioner",
+      "RemoteRef": "master",
+      "RemoteSha": "807ddb2267d572c18fb05673ec3b278052682890",
+      "Hash": "516bc12e1292e5c3317f9664772cb96a"
+    },
     "cellranger": {
       "Package": "cellranger",
       "Version": "1.1.0",
@@ -802,6 +814,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "14dc9f7a3c91ebb14ec5bb9208a07061"
+    },
+    "pryr": {
+      "Package": "pryr",
+      "Version": "0.1.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "bdc2df7c4155553e5a97a56a6c9f0a0d"
     },
     "ps": {
       "Package": "ps",
