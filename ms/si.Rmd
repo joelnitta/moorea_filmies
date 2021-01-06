@@ -36,15 +36,11 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, results = 
 ```
 
 ```{r load-data, cache = FALSE}
-tar_load(
-  names = c(
-    "filmy_dt_chamber",
-    "filmy_dt",
-    "filmy_habit",
-    "rel_water_indiv",
-    "rel_water_species_means"
-  )
-)
+tar_load(filmy_dt_chamber)
+tar_load(filmy_dt)
+tar_load(filmy_habit)
+tar_load(rel_water_indiv)
+tar_load(rel_water_species_means)
 ```
 
 ```{r load-functions, cache = FALSE}

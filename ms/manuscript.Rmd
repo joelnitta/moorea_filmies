@@ -34,20 +34,18 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, results = 
 ```
 
 ```{r load-data}
-tar_load(
-  names = c(
-    "refs",
-    "refs_other",
-    "climate",
-    "filmy_species",
-    "moorea_sites",
-    "phylosig",
-    "range_types",
-    "combined_species_means",
-    "t_test_results",
-    "env_range_dt_model_summary"
-  )
-)
+tar_load(refs)
+tar_load(refs_other)
+tar_load(climate)
+tar_load(filmy_species)
+tar_load(moorea_sites)
+tar_load(phylosig)
+tar_load(range_types)
+tar_load(combined_species_means)
+tar_load(t_test_results)
+tar_load(env_range_dt_model_summary)
+tar_load(recovery_species_means)
+tar_load(filmy_habit)
 ```
 
 <!-- to move to the next line without starting a new paragraph, 
