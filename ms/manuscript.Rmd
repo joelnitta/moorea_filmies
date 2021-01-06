@@ -385,7 +385,7 @@ ttest_pval <- function(species_select, response_select, data = t_test_results, p
 ```
 
 Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases (Appendix S3).
-A general correlation of DT with habitat was observed in sporophytes (Fig. 4).
+A general correlation of DT with habitat was observed in sporophytes (`r figure("sporo-dt")`).
 Both terrestrial species (*Abrodictyum dentatum* (Bosch) Ebihara & K Iwats. and *C. apiifolia*) lacked even moderate DT, and failed to recover from the gentlest treatment of 2 d at --38 MPa (more stringent tests were not conducted on these species after confirming their lack of DT at this level).
 Saxicolous species (*Crepidomanes kurzii* (Bedd.) Tagawa & K. Iwats., *Polyphlebium endlicherianum* (C. Presl) Ebihara & K. Iwats., and *Vandenboschia maxima* (Blume) Copel.) also had low DT; only *C. kurzii* was able to recover from desiccation up to --86 MPa for 2 d but not more.
 All epiphytic species were capable of recovering from desiccation to a certain degree, but ability varied between species.
@@ -470,7 +470,6 @@ sporo_vpd_pval <- env_range_dt_model_summary %>% filter(model == "sporo_vpd_mode
 gameto_vpd_pval <- env_range_dt_model_summary %>% filter(model == "gameto_vpd_model") %>% pull(p_value) %>%
   round_t(2)
 ```
-
 
 Desiccation tolerance tended to increase with VPD for both gametophytes and sporophytes (Fig. 6).
 These trends were significant when analyzed using PGLS for gametophytes (*P* = `r gameto_vpd_pval`) but not sporophytes (*P* = `r sporo_vpd_pval`; Appendix S5).
@@ -560,7 +559,7 @@ The relevance of plant size to water relations is supported by a study showing i
 Future studies of DT in filmy ferns should include juvenile stages of the sporophyte, which are expected to experience similar microhabitats as gametophytes, to better determine the role of microhabitat vs. life stage (and plant size) on DT.
 Finally, more detailed analyses of the strategies used by each generation to cope with desiccation stress, such as transcriptomics, are needed to better understand the ecology and evolution of filmy ferns as well as the transition from desiccation tolerance to avoidance in vascular plants.
 
-Acknowledgments
+**Acknowledgments**
 
 Members of the Davis Lab and Jonathan B. Losos provided helpful discussion and comments on drafts.
 Saad Amer, Tohei Theophilus, and Suzanne Vinnette assisted with fieldwork and experiments.
@@ -575,8 +574,9 @@ Funding provided in part by the National Science Foundation (Doctoral Dissertati
 <div id="refs"></div>
 
 ## Figure Captions
+<!-- JPR requirements: Figure captions begin with the term Fig. in bold type, followed by the figure number, also in boldtype. No punctuation is to be included after the number, nor is any punctuation to be placed at the end of the caption. -->
 
-**Fig. 1** Results of sporophyte desiccation tolerance test on filmy fern sporophytes from Moorea, French Polynesia.
+**`r figure("sporo-dt")`** Results of sporophyte desiccation tolerance test on filmy fern sporophytes from Moorea, French Polynesia.
 Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation at three different intensities for either 2 or 15 days (see Methods).
 Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%).
 Error bars indicate standard deviation.
@@ -683,4 +683,4 @@ ggplot(data = plot_data, aes(x = rec_time, y = recovery, group = interaction(dry
 ggsave(here::here("results/ms/fig_1_sporo_dt.eps"), width = 6.85, height = 7.5)
 ```
 
-**Fig. 1**
+**`r figure("sporo-dt")`**
