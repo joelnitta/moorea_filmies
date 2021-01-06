@@ -170,18 +170,18 @@ tar_plan(
   tar_file(refs_other, "ms/references_other.yaml"),
 
   # Render PDF
-  tar_render(manuscript_pdf, "ms/manuscript.Rmd", output_dir = here::here("results")),
+  tar_render(manuscript_pdf, "ms/manuscript.Rmd", output_dir = here::here("results/ms")),
   
   # Render MS Word
   ms_docx = latex2docx(
-    latex = "results/manuscript.tex",
-    docx = "results/manuscript.docx",
+    latex = "results/ms/manuscript.tex",
+    docx = "results/ms/manuscript.docx",
     template = "ms/journal-of-plant-research.docx",
     wd = here::here("results"),
     depends = manuscript_pdf
   ),
   
   # SI
-  tar_render(si_pdf, "ms/si.Rmd", output_dir = here::here("results"))
+  tar_render(si_pdf, "ms/si.Rmd", output_dir = here::here("results/ms"))
   
 )
