@@ -584,7 +584,58 @@ Growth habit indicated in parentheses after each species: T, terrestrial; S, sax
 
 ## Figures
 
-```{r sporo-dt, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
+```{r dt-plot-setup}
+### Format data for plotting ###
+
+# Format labels for number of samples per species/generation
+n_labels <-
+recovery_species_means %>%
+  group_by(species, generation) %>%
+  mutate(n_count = n_distinct(recovery_n)) %>%
+  mutate(
+    n_label = case_when(
+      # no label if exactly 8
+      n_count == 1 & recovery_n == 8 ~ "",
+      # single number if no. samples is NOT 8 and consistent across treatments
+      n_count == 1 & recovery_n != 8 ~ as.character(glue(", *n* = {recovery_n}")),
+      # range if no. samples is NOT 8 and varies across treatments
+      n_count > 1 ~ as.character(glue(", *n* = {min(recovery_n)}-{max(recovery_n)}"))
+    )) %>%
+  select(species, generation, n_label) %>%
+  unique() %>%
+  ungroup()
+
+dt_plot_data <-
+  recovery_species_means %>%
+  # Add growth habit data
+  left_join(filmy_habit, by = "species") %>%
+  assert(not_na, habit) %>%
+  # Add labels for number of samples
+  left_join(n_labels, by = c("species", "generation")) %>%
+  # Abbreviate growth habit, set as factor and specify levels
+  mutate(
+    habit = case_when(
+      habit == "High_Epiphyte" ~ "HE",
+      habit == "Low_Epiphyte" ~ "LE",
+      habit == "Saxicolous" ~ "S",
+      habit == "Terrestrial" ~ "T"
+    ) %>% factor(., levels = c("T", "S", "LE", "HE"))) %>%
+  # Format labels:
+  # - abbreviate species names to "G. species", make italic, add growth habit
+  #   and sample number if not 8 
+  mutate(
+    label = str_replace_all(species, "[a-z]+_", ". "),
+    label = glue("*{label}* ({habit}{n_label})")
+  ) %>%
+  # - order by alphabetical species within growth habit
+  arrange(habit, species) %>%
+  mutate(
+    order = 1:nrow(.),
+    # fct_reorder must reorder based on a numeric vector
+    label = fct_reorder(label, order)) %>%
+  # Tweak variable names
+  rename(recovery = recovery_mean, sd = recovery_sd, n = recovery_n)
+
 ### Set up plotting variables ###
 
 # Define color-blind palette
@@ -607,40 +658,10 @@ salt_shapes <- c(
 # Set offset of datapoints (dodge)
 pd <- position_dodge(.3)
 
-### Format data for plotting ###
-plot_data <-
-  recovery_species_means %>%
-  # Use only sporophytes
-  filter(generation == "sporophyte") %>%
-  # Add growth habit data
-  left_join(filmy_habit, by = "species") %>%
-  assert(not_na, habit) %>%
-  # Abbreviate growth habit, set as factor and specify levels
-  mutate(
-    habit = case_when(
-      habit == "High_Epiphyte" ~ "HE",
-      habit == "Low_Epiphyte" ~ "LE",
-      habit == "Saxicolous" ~ "S",
-      habit == "Terrestrial" ~ "T"
-    ) %>% factor(., levels = c("T", "S", "LE", "HE"))) %>%
-  # Format labels:
-  # - abbreviate species names to "G. species", make italic, add growth habit
-  mutate(
-    label = str_replace_all(species, "[a-z]+_", ". "),
-    label = glue("*{label}*"),
-    label = glue("{label} ({habit})")
-  ) %>%
-  # - order by alphabetical species within growth habit
-  arrange(habit, species) %>%
-  mutate(
-    order = 1:nrow(.),
-    # fct_reorder must reorder based on a numeric vector
-    label = fct_reorder(label, order)) %>%
-  # Tweak variable names
-  rename(recovery = recovery_mean, sd = recovery_sd, n = recovery_n)
-
-### Make plot ###
-ggplot(data = plot_data, aes(x = rec_time, y = recovery, group = interaction(dry_time, salt), shape = salt, fill = salt)) +
+### Define function for making dt plot ###
+make_dt_plot <- function (dt_plot_data, generation_select, plot_part) {
+  dt_plot_data %>% filter(generation == generation_select) %>%
+  ggplot(aes(x = rec_time, y = recovery, group = interaction(dry_time, salt), shape = salt, fill = salt)) +
   geom_line(position = pd, aes(linetype = dry_time)) +
   geom_errorbar(
     aes(ymin = recovery - sd, ymax = recovery + sd), 
@@ -659,14 +680,20 @@ ggplot(data = plot_data, aes(x = rec_time, y = recovery, group = interaction(dry
                     values = salt_cols, 
                     breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
                     labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) +
-  scale_y_continuous(label = label_percent(accuracy = 1), limits = c(-0.1,1.1), expand = c(0,0), breaks=c(0,.2,.4,.6,.8,1.0)) +
+  scale_y_continuous(label = label_percent(accuracy = 1), limits = c(-0.1,1.2), expand = c(0,0), breaks=c(0,.25,.5,.75,1.0)) +
   scale_x_discrete(limits = c("30min","24hr","48hr"),
                    labels = c("0.5", "24", "48")) +
   xlab("Recovery Time (hr)") +
   ylab("Recovery (%)") +
+  labs(
+    x = "Recovery Time (hr)",
+    y = "Recovery (%)",
+    title = glue("**{plot_part}**")
+  ) +
   theme_bw() +
   theme(
     legend.position = "bottom",
+    plot.title = element_markdown(),
     panel.grid.minor = element_blank(), 
     panel.grid.major.x = element_blank(),
     # Use markdown to format facet strip labels
@@ -675,12 +702,21 @@ ggplot(data = plot_data, aes(x = rec_time, y = recovery, group = interaction(dry
     legend.box = "vertical", 
     legend.margin = margin()
   ) + 
-  facet_wrap(~label)
-
-# For JPR:
-# 39 mm, 84 mm, 129 mm, or 174 mm wide
-# not higher than 234 mm
-ggsave(here::here("results/ms/fig_1_sporo_dt.eps"), width = 6.85, height = 7.5)
+  facet_wrap(~label, ncol = 4)
+}
 ```
 
-**`r figure("sporo-dt")`**
+
+```{r sporo-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
+make_dt_plot(dt_plot_data, "sporophyte", "a")
+ggsave(here::here("results/ms/fig_1a_sporo_dt.pdf"), width = 6.85, height = 7.5)
+```
+
+**`r figure("sporo-dt")`a**
+
+```{r gameto-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
+make_dt_plot(dt_plot_data, "gametophyte", "b")
+ggsave(here::here("results/ms/fig_1b_gameto_dt.pdf"), width = 6.85, height = 6.5)
+```
+
+**`r figure("sporo-dt")`b**
