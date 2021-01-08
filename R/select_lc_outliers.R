@@ -1,45 +1,10 @@
 # Select outliers in light curve data
-source("R/packages.R")
 
-# Load packages for interactive plots/dataframes
-library(plotly)
-library(crosstalk)
-library(DT)
-options(persistent = FALSE)
+# Load packages
+source(here::here("R/packages.R"))
 
-# Define function for interactive plot with dataframe of selected points
-# see SO post:
-# https://stackoverflow.com/questions/50765687/return-datapoints-selected-in-a-plotly-scatterplot
-select_lc_points <- function(plotly_data_tibble, row_select)  {
-  
-  # Subset data to a single row
-  plotly_data <- plotly_data_tibble$data[[row_select]]
-  
-  plotly_title <- plotly_data_tibble$id[[row_select]]
-  
-  # Create shared data object so it's in sync between DataTable and Plotly
-  shared_data <- crosstalk::SharedData$new(plotly_data)
-  
-  # Create plot
-  plotly_plot <- plotly::plot_ly(shared_data, x = ~par, y = ~etr) %>% 
-    plotly::add_lines(y = ~etr_fit) %>%
-    plotly::add_markers(alpha = 0.5) %>%
-    plotly::highlight("plotly_selected", dynamic = TRUE)
-  
-  # Create data table
-  plotly_data <- DT::datatable(shared_data, extensions = 'Buttons', options = list(
-    dom = 'Bfrtip',
-    # include download button with file name set to data ID so it can be
-    # easily joined later
-    buttons = list(
-      list(extend = 'csv', filename = plotly_title)),
-    text = 'Download'
-  ))
-  
-  # Render the interactive plot
-  crosstalk::bscols(widths = c(7, 3), plotly_plot, plotly_data)
-  
-}
+# Load functions
+source("R/functions.R")
 
 # Load raw light-curve data
 filmy_lc <- read_csv("data/filmy_light_curves.csv", col_types = cols(
@@ -99,4 +64,4 @@ gameto_lc_model_fits <-
 
 # In RStudio, interactively go through data by increasing row selected one at a time,
 # select outliers, and save each as CSV
-select_lc_points(gameto_lc_model_fits, 1)
+select_lc_points(gameto_lc_model_fits, 5)

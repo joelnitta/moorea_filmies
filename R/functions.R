@@ -295,6 +295,52 @@ fix_gameto_dt_names <- function (data) {
   
 }
 
+#' Interactively select points in a scatterplot and save them to a CSV file
+#' 
+#' For selecting and excluding outliers from light-curve plots.
+#' 
+#' Based on this SO post:
+#' https://stackoverflow.com/questions/50765687/return-datapoints-selected-in-a-plotly-scatterplot
+#'
+#' @param plotly_data_tibble Nested data frame with one row per species,
+#' including an `id` column with the sample ID, and a `data` list-column with
+#' nested columns `etr`, `etr_fit`, and `par`
+#' @param row_select Index of the nested data frame row that should be plotted
+#'
+#' @return Nothing; in an RStudio session, the interactive plot will show up in 
+#' the Viewer pane.
+#' 
+select_lc_points <- function(plotly_data_tibble, row_select)  {
+  
+  # Subset data to a single row
+  plotly_data <- plotly_data_tibble$data[[row_select]]
+  
+  plotly_title <- plotly_data_tibble$id[[row_select]]
+  
+  # Create shared data object so it's in sync between DataTable and Plotly
+  shared_data <- crosstalk::SharedData$new(plotly_data)
+  
+  # Create plot
+  plotly_plot <- plotly::plot_ly(shared_data, x = ~par, y = ~etr) %>% 
+    plotly::add_lines(y = ~etr_fit) %>%
+    plotly::add_markers(alpha = 0.5) %>%
+    plotly::highlight("plotly_selected", dynamic = TRUE)
+  
+  # Create data table
+  plotly_data <- DT::datatable(shared_data, extensions = 'Buttons', options = list(
+    dom = 'Bfrtip',
+    # include download button with file name set to data ID so it can be
+    # easily joined later
+    buttons = list(
+      list(extend = 'csv', filename = plotly_title)),
+    text = 'Download'
+  ))
+  
+  # Render the interactive plot
+  crosstalk::bscols(widths = c(7, 3), plotly_plot, plotly_data)
+  
+}
+
 # Data loading ----
 
 #' Load data from a desiccation tolerance (DT) experiment
