@@ -1447,8 +1447,30 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
   
 }
 
-# Manuscript rendering ----
+# Manuscript ----
 
+# Helper function to check on p-value significance and extract from t_test_results
+#
+#' @param species_select Name of species to select from t-test results
+#' @param response_select Name of response to select from t-test results
+#' @param data t-test results
+#' @param p_check Boolean: should the p-value be required to be less than 0.05?
+#'
+#' @return A p-value for the selected species and response
+ttest_pval <- function(species_select, response_select, data = t_test_results, p_check = TRUE) {
+  data %>% 
+    # Filter to appropriate species and response
+    filter(species == species_select, response == response_select) %>%
+    # Verify the p-value is significant (or override with `p_check = FALSE`)
+    assert(function (x) magrittr::is_less_than(x, 0.05) | !p_check, p_value) %>%
+    # Format the p-value
+    mutate(
+      p_value = case_when(
+        p_value < 0.001 ~ "<0.001",
+        TRUE ~ jntools::round_t(p_value, digits = 3))
+    ) %>% 
+    pull(p_value)
+}
 
 # Dummy function to track arbitary output from rmarkdown::render()
 render_tracked <- function (tracked_output, dep1 = NULL, dep2 = NULL, ...) {

@@ -67,8 +67,7 @@ YES (Joel H. Nitta)
 **Number of tables, black-and-white figures, and color figures.**  
 No tables / 2 black-and-white figure / 1 color figure
 
-\clearpage
-#####
+\newpage
 
 # Intergenerational Niche Differentiation in Filmy Ferns (Hymenophyllaceae)
 
@@ -103,8 +102,7 @@ Our results show that filmy fern gametophytes and sporophytes differ in their ph
 
 **Keywords**: chlorophyll fluorescence; desiccation tolerance; DNA barcoding; French Polynesia; gametophyte; Hymenophyllaceae
 
-\clearpage
-#####
+\newpage
 
 ## Introduction
 
@@ -181,7 +179,7 @@ We selected the island of Moorea, French Polynesia (17°32' S, 149°50' W) for o
 Moorea is a small (135 km^2^; maximum elevation 1206 m) tropical oceanic island, located ca.
 15 km NW of its larger sister island, Tahiti.
 Despite its small size, it hosts a range of habitats including coastal strand, low elevation rainforest, and high elevation cloud forest.
-A total of `r n_filmy_sp` filmy fern species are known from Moorea, including multiple terrestrial, saxicolous, and epiphytic species [@Murdock2003; @Ranker2005; @Nitta2011b; @Nitta2017; @Florence].
+A total of `r n_filmy_sp` filmy fern species are known from Moorea, including multiple terrestrial, saxicolous, and epiphytic species [@Murdock2003; @Ranker2005; @Nitta2011b; @Nitta2017; @Florence] (`r figure("filmy-habit")`).
 The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages [@Pryer2001a], are represented on Moorea by `r n_hymeno_sp` and `r n_trich_sp` species, respectively.
 We follow the taxonomic system of @Ebihara2006.
 
@@ -353,29 +351,6 @@ n_dt_species_both <- combined_species_means %>%
   n_distinct() %>%
   english2
 
-# Make helper function to check on p-value significance and extract from t_test_results
-#
-#' @param species_select Name of species to select from t-test results
-#' @param response_select Name of response to select from t-test results
-#' @param data t-test results
-#' @param p_check Boolean: should the p-value be required to be less than 0.05?
-#'
-#' @return A p-value for the selected species and response
-ttest_pval <- function(species_select, response_select, data = t_test_results, p_check = TRUE) {
-  data %>% 
-    # Filter to appropriate species and response
-    filter(species == species_select, response == response_select) %>%
-    # Verify the p-value is significant (or override with `p_check = FALSE`)
-    assert(function (x) magrittr::is_less_than(x, 0.05) | !p_check, p_value) %>%
-    # Format the p-value
-    mutate(
-      p_value = case_when(
-        p_value < 0.001 ~ "<0.001",
-        TRUE ~ jntools::round_t(p_value, digits = 3))
-    ) %>% 
-    pull(p_value)
-}
-
 # FIXME: double check on these p-values
 # ttest_pval("Polyphlebium_endlicherianum", "recovery")
 # ttest_pval("Crepidomanes_minutum2", "recovery")
@@ -385,7 +360,7 @@ ttest_pval <- function(species_select, response_select, data = t_test_results, p
 ```
 
 Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases (Appendix S3).
-A general correlation of DT with habitat was observed in sporophytes (`r figure("sporo-dt")`).
+A general correlation of DT with habitat was observed in sporophytes (`r figure("filmy-dt")`).
 Both terrestrial species (*Abrodictyum dentatum* (Bosch) Ebihara & K Iwats. and *C. apiifolia*) lacked even moderate DT, and failed to recover from the gentlest treatment of 2 d at --38 MPa (more stringent tests were not conducted on these species after confirming their lack of DT at this level).
 Saxicolous species (*Crepidomanes kurzii* (Bedd.) Tagawa & K. Iwats., *Polyphlebium endlicherianum* (C. Presl) Ebihara & K. Iwats., and *Vandenboschia maxima* (Blume) Copel.) also had low DT; only *C. kurzii* was able to recover from desiccation up to --86 MPa for 2 d but not more.
 All epiphytic species were capable of recovering from desiccation to a certain degree, but ability varied between species.
@@ -573,20 +548,39 @@ Funding provided in part by the National Science Foundation (Doctoral Dissertati
 <!-- Insert <div id="refs"></div> to place the refs here instead of at the end -->
 <div id="refs"></div>
 
+\newpage
+
 ## Figure Captions
 <!-- JPR requirements: Figure captions begin with the term Fig. in bold type, followed by the figure number, also in boldtype. No punctuation is to be included after the number, nor is any punctuation to be placed at the end of the caption. -->
 
-**`r figure("sporo-dt")`** Results of desiccation tolerance test on filmy fern sporophytes (**a**) and gametophytes (**b**) from Moorea, French Polynesia.
+**`r figure("filmy-habit")`** Examples of filmy ferns from French Polynesia.
+(**a**–**d**) sporophytes; (**e**–**h**) gametophytes.
+(**a**) *Crepidomanes humile*, a low elevation epiphyte. *Nitta 3392* (GH). 
+(**b**) *Hymenophyllum multifidum*, a high elevation epiphyte growing in association with leafy liverworts and mosses. *Nitta 1257*
+(GH). 
+(**c**) *Polyphlebium endlicherianum*, a saxicolous species found at low to middle elevations. *Nitta 629* (GH). 
+(**d**) *Callistopteris apiifolia*, a terrestrial species with sporophytes occurring only in humid cloud forests. *Nitta 3990* (GH).
+(**e**) *C. apiifolia* (ribbon morphotype). Arrow indicates gemmae (asexual propagules) at tip of lobe. *Nitta 2565* (GH). 
+(**f**) *Hymenophyllum polyanthos* (ribbon morphotype). *Nitta 3862* (GH).
+(**g**) Filamentous gametophytes of an unidentified species of Hymenophyllaceae. *Nitta 4036* (GH). 
+(**h**) *C. apiifolia*, showing detail of gemmifers (attachment points of gemmae, example indicated by arrow) and branched gemmae. *Nitta 3887* (GH). 
+Scalebars: (**a**–**c**) 1.0 cm; (**d**) 5.0 cm; (**e**) 5.0 mm; (**f**) 2.0 mm; (**g**, **h**) 1.0 mm. 
+Photographs by J. H. Nitta.
+
+**`r figure("filmy-dt")`** Results of desiccation tolerance test on filmy fern sporophytes (**a**) and gametophytes (**b**) from Moorea, French Polynesia.
 Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation at three different intensities for either 2 or 15 days (see Methods).
 Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%).
 Error bars indicate standard deviation.
 *n* = 8 samples per species/treatment unless otherwise indicated.
 Growth habit indicated in parentheses after each species: T, terrestrial; S, saxicolous; LE, low elevation epiphyte; HE, high elevation epiphyte
 
-## Figures
+\newpage
 
 ```{r plot-setup}
 original_theme <- theme_set(theme_bw(base_size = 10))
+# JPR requirements:
+# Figures should be 39 mm, 84 mm, 129 mm, or 174 mm wide and not higher than 234 mm
+# In inches, widths: 1.53, 3.31, 5.08, 6.85; height: 9.21
 ```
 
 ```{r dt-plot-setup}
@@ -710,7 +704,15 @@ make_dt_plot <- function (dt_plot_data, generation_select, plot_part) {
 }
 ```
 
-```{r sporo-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
+```{r filmies-fig, fig.width = 6.85, results = "asis"}
+knitr::include_graphics(here::here("data/figure_1.png"))
+```
+
+**`r figure("filmy-habit")`**
+
+\newpage
+
+```{r filmy-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
 dt_plot_data %>%
   mutate(label = str_replace_all(
     label, 
@@ -720,11 +722,15 @@ make_dt_plot("sporophyte", "a")
 ggsave(here::here("results/ms/fig_1a_sporo_dt.pdf"), width = 6.85, height = 7.5)
 ```
 
-**`r figure("sporo-dt")`**
+**`r figure("filmy-dt")`**
+
+\newpage
 
 ```{r gameto-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
 make_dt_plot(dt_plot_data, "gametophyte", "b")
 ggsave(here::here("results/ms/fig_1b_gameto_dt.pdf"), width = 6.85, height = 6.5)
 ```
 
-**`r figure("sporo-dt")`** continued
+**`r figure("filmy-dt")`** (continued)
+
+\newpage
