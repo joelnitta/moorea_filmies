@@ -576,13 +576,18 @@ Funding provided in part by the National Science Foundation (Doctoral Dissertati
 ## Figure Captions
 <!-- JPR requirements: Figure captions begin with the term Fig. in bold type, followed by the figure number, also in boldtype. No punctuation is to be included after the number, nor is any punctuation to be placed at the end of the caption. -->
 
-**`r figure("sporo-dt")`** Results of sporophyte desiccation tolerance test on filmy fern sporophytes from Moorea, French Polynesia.
+**`r figure("sporo-dt")`** Results of desiccation tolerance test on filmy fern sporophytes (**a**) and gametophytes (**b**) from Moorea, French Polynesia.
 Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation at three different intensities for either 2 or 15 days (see Methods).
 Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%).
 Error bars indicate standard deviation.
+*n* = 8 samples per species/treatment unless otherwise indicated.
 Growth habit indicated in parentheses after each species: T, terrestrial; S, saxicolous; LE, low elevation epiphyte; HE, high elevation epiphyte
 
 ## Figures
+
+```{r plot-setup}
+original_theme <- theme_set(theme_bw(base_size = 10))
+```
 
 ```{r dt-plot-setup}
 ### Format data for plotting ###
@@ -690,7 +695,6 @@ make_dt_plot <- function (dt_plot_data, generation_select, plot_part) {
     y = "Recovery (%)",
     title = glue("**{plot_part}**")
   ) +
-  theme_bw() +
   theme(
     legend.position = "bottom",
     plot.title = element_markdown(),
@@ -706,17 +710,21 @@ make_dt_plot <- function (dt_plot_data, generation_select, plot_part) {
 }
 ```
 
-
 ```{r sporo-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
-make_dt_plot(dt_plot_data, "sporophyte", "a")
+dt_plot_data %>%
+  mutate(label = str_replace_all(
+    label, 
+    fixed("*C. bipunctatum* (LE, *n* = 10-12)"),
+    "*C. bipunctatum*<br>(LE, *n* = 10-12)")) %>%
+make_dt_plot("sporophyte", "a")
 ggsave(here::here("results/ms/fig_1a_sporo_dt.pdf"), width = 6.85, height = 7.5)
 ```
 
-**`r figure("sporo-dt")`a**
+**`r figure("sporo-dt")`**
 
 ```{r gameto-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = ""}
 make_dt_plot(dt_plot_data, "gametophyte", "b")
 ggsave(here::here("results/ms/fig_1b_gameto_dt.pdf"), width = 6.85, height = 6.5)
 ```
 
-**`r figure("sporo-dt")`b**
+**`r figure("sporo-dt")`** continued
