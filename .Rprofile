@@ -1,2 +1,2 @@
-renv::settings$use.cache(FALSE)
 source("renv/activate.R")
+renv::settings$use.cache(FALSE)
