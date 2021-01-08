@@ -303,7 +303,7 @@ ggsave(plot = filmy_all_lc_plot_filtered, file = "data_raw/intermediates/all_lig
 # INTERACTIVE STEP:
 # In RStudio, go through data by increasing row selected one at a time,
 # select outliers, and save each as CSV
-select_lc_points(filmy_lc_models_filtered, 22)
+select_lc_points(filmy_lc_models_filtered, 1)
 
 # Read in outliers, flag them in the filtered data and remove
 read_outlier <- function(file) {

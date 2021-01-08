@@ -316,7 +316,8 @@ select_lc_points <- function(plotly_data_tibble, row_select)  {
   plotly_data <- plotly_data_tibble %>%
     magrittr::extract(row_select,) %>%
     select(species, generation, individual, coll_num, condition, date, data, fitted) %>%
-    unnest(cols = c(data, fitted))
+    unnest(cols = c(data, fitted)) %>%
+    select(etr, par, etr_fit, everything())
   
   plotly_title <- plotly_data %>%
     abbrev_sp %>%
