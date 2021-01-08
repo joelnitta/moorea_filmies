@@ -178,6 +178,7 @@ tar_plan(
     latex = "results/ms/manuscript.tex",
     docx = "results/ms/manuscript.docx",
     template = "ms/journal-of-plant-research.docx",
+    lua_filter = "ms/pagebreak.lua",
     wd = here::here("results"),
     depends = manuscript_pdf
   ),

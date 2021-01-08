@@ -1461,7 +1461,8 @@ render_tracked <- function (tracked_output, dep1 = NULL, dep2 = NULL, ...) {
 #'
 #' @param latex Path to input latex file.
 #' @param docx Path to output docx file.
-#' @param template Path to template docx file.
+#' @param template Optional; path to template docx file.
+#' @param lua_filter Optional; path to lua filter file.
 #' @param wd Working directory to run conversion. Should be same as
 #' directory containing any files needed to render latex to pdf.
 #' @param ... Other arguments; not used by this function, but for tracking dependencies.
@@ -1469,7 +1470,7 @@ render_tracked <- function (tracked_output, dep1 = NULL, dep2 = NULL, ...) {
 #' @return List including STDOUT of pandoc; externally, the
 #' docx file will be rendered in `wd`.
 #' 
-latex2docx <- function (latex, docx, template = NULL, wd = getwd(), ...) {
+latex2docx <- function (latex, docx, template = NULL, lua_filter = NULL, wd = getwd(), ...) {
   
   assertthat::assert_that(assertthat::is.readable(latex))
   
@@ -1485,9 +1486,15 @@ latex2docx <- function (latex, docx, template = NULL, wd = getwd(), ...) {
     NULL
   }
   
+  lua_filter <- if (!is.null(lua_filter)) {
+    glue::glue("--lua-filter={fs::path_abs(lua_filter)}")
+  } else {
+    NULL
+  }
+  
   processx::run(
     command = "pandoc",
-    args = c("-s", latex, template, "-o", docx),
+    args = c("-s", latex, template, "-o", docx, lua_filter),
     wd = wd
   )
   
