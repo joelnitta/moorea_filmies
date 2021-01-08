@@ -194,7 +194,7 @@ filmy_gameto_lc_field <-
   ungroup %>%
   mutate(individual = as.character(individual))
 
-# Combine data and write out ----
+# Combine data ----
 filmy_lc_data <- bind_rows(filmy_sporo_lc_lab, filmy_sporo_lc_field, filmy_gameto_lc_field) %>% 
   mutate(species = str_replace_all(species, " ", "_")) %>%
   # Check not missing data
@@ -210,4 +210,136 @@ filmy_lc_data <- bind_rows(filmy_sporo_lc_lab, filmy_sporo_lc_field, filmy_gamet
   # Add date
   mutate(date = date(date_time))
 
-write_csv(filmy_lc_data, "data/filmy_light_curves.csv")
+# Filter out poorly fitting light curves ----
+
+# Fit model to each set of light curve data
+filmy_lc_models <-
+  filmy_lc_data %>%
+  select(species, generation, individual, coll_num, condition, date, par, etr) %>%
+  # create ID field
+  mutate(id = paste(coll_num, individual, as.character(date), sep = "_")) %>%
+  nest(data = c(par, etr)) %>%
+  mutate(
+    nls_mod = map(
+      data, 
+      # nonlinear least-squares estimates of parameters of the subsetted data
+      ~nls(
+        etr~max(etr)*(1-exp(-k*par)),
+        start = list(k = 0.04),
+        data =.,
+        trace = FALSE,
+        control = list(maxiter = 500))
+    ),
+    k_stats = map(nls_mod, broom::tidy)
+  ) %>%
+  mutate(fitted = map(nls_mod, ~fitted(.) %>% tibble(etr_fit = .)))
+
+# Extract model parameters: pvalue, critical PAR, and ETR at 95% of estimated max value
+filmy_lc_model_params <-
+  filmy_lc_models %>%
+  select(-nls_mod, -data) %>%
+  unnest(cols = fitted) %>%
+  group_by(species, generation, individual, coll_num, condition, date) %>%
+  mutate(etr_max = max(etr_fit)) %>%
+  ungroup %>%
+  select(-etr_fit) %>%
+  unique() %>%
+  unnest(cols = k_stats) %>%
+  mutate(par_critical = -log(0.05)/estimate)
+
+# Filter light curve data by removing any samples with a poor light curve fit
+# (p-value > 0.05)
+filmy_lc_data_filtered <-
+  filmy_lc_data %>%
+  # Add light-curve p-values
+  left_join(
+      select(filmy_lc_model_params, species, generation, individual, coll_num, condition, date, p.value)
+  ) %>%
+  # Make sure the join didn't change the number of rows
+  verify(nrow(.) == nrow(filmy_lc_data)) %>%
+  assert(not_na, p.value) %>%
+  # Filter by p-value
+  filter(p.value < 0.05)
+
+filmy_lc_models_filtered <-
+  filmy_lc_models %>%
+  # Add light-curve p-values
+  left_join(
+    select(filmy_lc_model_params, species, generation, individual, coll_num, condition, date, p.value)
+  ) %>%
+  # Make sure the join didn't change the number of rows
+  verify(nrow(.) == nrow(filmy_lc_models)) %>%
+  # Filter by p-value
+  assert(not_na, p.value) %>%
+  filter(p.value < 0.05) %>%
+  select(-p.value)
+
+# Flag and filter outliers ----
+
+# Optional: plot all filtered light curves to identify those with outliers
+# - Extract fitted data points, abbreviate species names
+filmy_lc_model_fitted_data_filtered <-
+  filmy_lc_models_filtered %>%
+  select(-nls_mod, -k_stats) %>%
+  unnest(cols = c(data, fitted)) %>%
+  abbrev_sp()
+
+filmy_lc_model_params_filtered <-
+  filmy_lc_model_params %>%
+  filter(p.value < 0.05)  %>%
+  abbrev_sp()
+
+# - Make plots
+filmy_all_lc_plot_filtered <-
+  ggplot(abbrev_sp(filmy_lc_model_fitted_data_filtered), aes(x = par)) +
+  geom_point(aes(y = etr)) +
+  geom_line(aes(y = etr_fit)) +
+  geom_hline(data = filmy_lc_model_params_filtered, aes(yintercept = etr_max), color = "green") +
+  geom_vline(data = filmy_lc_model_params_filtered, aes(xintercept = par_critical), color = "red") +
+  facet_wrap(vars(generation, species, id), scales = "free")
+
+ggsave(plot = filmy_all_lc_plot_filtered, file = "data_raw/intermediates/all_light_curves_filtered.pdf", height = 40, width = 40)
+
+# INTERACTIVE STEP:
+# In RStudio, go through data by increasing row selected one at a time,
+# select outliers, and save each as CSV
+select_lc_points(filmy_lc_models_filtered, 22)
+
+# Read in outliers, flag them in the filtered data and remove
+read_outlier <- function(file) {
+  suppressWarnings(
+    read_csv(file, col_types = cols(
+      X1 = col_double(),
+      species = col_character(),
+      generation = col_character(),
+      individual = col_character(),
+      coll_num = col_character(),
+      condition = col_character(),
+      date = col_date(format = ""),
+      par = col_double(),
+      etr = col_double(),
+      etr_fit = col_double()
+    ))
+  ) %>%
+    select(-X1, -etr_fit)
+}
+
+outliers <- list.files("data_raw/intermediates/lc_outliers", full.names = TRUE) %>%
+  map_df(read_outlier) %>%
+  unique() %>%
+  mutate(outlier = TRUE)
+
+filmy_lc_data_filtered_outliers_removed <-
+  filmy_lc_data_filtered %>%
+  left_join(
+    outliers,
+    by = c("par", "etr", "species", "individual", "generation", "coll_num", "condition", "date")) %>%
+  # make sure join didn't duplicate any values
+  # (number of rows should be the same before and after)
+  verify(nrow(.) == nrow(filmy_lc_data_filtered)) %>%
+  mutate(outlier = replace_na(outlier, FALSE)) %>%
+  filter(outlier == FALSE) %>%
+  select(-outlier)
+
+# Write out final cleaned dataset ----
+write_csv(filmy_lc_data_filtered_outliers_removed, "data/filmy_light_curves.csv")

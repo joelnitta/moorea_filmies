@@ -313,9 +313,16 @@ fix_gameto_dt_names <- function (data) {
 select_lc_points <- function(plotly_data_tibble, row_select)  {
   
   # Subset data to a single row
-  plotly_data <- plotly_data_tibble$data[[row_select]]
+  plotly_data <- plotly_data_tibble %>%
+    magrittr::extract(row_select,) %>%
+    select(species, generation, individual, coll_num, condition, date, data, fitted) %>%
+    unnest(cols = c(data, fitted))
   
-  plotly_title <- plotly_data_tibble$id[[row_select]]
+  plotly_title <- plotly_data %>%
+    abbrev_sp %>%
+    mutate(label = paste(species, generation, individual, coll_num, condition, date, sep = "_")) %>%
+    pull(label) %>%
+    unique()
   
   # Create shared data object so it's in sync between DataTable and Plotly
   shared_data <- crosstalk::SharedData$new(plotly_data)
@@ -399,6 +406,27 @@ load_filmy_dt_chamber <- function (file) {
     generation = col_character(),
     year = col_double(),
     serial_no = col_character()
+  )
+  )
+}
+
+load_filmy_lc <- function (file) {
+  readr::read_csv(file, col_types = cols(
+    type = col_character(),
+    no = col_double(),
+    f = col_double(),
+    fm = col_double(),
+    par = col_double(),
+    yield = col_double(),
+    etr = col_double(),
+    date_time = col_datetime(format = ""),
+    species = col_character(),
+    individual = col_character(),
+    generation = col_character(),
+    coll_num = col_character(),
+    sporo_site = col_character(),
+    condition = col_character(),
+    date = col_date(format = "")
   )
   )
 }
@@ -790,6 +818,14 @@ combine_env_env_range_recover <- function (combined_species_means, env_range_dat
     ), 
     by = "species") %>%
   as.data.frame()
+}
+
+# Convert genus to just first letter
+abbrev_sp <- function(data) {
+  data %>%
+    separate(species, c("genus", "epithet")) %>%
+    mutate(genus = substr(genus, 1, 1)) %>%
+    unite("species", genus, epithet)
 }
 
 # t-test ----
