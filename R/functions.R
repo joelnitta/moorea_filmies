@@ -1514,9 +1514,19 @@ latex2docx <- function (latex, docx, template = NULL, lua_filter = NULL, wd = ge
     NULL
   }
   
+  # Run pandoc externally
+  # need to include "+raw_tex" for linebreak lua filter to work
+  # https://github.com/pandoc/lua-filters/issues/152
   processx::run(
     command = "pandoc",
-    args = c("-s", latex, template, "-o", docx, lua_filter),
+    args = c(
+      "-o", docx, # Name of output file
+      template, # (optional) MS word template
+      lua_filter, # (optional) lua filter
+      "-f", "latex+raw_tex", # Input format
+      "-t", "docx", # Output format
+      latex # Input file
+      ),
     wd = wd
   )
   
