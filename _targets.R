@@ -43,7 +43,8 @@ tar_plan(
 
   # - light responses
   tar_file(light_data_file, "data/filmy_light_curves.csv"),
-  light_data = read_csv(light_data_file),
+  light_data_all = load_filmy_lc(light_data_file),
+  light_data = filter(light_data_all, outlier == FALSE), # remove outliers
   
   # - specimen data
   tar_file(specimens_raw_file, "data/fern_specimens.csv"),

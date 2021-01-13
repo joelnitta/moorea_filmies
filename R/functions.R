@@ -310,7 +310,7 @@ fix_gameto_dt_names <- function (data) {
 #' @return Nothing; in an RStudio session, the interactive plot will show up in 
 #' the Viewer pane.
 #' 
-select_lc_points <- function(plotly_data_tibble, row_select)  {
+select_lc_points <- function(plotly_data_tibble, row_select = 1)  {
   
   # Subset data to a single row
   plotly_data <- plotly_data_tibble %>%
@@ -427,7 +427,8 @@ load_filmy_lc <- function (file) {
     coll_num = col_character(),
     sporo_site = col_character(),
     condition = col_character(),
-    date = col_date(format = "")
+    date = col_date(format = ""),
+    outlier = col_logical()
   )
   )
 }

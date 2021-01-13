@@ -303,9 +303,12 @@ ggsave(plot = filmy_all_lc_plot_filtered, file = "data_raw/intermediates/all_lig
 # INTERACTIVE STEP:
 # In RStudio, go through data by increasing row selected one at a time,
 # select outliers, and save each as CSV
-select_lc_points(filmy_lc_models_filtered, 1)
+filmy_lc_models_filtered %>%
+  filter(str_detect(id, "2479_1_2013-06-10")) %>%
+  select_lc_points()
+  
+# Read in outliers, flag them in the filtered data
 
-# Read in outliers, flag them in the filtered data and remove
 read_outlier <- function(file) {
   suppressWarnings(
     read_csv(file, col_types = cols(
@@ -329,7 +332,7 @@ outliers <- list.files("data_raw/intermediates/lc_outliers", full.names = TRUE) 
   unique() %>%
   mutate(outlier = TRUE)
 
-filmy_lc_data_filtered_outliers_removed <-
+filmy_lc_data_filtered_outliers_flagged <-
   filmy_lc_data_filtered %>%
   left_join(
     outliers,
@@ -337,9 +340,7 @@ filmy_lc_data_filtered_outliers_removed <-
   # make sure join didn't duplicate any values
   # (number of rows should be the same before and after)
   verify(nrow(.) == nrow(filmy_lc_data_filtered)) %>%
-  mutate(outlier = replace_na(outlier, FALSE)) %>%
-  filter(outlier == FALSE) %>%
-  select(-outlier)
+  mutate(outlier = replace_na(outlier, FALSE))
 
 # Write out final cleaned dataset ----
-write_csv(filmy_lc_data_filtered_outliers_removed, "data/filmy_light_curves.csv")
+write_csv(filmy_lc_data_filtered_outliers_flagged, "data/filmy_light_curves.csv")
