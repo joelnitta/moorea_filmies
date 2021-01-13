@@ -8,6 +8,9 @@
       }
     ]
   },
+  "Bioconductor": {
+    "Version": "3.12"
+  },
   "Packages": {
     "BH": {
       "Package": "BH",
@@ -15,6 +18,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "8f9ce74c6417d61f0782cbae5fd2b7b0"
+    },
+    "BiocManager": {
+      "Package": "BiocManager",
+      "Version": "1.30.10",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "db75371846625725e221470b310da1d5"
     },
     "Ckmeans.1d.dp": {
       "Package": "Ckmeans.1d.dp",
@@ -29,6 +39,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "4744be45519d675af66c28478720fce5"
+    },
+    "DT": {
+      "Package": "DT",
+      "Version": "0.17",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "56b33b77f4cffd78ff96b8e5a69eabb0"
     },
     "MASS": {
       "Package": "MASS",
@@ -106,6 +123,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "08310cebe9ad2da068486b26b05e6030"
+    },
+    "aplot": {
+      "Package": "aplot",
+      "Version": "0.0.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9f5934d50a5994ccc8349eed5706b827"
     },
     "askpass": {
       "Package": "askpass",
@@ -294,6 +318,13 @@
       "Repository": "RSPM",
       "Hash": "0d57bc8e27b7ba9e45dba825ebc0de6b"
     },
+    "crosstalk": {
+      "Package": "crosstalk",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2b06f9e415a62b6762e4b8098d2aecbc"
+    },
     "cubature": {
       "Package": "cubature",
       "Version": "2.0.4.1",
@@ -448,6 +479,18 @@
       "Repository": "CRAN",
       "Hash": "03d8caec959ac70e2d13bad1ac40667c"
     },
+    "ggtree": {
+      "Package": "ggtree",
+      "Version": "2.5.1",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "YuLab-SMU",
+      "RemoteRepo": "ggtree",
+      "RemoteRef": "master",
+      "RemoteSha": "652e1e053a9023b68f0ba29a174b51f1c113f552",
+      "Hash": "fa9476ed403744a6faedd3927633a5a1"
+    },
     "glue": {
       "Package": "glue",
       "Version": "1.4.2",
@@ -593,12 +636,26 @@
       "Repository": "RSPM",
       "Hash": "73832978c1de350df58108c745ed0e3e"
     },
+    "later": {
+      "Package": "later",
+      "Version": "1.1.0.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "d0a62b247165aabf397fded504660d8a"
+    },
     "lattice": {
       "Package": "lattice",
       "Version": "0.20-41",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "fbd9285028b0263d76d18c95ae51a53d"
+    },
+    "lazyeval": {
+      "Package": "lazyeval",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "d908914ae53b04d4c0c0fd72ecc35370"
     },
     "lifecycle": {
       "Package": "lifecycle",
@@ -766,6 +823,13 @@
       "Repository": "RSPM",
       "Hash": "b6b150cd4709e0c0c9b5d51ac4376282"
     },
+    "plotly": {
+      "Package": "plotly",
+      "Version": "4.9.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f6b85d9e4ed88074ea0ede1aa74bb00e"
+    },
     "plotrix": {
       "Package": "plotrix",
       "Version": "3.7-8",
@@ -814,6 +878,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "14dc9f7a3c91ebb14ec5bb9208a07061"
+    },
+    "promises": {
+      "Package": "promises",
+      "Version": "1.1.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "a8730dcbdd19f9047774909f0ec214a4"
     },
     "pryr": {
       "Package": "pryr",
@@ -912,6 +983,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "33a5b27a03da82ac4b1d43268f80088a"
+    },
+    "rvcheck": {
+      "Package": "rvcheck",
+      "Version": "0.1.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "11ebf2d3d4990e8bb9f28d5ab0c204fc"
     },
     "rvest": {
       "Package": "rvest",
@@ -1042,6 +1120,13 @@
       "Repository": "RSPM",
       "Hash": "6ea435c354e8448819627cf686f66e0a"
     },
+    "tidytree": {
+      "Package": "tidytree",
+      "Version": "0.3.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ae1850264b8f021c02f181bd28b24f96"
+    },
     "tidyverse": {
       "Package": "tidyverse",
       "Version": "1.3.0",
@@ -1062,6 +1147,18 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "50470c7ed0cc8099cbc17b38f0ef621f"
+    },
+    "treeio": {
+      "Package": "treeio",
+      "Version": "1.15.2",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "GuangchuangYu",
+      "RemoteRepo": "treeio",
+      "RemoteRef": "master",
+      "RemoteSha": "28e6adccf85c2b809019178c0f442e864db22ea3",
+      "Hash": "ea1a3084c0afe04428ffb55fdadb1a90"
     },
     "utf8": {
       "Package": "utf8",
