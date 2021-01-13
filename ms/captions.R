@@ -14,6 +14,7 @@
 figure_full <- captioner::captioner(prefix = "Fig.", suffix = "")
 figure_full(name = "filmy-habit", caption = "filmy-habit")
 figure_full(name = "filmy-dt", caption = "filmy-dt")
+figure_full(name = "combined", caption = "combined")
 
 # - Tables
 table_full <- captioner::captioner(prefix = "Table")

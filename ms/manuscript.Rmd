@@ -46,6 +46,7 @@ tar_load(t_test_results)
 tar_load(env_range_dt_model_summary)
 tar_load(recovery_species_means)
 tar_load(filmy_habit)
+tar_load(filmy_phy)
 ```
 
 <!-- to move to the next line without starting a new paragraph, 
@@ -577,10 +578,24 @@ Growth habit indicated in parentheses after each species: T, terrestrial; S, sax
 \newpage
 
 ```{r plot-setup}
-original_theme <- theme_set(theme_bw(base_size = 10))
 # JPR requirements:
 # Figures should be 39 mm, 84 mm, 129 mm, or 174 mm wide and not higher than 234 mm
 # In inches, widths: 1.53, 3.31, 5.08, 6.85; height: 9.21
+
+# Set overall theme, saving default theme
+default_theme <- theme_set(theme_bw(base_size = 10))
+
+# Define color-blind palette
+cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
+               green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
+               red = "#D55E00", purple = "#CC79A7")
+
+# Define function for formatting text in legends
+pretty_text <- function (x) {
+  x %>%
+  str_replace_all("_", " ") %>%
+    str_to_sentence()
+}
 ```
 
 ```{r dt-plot-setup}
@@ -636,11 +651,6 @@ dt_plot_data <-
   rename(recovery = recovery_mean, sd = recovery_sd, n = recovery_n)
 
 ### Set up plotting variables ###
-
-# Define color-blind palette
-cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
-               green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
-               red = "#D55E00", purple = "#CC79A7")
 
 # Set colors, shapes for desiccation intensity
 salt_cols <- c(
@@ -734,3 +744,105 @@ ggsave(here::here("results/ms/fig_1b_gameto_dt.pdf"), width = 6.85, height = 6.5
 **`r figure("filmy-dt")`** (continued)
 
 \newpage
+
+```{r combined-plot, fig.width = 6.85, fig.height = 5, fig.cap = ""}
+# Copy phylogeny and species means data so they
+# can be manipulated for this plot
+phy <- filmy_phy
+traits <- combined_species_means
+
+# Set colors for growth habit, generation
+habit_colors <- c(
+  "Terrestrial" = cbPalette[["red"]], 
+  "Saxicolous" = cbPalette[["gold"]], 
+  "Low_Epiphyte" = cbPalette[["green"]],
+  "High_Epiphyte" = cbPalette[["blue"]])
+
+generation_colors <- c(
+  "gametophyte" = "grey70",
+  "sporophyte" = "grey30"
+)
+
+# Subset tree to only species with trait data
+phy <- drop.tip(phy, setdiff(phy$tip.label, traits$species))
+
+# Sort species by position in phylogeny
+traits <-
+  traits %>%
+  filter(species %in% phy$tip.label) %>%
+  mutate(species = factor(species, levels = jntools::get_tips_in_ape_plot_order(phy)))
+
+filmy_habit <-
+  filmy_habit %>%
+  filter(species %in% phy$tip.label)
+  
+# Part a (left): tree
+a <- ggtree(phy) %<+% filmy_habit +
+  geom_tippoint(aes(color = habit), position = position_nudge(x = 7, y = 0), size = 4) +
+  scale_color_manual(values = habit_colors, labels = pretty_text) +
+  labs(color = "Growth habit")
+
+# Part b (middle): desiccation tolerance
+b <- 
+ggplot(traits, aes(y = species, x = recovery_mean, fill = generation)) +
+  geom_col(position = position_dodge(0.5, preserve = "single"), width = 0.5) +
+  geom_errorbarh(
+    aes(xmax = recovery_mean + recovery_sd, xmin = recovery_mean),
+    position = position_dodge(0.5, preserve = "single"),
+    height = 0,
+    color = "grey20") +
+  scale_x_continuous(
+    labels = percent, 
+    limits = c(0,1.2), 
+    expand = expansion(mult = c(0,0.025)), 
+    breaks=c(0,.25,.5,.75,1.0)) +
+  scale_fill_manual(values = generation_colors, labels = pretty_text) +
+  theme_bw(base_size = 10) +
+  labs(x = "Recovery", fill = "Generation") +
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    legend.position = "bottom"
+  )
+
+# Part c (right): light-levels
+c <-
+ggplot(traits, aes(y = species, x = etr_mean, fill = generation)) +
+  geom_col(position = position_dodge(0.5, preserve = "single"), width = 0.5) +
+  geom_errorbarh(
+    aes(xmax = etr_mean + etr_sd, xmin = etr_mean),
+    position = position_dodge(0.5, preserve = "single"),
+    height = 0,
+    color = "grey20") +
+  theme_bw(base_size = 10) +
+  scale_fill_manual(values = generation_colors, labels = pretty_text) +
+  scale_y_discrete(
+    position = "right",
+    # Format species names by converting underscore to space and italicizing
+    labels = function(x) str_replace_all(x, "_", " ") %>% paste0("*", ., "*")
+    ) +
+  scale_x_continuous(expand = expansion(mult = c(0,0.025))) +
+  labs(x = "ETR<sub>max</sub>", fill = "Generation") +
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y.right = element_markdown(), # NOT axis.text.y
+    axis.title.x = element_markdown()
+  ) +
+  guides(fill = "none")
+
+# Combine plots
+a + b + c + plot_layout(nrow = 1, guides = "collect") &
+  theme(
+    legend.position = "bottom",
+    # Adjust invididual margins to remove whitespace between subplots
+    plot.margin = margin(t = 0.1, r = 0, b = 0.1, l = 0.04, unit = "in"))
+
+ggsave(here::here("results/ms/fig_combined.pdf"), width = 6.85, height = 5)
+```
+
+**`r figure("combined")`**
