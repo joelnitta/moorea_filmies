@@ -624,8 +624,9 @@ combine_mean_phys_traits <- function (recovery_species_means, etr_species_means,
     recovery_species_means %>%
     mutate(
       keep = case_when(
-        species == "Callistopteris_apiifolia" & generation == "sporo" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
-        species == "Abrodictyum_dentatum" & generation == "sporo" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
+        # For sporophytes, use only recovery after 48 hr for 2-day drying treatment with MgNO3
+        # But make exception for A. dentatum, which was NaCl
+        species == "Abrodictyum_dentatum" & generation == "sporophyte" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
         salt == "MgNO3" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
         TRUE ~ FALSE
       )
