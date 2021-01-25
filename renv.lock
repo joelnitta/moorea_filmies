@@ -669,6 +669,13 @@
       "Repository": "CRAN",
       "Hash": "2657f20b9a74c996c602e74ebe540b06"
     },
+    "kableExtra": {
+      "Package": "kableExtra",
+      "Version": "1.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "fa7f610e7eadfc9c47d501a333e03f1a"
+    },
     "knitr": {
       "Package": "knitr",
       "Version": "1.29",
@@ -828,6 +835,13 @@
       "RemoteSha": "79223d3002e7bd7e715a270685c6507d684b2622",
       "Hash": "bb0351006f85f2c68810f8202d74e2d1"
     },
+    "pdftools": {
+      "Package": "pdftools",
+      "Version": "2.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c395e2a35e1c2a4c9ba5424cd7cd26c7"
+    },
     "phangorn": {
       "Package": "phangorn",
       "Version": "2.5.5",
@@ -953,6 +967,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "97def703420c8ab10d8f0e6c72101e02"
+    },
+    "qpdf": {
+      "Package": "qpdf",
+      "Version": "1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5a2907cd44279b5861ac5f813465b5c9"
     },
     "quadprog": {
       "Package": "quadprog",
@@ -1260,6 +1281,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "12545f2acf49d1d346d075580122d89c"
+    },
+    "webshot": {
+      "Package": "webshot",
+      "Version": "0.5.2",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "e99d80ad34457a4853674e89d5e806de"
     },
     "whisker": {
       "Package": "whisker",
