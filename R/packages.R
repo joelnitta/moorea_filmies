@@ -15,6 +15,7 @@ library(patchwork)
 library(scales)
 library(ggtext)
 library(ggtree)
+library(kableExtra)
 library(tidyverse)
 
 conflict_prefer("col_factor", "readr")
