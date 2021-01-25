@@ -318,6 +318,13 @@
       "Repository": "RSPM",
       "Hash": "0d57bc8e27b7ba9e45dba825ebc0de6b"
     },
+    "credentials": {
+      "Package": "credentials",
+      "Version": "1.3.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "a96728288c75a814c900af9da84387be"
+    },
     "crosstalk": {
       "Package": "crosstalk",
       "Version": "1.1.1",
@@ -423,6 +430,18 @@
       "Repository": "CRAN",
       "Hash": "2cfe25650d69960c54e06840e4b5d8e4"
     },
+    "fnmate": {
+      "Package": "fnmate",
+      "Version": "0.0.1.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "milesmcbain",
+      "RemoteRepo": "fnmate",
+      "RemoteRef": "master",
+      "RemoteSha": "908f638b782dcc706deb5443a172bd31877f5cde",
+      "Hash": "aa26ffb608d6db8c4d464a7666820305"
+    },
     "forcats": {
       "Package": "forcats",
       "Version": "0.5.0",
@@ -465,6 +484,13 @@
       "Repository": "CRAN",
       "Hash": "eee36211f74e4dbc80eae9d504b58f0b"
     },
+    "gert": {
+      "Package": "gert",
+      "Version": "1.0.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0ebdadbb2b742cd230cb3ec7fdf5898a"
+    },
     "ggplot2": {
       "Package": "ggplot2",
       "Version": "3.3.2",
@@ -490,6 +516,20 @@
       "RemoteRef": "master",
       "RemoteSha": "652e1e053a9023b68f0ba29a174b51f1c113f552",
       "Hash": "fa9476ed403744a6faedd3927633a5a1"
+    },
+    "gh": {
+      "Package": "gh",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "05129b4387282404780d2f8593636388"
+    },
+    "gitcreds": {
+      "Package": "gitcreds",
+      "Version": "0.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f3aefccc1cc50de6338146b62f115de8"
     },
     "glue": {
       "Package": "glue",
@@ -581,6 +621,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "3878c30ce67cdb7f2d7f72554e37f476"
+    },
+    "ini": {
+      "Package": "ini",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "6154ec2223172bce8162d4153cda21f7"
     },
     "isoband": {
       "Package": "isoband",
@@ -914,6 +961,13 @@
       "Repository": "CRAN",
       "Hash": "5f919ae5e7f83a6f91dcf2288943370d"
     },
+    "rappdirs": {
+      "Package": "rappdirs",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "8c8298583adbbe76f3c2220eef71bebc"
+    },
     "rbibutils": {
       "Package": "rbibutils",
       "Version": "2.0",
@@ -1099,6 +1153,18 @@
       "Repository": "RSPM",
       "Hash": "0829b987b8961fb07f3b1b64a2fbc495"
     },
+    "tflow": {
+      "Package": "tflow",
+      "Version": "0.0.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "milesmcbain",
+      "RemoteRepo": "tflow",
+      "RemoteRef": "master",
+      "RemoteSha": "3b4603fa3f62576469bff6f75ae8f1884095e72c",
+      "Hash": "846d099102f12d71af166b7a6ba052ad"
+    },
     "tibble": {
       "Package": "tibble",
       "Version": "3.0.3",
@@ -1160,6 +1226,13 @@
       "RemoteSha": "28e6adccf85c2b809019178c0f442e864db22ea3",
       "Hash": "ea1a3084c0afe04428ffb55fdadb1a90"
     },
+    "usethis": {
+      "Package": "usethis",
+      "Version": "2.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "133099afbac51dc52948b89b387a9734"
+    },
     "utf8": {
       "Package": "utf8",
       "Version": "1.1.4",
@@ -1197,10 +1270,10 @@
     },
     "withr": {
       "Package": "withr",
-      "Version": "2.2.0",
+      "Version": "2.4.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "ecd17882a0b4419545691e095b74ee89"
+      "Hash": "8e07f30a26bc288326edcfe14883fbac"
     },
     "xfun": {
       "Package": "xfun",
@@ -1222,6 +1295,13 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "2826c5d9efb0a88f657c7a679c7106db"
+    },
+    "zip": {
+      "Package": "zip",
+      "Version": "2.1.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "3bc8405c637d988801ec5ea88372d0c2"
     }
   }
 }
