@@ -83,8 +83,8 @@ tar_plan(
     filmy_species = filmy_species
   ),
   
-  # - determine which species have widespread gametophytes
-  range_types = analyze_dist_pattern(
+  # - determine range of gametophytes beyond sporophytes
+  range_comparison = analyze_dist_pattern(
     community_matrix_raw = community_matrix_raw,
     filmy_species = filmy_species,
     phy = filmy_phy,
@@ -96,7 +96,7 @@ tar_plan(
     list(
       mean_vpd_gameto,
       mean_vpd_sporo,
-      range_types),
+      range_comparison),
     left_join,
     by = "species"
   ),
@@ -153,7 +153,7 @@ tar_plan(
   # PGLS ----
   # (Phylogenetic Generalized Least Squares)
   
-  # Run PGLS for gametophyte range size vs. desiccation tolerance
+  # Run PGLS for VPD and gametophyte range breadth vs. desiccation tolerance
   env_range_recover_data = combine_env_env_range_recover(
     combined_species_means = combined_species_means,
     env_range_data = env_range_data

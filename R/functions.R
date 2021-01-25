@@ -816,8 +816,7 @@ combine_env_env_range_recover <- function (combined_species_means, env_range_dat
            species, 
            sporo_vpd, 
            gameto_vpd,
-           sporo_range_breadth,
-           gameto_range_breadth
+           gameto_beyond_sporo
     ), 
     by = "species") %>%
   as.data.frame()
@@ -1178,8 +1177,7 @@ run_pgls <- function (env_range_recover_data, phy) {
   res <- list(
     sporo_vpd_model = caper::pgls(recovery_sporophyte ~ sporo_vpd, env_range_recover_data_comp),
     gameto_vpd_model = caper::pgls(recovery_gametophyte ~ gameto_vpd, env_range_recover_data_comp),
-    sporo_range_model = caper::pgls(recovery_sporophyte ~ sporo_range_breadth, env_range_recover_data_comp),
-    gameto_range_model = caper::pgls(recovery_gametophyte ~ gameto_range_breadth, env_range_recover_data_comp)
+    gameto_range_model = caper::pgls(recovery_gametophyte ~ gameto_beyond_sporo, env_range_recover_data_comp)
     )
   
 }
@@ -1437,15 +1435,17 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
   ) %>%
     assert(is_uniq, species) %>%
     mutate(
-      range = case_when(
-        gameto_max_range > sporo_max_range + 200 ~ "widespread",
-        gameto_min_range < sporo_min_range - 200 ~ "widespread",
-        is.na(sporo_max_range) & is.na(sporo_min_range) ~ "widespread",
-        TRUE ~ "not_widespread"
-      )
+      # Calculate elevational range of gametophytes beyond sporophytes
+      gameto_beyond_sporo_min = sporo_min_range - gameto_min_range,
+      gameto_beyond_sporo_max = gameto_max_range - sporo_max_range,
+      # If observed sporo range exceeds observed gameto range, consider
+      # range of gameto beyond sporo to be zero
+      gameto_beyond_sporo_min = ifelse(gameto_beyond_sporo_min < 0, 0, gameto_beyond_sporo_min),
+      gameto_beyond_sporo_max = ifelse(gameto_beyond_sporo_max < 0, 0, gameto_beyond_sporo_max)
     ) %>%
-    mutate(gameto_range_breadth = gameto_max_range - gameto_min_range) %>%
-    mutate(sporo_range_breadth = sporo_max_range - sporo_min_range)
+    rowwise() %>%
+    mutate(gameto_beyond_sporo = sum(gameto_beyond_sporo_min, gameto_beyond_sporo_max)) %>%
+    select(-gameto_beyond_sporo_min, -gameto_beyond_sporo_max)
   
 }
 

@@ -40,7 +40,7 @@ tar_load(climate)
 tar_load(filmy_species)
 tar_load(moorea_sites)
 tar_load(phylosig)
-tar_load(range_types)
+tar_load(range_comparison)
 tar_load(combined_species_means)
 tar_load(t_test_results)
 tar_load(env_range_dt_model_summary)
@@ -283,7 +283,7 @@ To test whether gametophytes with wider ranges have higher DT, we conducted PGLS
 
 ### Field survey
 
-In total, `r n_distinct(range_types$species)` filmy fern taxa (including two species that were recognized as multiple varieties) were observed on Moorea.
+In total, `r n_distinct(range_comparison$species)` filmy fern taxa (including two species that were recognized as multiple varieties) were observed on Moorea.
 Three taxa with distinct *rbcL* sequences, morphology, and elevational ranges could be distinguished within the *Crepidomanes minutum* (Blume) K. Iwats. species complex, but species status of these taxa remains uncertain (Nitta et al., 2011a).
 We refer to these here as *C. minutum* var. 1, 2, and 3.
 Similarly, two members of the *Abrodictyum asae-grayi* (Bosch) Ebihara & K. Iwats. complex (also including *Abrodictyum caudatum* (Brack.) Ebihara & K. Iwats. in our tree; Appendix S1) were observed on the basis of *rbcL* and morphology, but as taxonomic treatment is beyond the scope of the current study we refer to them as *A. asae-grayi* var. 1 and 2.
