@@ -700,7 +700,9 @@ calculate_mean_vpd_gameto <- function(
     # there are several sites that are missing a datalogger,
     # so don't include na values when calculating mean
     summarize(
-      gameto_vpd = mean(vpd, na.rm = TRUE),
+      vpd_gametophyte_mean = mean(vpd, na.rm = TRUE),
+      vpd_gametophyte_sd = sd(vpd, na.rm = TRUE),
+      vpd_gametophyte_n = n(),
       .groups = "drop"
     )
   
@@ -748,7 +750,9 @@ calculate_mean_vpd_sporo <- function (community_matrix_raw, filmy_species, moore
     uncount(abundance) %>%
     group_by(species) %>%
     summarize(
-      sporo_vpd = mean(vpd),
+      vpd_sporophyte_mean = mean(vpd),
+      vpd_sporophyte_sd = sd(vpd),
+      vpd_sporophyte_n = n(),
       .groups = "drop"
     )
 }
@@ -814,8 +818,8 @@ combine_env_env_range_recover <- function (combined_species_means, env_range_dat
   left_join(
     select(env_range_data, 
            species, 
-           sporo_vpd, 
-           gameto_vpd,
+           vpd_sporophyte = vpd_sporophyte_mean, 
+           vpd_gametophyte = vpd_gametophyte_mean,
            gameto_beyond_sporo
     ), 
     by = "species") %>%
@@ -1175,8 +1179,8 @@ run_pgls <- function (env_range_recover_data, phy) {
   
   # Run PGLS for each combination of generation x vpd or range breadth vs. recovery
   res <- list(
-    sporo_vpd_model = caper::pgls(recovery_sporophyte ~ sporo_vpd, env_range_recover_data_comp),
-    gameto_vpd_model = caper::pgls(recovery_gametophyte ~ gameto_vpd, env_range_recover_data_comp),
+    sporo_vpd_model = caper::pgls(recovery_sporophyte ~ vpd_sporophyte, env_range_recover_data_comp),
+    gameto_vpd_model = caper::pgls(recovery_gametophyte ~ vpd_gametophyte, env_range_recover_data_comp),
     gameto_range_model = caper::pgls(recovery_gametophyte ~ gameto_beyond_sporo, env_range_recover_data_comp)
     )
   

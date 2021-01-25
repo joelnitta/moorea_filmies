@@ -12,12 +12,14 @@
 
 # - Figures
 figure_full <- captioner::captioner(prefix = "Fig.", suffix = "")
-figure_full(name = "filmy-habit", caption = "filmy-habit")
-figure_full(name = "filmy-dt", caption = "filmy-dt")
+figure_full(name = "habit", caption = "habit")
+figure_full(name = "dt", caption = "dt")
 figure_full(name = "combined", caption = "combined")
+figure_full(name = "corr", caption = "corr")
 
 # - Tables
 table_full <- captioner::captioner(prefix = "Table")
+table_full(name = "glmm", caption = "glmm")
 
 # - SI figures
 s_figure_full <- captioner::captioner(prefix = "Fig. S", suffix = "")
