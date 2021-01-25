@@ -2,6 +2,14 @@ FROM rocker/verse:4.0.2
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+###############################################
+### Install other dependencies with apt-get ###
+###############################################
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+  libpoppler-cpp-dev
+
 ####################################
 ### Install R packages with renv ###
 ####################################
@@ -23,7 +31,9 @@ WORKDIR tmp/project
 # Don't use cache (the symlinks won't work from Rstudio server)
 RUN Rscript -e 'install.packages("renv"); renv::consent(provided = TRUE); renv::settings$use.cache(FALSE); renv::init(bare = TRUE); renv::restore()'
 
-# Install latex packages with tinytex
+###########################################
+### Install latex packages with tinytex ###
+###########################################
 
 COPY install_latex.R .
 
