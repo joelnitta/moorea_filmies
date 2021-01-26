@@ -19,7 +19,9 @@ figure_full(name = "corr", caption = "corr")
 
 # - Tables
 table_full <- captioner::captioner(prefix = "Table")
+table_full(name = "physig", caption = "physig")
 table_full(name = "glmm", caption = "glmm")
+table_full(name = "glmm-pars", caption = "glmm-pars")
 
 # - SI figures
 s_figure_full <- captioner::captioner(prefix = "Fig. S", suffix = "")
@@ -27,8 +29,13 @@ s_figure_full <- captioner::captioner(prefix = "Fig. S", suffix = "")
 # - SI tables
 s_table_full <- captioner::captioner(prefix = "S", auto_space = FALSE, suffix = " Table. ")
 
-# Make short versions of citation functions (just the number)
+# Make short versions of citation functions (just the object type and number, e.g., "Fig. 1")
 figure <- pryr::partial(figure_full, display = "cite")
 table <- pryr::partial(table_full, display = "cite")
 s_figure <- pryr::partial(s_figure_full, display = "cite")
 s_table <- pryr::partial(s_table_full, display = "cite")
+
+# just the number (e.g., "1")
+table_num <- function (name) {table(name) %>% str_remove("Table ")}
+figure_num <- function (figure) {table(name) %>% str_remove("Fig. ")}
+

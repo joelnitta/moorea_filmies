@@ -49,7 +49,9 @@ tar_load(filmy_habit)
 tar_load(filmy_phy)
 tar_load(mean_vpd_sporo)
 tar_load(mean_vpd_gameto)
-
+tar_load(glmm_summary)
+tar_load(glmm_params)
+tar_load(env_range_dt_model_summary)
 ```
 
 <!-- to move to the next line without starting a new paragraph, 
@@ -316,7 +318,7 @@ phylosig %>%
   verify(all(lambda_pval > 0.05), success_fun = success_logical, error_fun = error_stop)
 ```
 
-Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT (gametophytes *K* and λ both near 1, *P \<*0.05; sporophytes *K* = `r sporo_recover_k`, *P* = `r sporo_recover_k_pval` and λ = `r sporo_recover_lambda`, *P* = `r sporo_recover_lambda_pval`), but no signal for PPFD~95%~ or ETR~max~ (Table 2).
+Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT (gametophytes *K* and λ both near 1, *P \<*0.05; sporophytes *K* = `r sporo_recover_k`, *P* = `r sporo_recover_k_pval` and λ = `r sporo_recover_lambda`, *P* = `r sporo_recover_lambda_pval`), but no signal for PPFD~95%~ or ETR~max~ (`r table("physig")`).
 
 ### Desiccation tolerance
 
@@ -348,6 +350,29 @@ n_dt_species_both <- combined_species_means %>%
   n_distinct() %>%
   english2
 
+# Extract effect of generation on DT from GLMM
+sporo_dt_effect_mean <-
+glmm_params %>% 
+  filter(response == "recovery") %>%
+  verify(predictor == "generationsporophyte") %>%
+  pull(post.mean) %>%
+  scales::percent(accuracy = 0.1)
+
+sporo_dt_effect_lower <-
+glmm_params %>% 
+  filter(response == "recovery") %>%
+  verify(predictor == "generationsporophyte") %>%
+  pull(`l-95% CI`) %>%
+  scales::percent(accuracy = 0.1)
+
+sporo_dt_effect_upper <-
+glmm_params %>% 
+  filter(response == "recovery") %>%
+  verify(predictor == "generationsporophyte") %>%
+  pull(`u-95% CI`) %>%
+  scales::percent(accuracy = 0.1)
+
+
 # FIXME: double check on these p-values
 # ttest_pval("Polyphlebium_endlicherianum", "recovery")
 # ttest_pval("Crepidomanes_minutum2", "recovery")
@@ -369,8 +394,7 @@ Gametophytes of low elevation epiphytes had the highest DT (\circa{ }80% recover
 
 DT of gametophytes did not significantly exceed that of sporophytes for any species except for saxicolous *P. endlicherianum* (Fig. 5; *t*-test, *P* = ), and was significantly lower in gametophytes than sporophytes of some high elevation epiphytic species including *C. minutum* var. 2, *H.* *digitatum*, *H. polyanthos*, and *P. borbonicum* (Fig. 5; *t*-test, *P* = XXX, XXX, XXX, and XXX, respectively).
 
-The GLMM showed that both generation and the interaction of generation and growth habit, but not growth habit alone, have a significant effect on DT while controlling for phylogeny (Table 3).
-In contrast, range type (gametophytes widespread beyond sporophytes or not) has no significant effect on DT (Table 3).
+The GLMM including the effect of generation only was selected as the best-fitting model for DT (`r table("glmm")`) while taking phylogeny into account. Sporophytes had `r sporo_dt_effect_mean` greater DT (95% CI `r sporo_dt_effect_lower` to `r sporo_dt_effect_upper`) relative to gametophytes (`r table("glmm-pars")`).
 
 ### Photosynthetic optima
 
@@ -549,7 +573,154 @@ Funding provided in part by the National Science Foundation (Doctoral Dissertati
 
 ## Tables
 
-**`r table("glmm")`** 
+**`r table("physig")`** Results of tests for phylogenetic signal (Blomberg’s *K* and Pagel’s λ) in desiccation tolerance (DT) and photosynthetic parameters of filmy ferns from Moorea, French Polynesia by generation
+
+```{r table-physig, results = "asis"}
+# Format phylogenetic signal results as a pretty table
+phylosig %>%
+  mutate(k_pval_stars = case_when(
+    k_pval < 0.001 ~ "***",
+    k_pval < 0.01 ~ "**",
+    k_pval < 0.05 ~ "*",
+    TRUE ~ ""
+  )) %>%
+  mutate(lambda_pval_stars = case_when(
+    lambda_pval < 0.001 ~ "***",
+    lambda_pval < 0.01 ~ "**",
+    lambda_pval < 0.05 ~ "*",
+    TRUE ~ ""
+  )) %>%
+  mutate(
+    kval = ifelse(kval < 0.001, format(kval, digits = 3), round_t(kval, 3)) %>% paste0(., k_pval_stars),
+    lambda = ifelse(lambda < 0.001, format(lambda, digits = 3), round_t(lambda, 3)) %>% paste0(., lambda_pval_stars),
+    trait = str_replace_all(trait, "recovery_mean", "Recovery") %>%
+      str_replace_all("etr_mean", "ETR~max~") %>%
+      str_replace_all("par_mean", "PPFD~95%~"),
+    generation = str_to_sentence(generation)
+  ) %>%
+  select(generation, trait, kval, lambda) %>%
+  group_by(generation) %>%
+  gt(rowname_col = "species") %>%
+  cols_label(kval = md("*K*"), lambda = "λ", trait = "") %>%
+  as_latex()
+```
+
+Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa; ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached.
+
+Asterisks indicate significance of phylogenetic signal: \*\*, \pval{ }< 0.01, \*, \pval{ }< 0.05.
+
+\newpage
+
+**`r table("glmm")`** Deviance information criterion (DIC) and delta DIC for general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to generation and growth habit in filmy ferns from Moorea, French Polynesia
+
+```{r glmm-summary, results = "asis"}
+# Format GLMM summary for printing
+glmm_summary %>%
+  mutate(
+    fixed_effects = case_when(
+      fixed_effects == "both" ~ "Generation + habit",
+      fixed_effects == "intersect" ~ "Generation + habit + Generation:habit",
+      TRUE ~ str_to_sentence(fixed_effects)
+    ),
+    response = str_replace_all(response, "recovery", "Recovery") %>%
+      str_replace_all("etr", "ETR~max~") %>%
+      str_replace_all("par", "PPFD~95%~")
+  ) %>%
+  group_by(response) %>%
+  gt() %>%
+  cols_label(
+    fixed_effects = "Fixed effects", 
+    response = "Response", 
+    delta_DIC = "delta DIC") %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = everything(),
+      rows = delta_DIC == 0)) %>%
+  fmt_number(
+    columns = vars(DIC, delta_DIC)
+  ) %>%
+  as_latex()
+```
+
+ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
+
+Best model (that with the lowest DIC) for each response variable in bold 
+
+\newpage
+
+**`r table("glmm-pars")`** Predictor effects, lower and upper 95% confidence interval (CI), effective sample size, and significance of model parameters for the best general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to generation and growth habit in filmy ferns from Moorea, French Polynesia
+
+```{r glmm-params, results = "asis"}
+# Format summary of best GLMM parameters for printing
+glmm_params %>%
+  mutate(
+    fixed_effects = str_to_sentence(fixed_effects),
+    response = str_replace_all(response, "recovery", "Recovery") %>%
+      str_replace_all("etr", "ETR~max~") %>%
+      str_replace_all("par", "PPFD~95%~"),
+    predictor = str_replace_all(predictor, "generationsporophyte", "Sporophyte") %>%
+      str_replace_all("habitLow_Epiphyte", "Low Epiphyte") %>%
+      str_replace_all("habitSaxicolous", "Saxicolous") %>%
+      str_replace_all("habitTerrestrial", "Terrestrial")
+  ) %>%
+  group_by(response) %>%
+  gt() %>%
+  cols_label(
+    fixed_effects = "Fixed effects", 
+    predictor = "Predictor", 
+    post.mean = "Mean effect",
+    `l-95% CI` = "Lower 95% CI",
+    `u-95% CI` = "Upper 95% CI",
+    eff.samp = "Ef. sample size",
+    pMCMC = md("*P* MCMC")) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    locations = cells_body(
+      columns = everything(),
+      rows = pMCMC < 0.05)) %>%
+  fmt_number(columns = vars(post.mean, `l-95% CI`, `u-95% CI`)) %>%
+  fmt_number(columns = vars(eff.samp), decimals = 0) %>%
+  fmt_number(columns = vars(pMCMC), decimals = 3, drop_trailing_zeros = TRUE) %>%
+as_latex()
+```
+
+ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
+
+Effect of generation is relative to gametophytes; effect of growth habit is relative to high elevation epiphytes
+
+Significant predictors in bold
+
+\newpage
+
+**`r table("pglm")`** Phylogenetic generalized least squares (PLGS) models of desiccation tolerance as a function of environmental water potential (VPD) or the range of gametophytes beyond sporophytes (G beyond S) in filmy ferns from Moorea, French Polynesia
+
+```{r pglm, results = "asis"}
+env_range_dt_model_summary %>%
+  mutate(generation = case_when(
+    str_detect(model, "sporo") ~ "S",
+    str_detect(model, "gameto") ~ "G"
+  )) %>%
+  assert(not_na, generation) %>%
+  mutate(
+    predictor = case_when(
+      str_detect(model, "vpd") ~ "VPD",
+      str_detect(model, "range") ~ "G beyond S"
+    )
+  ) %>%
+  assert(not_na, predictor) %>%
+  select(generation, predictor, df, f_value, adj_r_squared, p_value) %>%
+  mutate(
+    f_value = round_t(f_value, 3),
+    p_value = round_t(p_value, 3),
+    adj_r_squared = round_t(adj_r_squared, 3)
+  ) %>%
+  kbl(col.names = c("Generation", "Predictor", "df", "$F$", "adj. $R^2$", "$P$"), escape = FALSE, booktabs = TRUE)
+```
+
+S, sporophyte; G, gametophyte
+
+\newpage
 
 ## Figure Captions
 <!-- JPR requirements: Figure captions begin with the term Fig. in bold type, followed by the figure number, also in boldtype. No punctuation is to be included after the number, nor is any punctuation to be placed at the end of the caption. -->
@@ -580,8 +751,8 @@ Phylogeny adapted from Nitta et al. (2016); only species with physiological data
 Bootstrap support >50% from 100 ML bootstraps indicated at nodes.
 Bold letters indicate major clades (H = hymenophylloid clade, T = trichomanoid clade).
 Growth habit indicated by colored symbols (blue = low elevation epiphyte, green = high elevation epiphyte, yellow = saxicolous, red = terrestrial).
-**Crepidomanes bipunctatum** and **C. humile** were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
-Asterisk indicates significant difference in means (**P** <0.05) between generations for a particular species (**t**-test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for **t**-test.
+*Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
+Asterisk indicates significant difference in means (*P* <0.05) between generations for a particular species (*t*-test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for *t*-test.
 Left bar plot shows recovery (%) of chlorophyll fluorescence (Fv/Fm) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). 
 Right bar plot shows maximum relative electron transport rate of photosystem II (ETR~max~). 
 The other photosynthetic parameter measured, photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~), was qualitatively very similar to ETR~max~ and not shown.
@@ -590,8 +761,8 @@ Absence of a bar indicates measurements not available for gametophytes or sporop
 **`r figure("corr")`** Recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa plotted against environmental vapor pressure deficit (VPD; kPa) (**a**, **b**) or range of gametophytes beyond sporophytes (m) (**c**) for gametophytes (**a**, **c**) or sporophytes (**b**). 
 Species means ± 1 SD are shown. 
 Growth habit indicated by colored symbols (blue = low elevation epiphyte, green = high elevation epiphyte, yellow = saxicolous, red = terrestrial). 
-**Crepidomanes bipunctatum** and **C. humile** were observed growing as both epiphytes and saxicoles, but were treated as epiphytes to distinguish them from exclusively saxicolous species.
-**Abrodictyum dentatum** sporophytes were desiccated at –38 MPa instead of –86 MPa.
+*Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but were treated as epiphytes to distinguish them from exclusively saxicolous species.
+*Abrodictyum dentatum* sporophytes were desiccated at –38 MPa instead of –86 MPa.
 Range of gametophytes beyond sporophytes calculated as the total elevation that gametophytes exceeded sporophytes at either end of the elevational gradient.
 Relationships between recovery and VPD or range of gametophytes beyond sporophytes were analyzed with phylogenetic generalized least squares (PGLS); no significant relationships were detected.
 

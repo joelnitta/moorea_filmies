@@ -150,6 +150,12 @@ tar_plan(
     traits = filmy_habit,
     phy = filmy_phy),
   
+  # Get DIC for each GLMM
+  glmm_summary = tidy_glmms(glmms),
+  
+  # Get parameters for best GLMMs only
+  glmm_params = tidy_best_glmm_params(glmms),
+  
   # PGLS ----
   # (Phylogenetic Generalized Least Squares)
   

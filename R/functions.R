@@ -1219,6 +1219,60 @@ tidy_pgls <- function (model) {
   )
 }
 
+#' Summarize model statistics of a generalized linear mixed model (GLMM)
+#'
+#' @param model The model
+#'
+#' @return Tibble with DIC
+#' 
+summarize_glmm <- function(model) {
+  model_sum <- summary(model)
+  tibble(
+    DIC = model_sum$DIC
+  )
+}
+
+tidy_glmms <- function (model_df) {
+  model_df %>%
+    mutate(summary = map(model, summarize_glmm)) %>%
+    select(fixed_effects, response, summary) %>%
+    unnest(cols = "summary") %>%
+    group_by(response) %>%
+    mutate(
+      delta_DIC = DIC - min(DIC)) %>%
+    ungroup %>%
+    arrange(response, delta_DIC)
+}
+
+#' Summarize model parameters of a generalized linear mixed model (GLMM)
+#'
+#' @param model The model
+#'
+#' @return Tibble with estimated effect, confidence intervals, sample size, and probability
+#' 
+summarize_glmm_params <- function(model) {
+  model_sum <- summary(model)
+  model_sum$solutions %>% 
+    as.data.frame %>%
+    rownames_to_column("predictor") %>%
+    filter(!str_detect(predictor, "Intercept")) %>%
+    as_tibble()
+}
+
+tidy_best_glmm_params <- function (model_df) {
+  model_df %>%
+    mutate(param_summary = map(model, summarize_glmm_params)) %>%
+    mutate(summary = map(model, summarize_glmm)) %>%
+    select(fixed_effects, response, param_summary, summary) %>%
+    unnest(cols = c("param_summary", "summary")) %>%
+    group_by(response) %>%
+    mutate(
+      delta_DIC = DIC - min(DIC)) %>%
+    ungroup %>%
+    filter(delta_DIC == 0) %>%
+    select(-DIC, -delta_DIC)
+}
+
 # Etc ----
 
 #' Match trait data and tree
