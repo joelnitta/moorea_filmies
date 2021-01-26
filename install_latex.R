@@ -12,6 +12,7 @@ latex_packages <- c(
   "bigintcalc",
   "bitset",
   "booktabs",
+  "caption",
   "colortbl",
   "environ",
   "etexcmds",
