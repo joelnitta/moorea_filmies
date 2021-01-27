@@ -819,13 +819,6 @@ default_theme <- theme_set(
 cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
                green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
                red = "#D55E00", purple = "#CC79A7")
-
-# Define function for formatting text in legends
-pretty_text <- function (x) {
-  x %>%
-  str_replace_all("_", " ") %>%
-    str_to_sentence()
-}
 ```
 
 ```{r dt-plot-setup}

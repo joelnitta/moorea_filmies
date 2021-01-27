@@ -1508,6 +1508,13 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
   
 }
 
+# Define function for formatting text in legends
+pretty_text <- function (x) {
+  x %>%
+    str_replace_all("_", " ") %>%
+    str_to_sentence()
+}
+
 # Manuscript ----
 
 # Helper function to check on p-value significance and extract from t_test_results
