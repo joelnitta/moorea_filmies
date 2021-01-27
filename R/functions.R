@@ -835,6 +835,37 @@ abbrev_sp <- function(data) {
     unite("species", genus, epithet)
 }
 
+#' Transfer bootstrap values from BS tree to time tree
+#' 
+#' The time tree lacks BS values, but the topology is the same.
+#'
+#' @param filmy_phy_bs Tree output from RAxML with bootstrap values at nodes
+#' @param filmy_phy Time tree without bootstrap values
+#'
+#' @return Time tree with bootstrap values
+#' 
+transfer_bs <- function(filmy_phy_bs, filmy_phy) {
+  
+  # Rotate nodes of BS tree so that the tip position matches the time tree
+  filmy_phy_bs <- rotateConstr(filmy_phy_bs, constraint = filmy_phy$tip.label)
+  
+  # This only changes how the phylogeny *looks*, not the underlying data.
+  # Write out the tree, then read it in again to change the actual order in the data.
+  temp_tree_file <- fs::path(tempdir(), "filmy_phy_bs.tre")
+  ape::write.tree(filmy_phy_bs, temp_tree_file)
+  filmy_phy_bs <- ape::read.tree(temp_tree_file)
+  fs::file_delete(temp_tree_file)
+  
+  # Make sure tips are now in the same order.
+  assert_that(isTRUE(all.equal(filmy_phy_bs$tip.label, filmy_phy$tip.label)))
+  
+  # Transfer BS support values to the time tree
+  filmy_phy$node.label <- filmy_phy_bs$node.label
+  
+  filmy_phy
+  
+}
+
 # t-test ----
 
 #' Run a t-test comparing response values between gametophytes and sporophytes.
@@ -1166,12 +1197,14 @@ summary_to_csv <- function (model) {
 #' @param phy Phylogeny
 #'
 #' @return list of model objects:
-#' - sporo_vpd_model:
-#' - gameto_vpd_model:
-#' - sporo_range_model:
-#' - gameto_range_model:
+#' - sporo_vpd_model
+#' - gameto_vpd_model
+#' - gameto_range_model
 #' 
 run_pgls <- function (env_range_recover_data, phy) {
+  
+  # Need to drop node labels for caper::comparative.data()
+  phy$node.label <- NULL
   
   # Create a comparative.data object for caper combining the range size, vpd, 
   # and recovery data with the phylogeny

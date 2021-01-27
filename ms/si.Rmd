@@ -41,6 +41,8 @@ tar_load(filmy_dt)
 tar_load(filmy_habit)
 tar_load(rel_water_indiv)
 tar_load(rel_water_species_means)
+tar_load(filmy_phy)
+tar_load(filmy_habit)
 ```
 
 ```{r load-functions, cache = FALSE}
@@ -147,6 +149,94 @@ cluster_sporo_times <- function (sporo_time_data, salt_select, k_select) {
 
 ```
 
+```{r plot-setup}
+# JPR requirements:
+# Figures should be 39 mm, 84 mm, 129 mm, or 174 mm wide and not higher than 234 mm
+# In inches, widths: 1.53, 3.31, 5.08, 6.85; height: 9.21
+
+# Set overall theme, saving default theme
+default_theme <- theme_set(
+  theme_bw(base_size = 10) +
+    theme(
+      panel.grid.minor = element_blank()
+    ))
+
+# Define color-blind palette
+cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
+               green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
+               red = "#D55E00", purple = "#CC79A7")
+```
+
+```{r full-phylo, fig.height = 4.5, fig.width = 7, fig.cap = ""}
+# Copy phylogeny and species means data so they
+# can be manipulated for this plot
+phy <- filmy_phy
+habit <- filmy_habit
+
+# Set colors for growth habit, generation
+habit_colors <- c(
+  "Terrestrial" = cbPalette[["red"]], 
+  "Saxicolous" = cbPalette[["gold"]], 
+  "Low_Epiphyte" = cbPalette[["green"]],
+  "High_Epiphyte" = cbPalette[["blue"]])
+
+generation_colors <- c(
+  "gametophyte" = "grey70",
+  "sporophyte" = "grey30"
+)
+
+# Filter growth habit data to only species in phylogeny
+habit <-
+  habit %>%
+  filter(species %in% phy$tip.label)
+
+# Convert underscores to spaces
+# phy$tip.label <- str_replace_all(phy$tip.label, "_", "~")
+
+# Make a tibble of bootstrap values to map onto tree
+# - needs one column with "node", the other can be named as we like
+# - hard-code node ID: internal nodes start after tip nodes,
+#   and phy$node.label is in the same order as internal nodes
+bs_tibble <- tibble(
+  node=1:Nnode(phy) + Ntip(phy), 
+  # Don't print BS < 50%
+  bootstrap = ifelse(phy$node.label < 50, "", phy$node.label))
+
+# Join growth habit and BS data to ggtree object
+ggtree(phy) %<+% filmy_habit %<+% bs_tibble +
+  geom_text(aes(label=bootstrap), hjust=-.25, size = 3, color = "grey30") +
+  geom_tippoint(aes(color = habit), position = position_nudge(x = 0, y = 0), size = 4) +
+  # Add species labels
+  geom_tiplab(
+    # getting species names into italics is painful....
+    # need to use plotmath() parsing.
+    # to print a space, use `~`
+    # e.g., `italic("Hymenophyllum~polyanthos")`
+    aes(label=paste0('italic(', str_replace_all(label, "_", "~"), ')')), 
+    parse = TRUE,
+    hjust = -0.02) +
+  # There is no way modify the text in geom_treescale (to add units), so make the
+  # text disappear by setting fontsize = 0
+  geom_treescale(y = 20, x = 0, width = 40, fontsize = 0) +
+  # Manually place custom label above scale bar
+  annotate("text", x = 20, y = 20, label = "40 my", size = 3, vjust = -1) +
+  # Scale colors by growth habit
+  scale_color_manual(values = habit_colors, labels = pretty_text) +
+  labs(color = "Growth habit") +
+  # Need to remove clip so that species names print properly
+  coord_cartesian(clip = "off") +
+  theme(
+  plot.margin = margin(t = 0, r = 2.2, b = 0, l = 0, unit = "in"),
+  legend.position = "bottom"
+)
+```
+
+**Figure SXX**. Maximum likelihood ultrametric phylogenetic tree including all Moorean filmy fern species.
+Tree obtained by extracting Hymenophyllaceae from the tree of Nitta et al. (2016) with the extract.clade function of the ape package in R (Paradis et al., 2004).
+Bootstrap support values >50% shown at nodes.
+Growth habit indicated by colored dots. 
+*Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
+
 ```{r gametophyte-dt-2013, fig.height = 4.5, fig.width = 7, fig.cap = ""}
 # Calculate mean start/end times for gametophyte DT groups
 gameto_mean_times <-
@@ -199,7 +289,7 @@ chamber_gameto_2013_temp_plot + chamber_gameto_2013_rh_plot + dt_times_gameto_20
 # ggsave(here::here("results/S1_fig.png"))
 ```
 
-**Figure S1**. Conditions inside desiccation chamber and duration of desiccation treatment for gametophytes. MgNO~3~ was used to maintain constant humidity at \circa{ }58%. All gametophytes were treated to desiccation for 2 days, except for group 8, which was treated for four days unintentionally.
+**Figure SXX**. Conditions inside desiccation chamber and duration of desiccation treatment for gametophytes. MgNO~3~ was used to maintain constant humidity at \circa{ }58%. All gametophytes were treated to desiccation for 2 days, except for group 8, which was treated for four days unintentionally
 
 \clearpage
 
@@ -293,7 +383,7 @@ temp_plot_2013 + temp_plot_2014 +
 # ggsave(here::here("results/S2_fig.png"))
 ```
 
-**Figure S2**. Conditions inside desiccation chamber and duration of desiccation treatment for sporophytes at most intense desiccation level. LiCl was used to maintain constant humidity at \circa{ }18%.
+**Figure SXX**. Conditions inside desiccation chamber and duration of desiccation treatment for sporophytes at most intense desiccation level. LiCl was used to maintain constant humidity at \circa{ }18%.
 
 \clearpage
 
