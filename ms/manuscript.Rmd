@@ -645,7 +645,42 @@ glmm_summary %>%
 
 ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
 
-Best model (that with the lowest DIC) for each response variable in bold 
+Best model (that with the lowest DIC) for each response variable in bold
+
+\newpage
+
+```{r glmm-table-kableextra, results = "asis"}
+group_locs <-
+glmm_summary %>% mutate(row_num = 1:nrow(.)) %>% group_by(response) %>%
+  summarize(
+    start = min(row_num),
+    end = max(row_num),
+    .groups = "drop"
+  )
+
+glmm_summary %>%
+  mutate(
+    fixed_effects = case_when(
+      fixed_effects == "both" ~ "Generation + habit",
+      fixed_effects == "intersect" ~ "Generation + habit + Generation:habit",
+      TRUE ~ str_to_sentence(fixed_effects)
+    ),
+    response = str_replace_all(response, "recovery", "Recovery") %>%
+      str_replace_all("etr", "ETR~max~") %>%
+      str_replace_all("par", "PPFD~95%~"),
+    DIC = round_t(DIC, 2),
+    delta_DIC = round_t(delta_DIC, 2)
+  ) %>%
+  select(fixed_effects, response, DIC, delta_DIC) %>%
+  kbl(format = "latex", booktabs = TRUE, col.names = c("Fixed effects", "Response", "DIC", "delta DIC")) %>%
+  row_spec(which(glmm_summary$delta_DIC == 0), bold = TRUE) %>%
+  pack_rows(
+    "ETR\\textsubscript{max}", 
+    group_locs %>% filter(response == "etr") %>% pull(start),
+    group_locs %>% filter(response == "etr") %>% pull(end),
+    escape = FALSE)
+```
+
 
 \newpage
 
