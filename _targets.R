@@ -24,10 +24,15 @@ tar_plan(
   # - vector of filmy fern species
   filmy_species = filmy_habit$species,
   
-  # - phylogenetic tree
+  # - phylogenetic tree (time tree)
   tar_file(filmy_phy_file, "data/nitta_2017/treepl_Moorea_Tahiti.tre"),
   filmy_phy = ape::read.tree(filmy_phy_file) %>%
     ape::keep.tip(filmy_species),
+  
+  # - phylogenetic tree (ML tree with BS values at nodes)
+  tar_file(filmy_phy_bs_file, "data/nitta_2017/RAxML_bipartitions.all_broad.reduced"),
+  filmy_phy_bs = ape::read.tree(filmy_raxml_file) %>%
+    ape::keep.tip(filmy_phy$tip.label),
   
   # - desiccation tolerance yields
   tar_file(filmy_dt_file, "data/filmy_dt.csv"),

@@ -6,7 +6,7 @@ source("R/functions.R")
 # https://datadryad.org/stash/dataset/doi:10.5061/dryad.df59g, clicking on
 # "Download dataset", and saving to the "data" folder in this project.
 unzip_nitta_2017(
-  zipped_path = file_in("data/doi_10.5061_dryad.df59g__v1.zip"),
+  zipped_path = "data/doi_10.5061_dryad.df59g__v1.zip",
   unzip_path = "data/nitta_2017")
 
 # Unzip data from Nitta et al. 2020 New Phyt. from Dryad

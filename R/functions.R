@@ -468,6 +468,7 @@ unzip_nitta_2017 <- function (zipped_path, unzip_path, ...) {
   # Unzip only needed data files to data/nitta_2017/
   unzip(temp_zip, "data_and_scripts/Comm_Phylo_Analysis/data/all_plots.csv", exdir = unzip_path, junkpaths = TRUE, overwrite = TRUE)
   unzip(temp_zip, "data_and_scripts/Comm_Phylo_Analysis/data/treepl_Moorea_Tahiti.tre", exdir = unzip_path, junkpaths = TRUE, overwrite = TRUE)
+  unzip(temp_zip, "data_and_scripts/Phylo_Analysis/data/RAxML_bipartitions.all_broad.reduced", exdir = unzip_path, junkpaths = TRUE, overwrite = TRUE)
   unzip(temp_zip, "data_and_scripts/shared_data/sites.csv", exdir = unzip_path, junkpaths = TRUE, overwrite = TRUE)
   
   # Cleanup
