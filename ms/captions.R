@@ -22,6 +22,7 @@ table_full <- captioner::captioner(prefix = "Table")
 table_full(name = "physig", caption = "physig")
 table_full(name = "glmm", caption = "glmm")
 table_full(name = "glmm-pars", caption = "glmm-pars")
+table_full(name = "pgls", caption = "pgls")
 
 # - SI figures
 s_figure_full <- captioner::captioner(prefix = "Fig. S", suffix = "")

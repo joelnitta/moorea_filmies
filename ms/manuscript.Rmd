@@ -71,7 +71,7 @@ YES (Joel H. Nitta)
 (1) Taxonomy/Phylogenetics/Evolutionary Biology
 
 **Number of tables, black-and-white figures, and color figures.**  
-No tables / 2 black-and-white figure / 1 color figure
+4 tables / 0 black-and-white figures / 4 color figures
 
 \newpage
 
@@ -462,15 +462,15 @@ The GLMMs showed a significant effect of generation, but neither range type nor 
 
 ```{r pgls-stats}
 sporo_vpd_pval <- env_range_dt_model_summary %>% filter(model == "sporo_vpd_model") %>% pull(p_value) %>%
-  round_t(2)
+  round_t(3)
 gameto_vpd_pval <- env_range_dt_model_summary %>% filter(model == "gameto_vpd_model") %>% pull(p_value) %>%
-  round_t(2)
+  round_t(3)
 ```
 
-Desiccation tolerance tended to increase with VPD for both gametophytes and sporophytes (Fig. 6).
-These trends were significant when analyzed using PGLS for gametophytes (*P* = `r gameto_vpd_pval`) but not sporophytes (*P* = `r sporo_vpd_pval`; Appendix S5).
+Desiccation tolerance tended to increase with VPD for sporophytes, but not gametophytes (`r figure("corr")`).
+These trends were marginally non-significant when analyzed using PGLS for sporophytes (*P* = `r sporo_vpd_pval`) and not significant for gametophytes (*P* = `r gameto_vpd_pval`; `r table("pgls")`).
 
-No significant relationship was detected between range size of gametophytes and DT.
+No significant relationship was detected between range size of gametophytes and DT (`r figure("corr")`, `r table("pgls")`).
 
 ## Discussion
 
@@ -573,10 +573,24 @@ Funding provided in part by the National Science Foundation (Doctoral Dissertati
 
 ## Tables
 
+```{r table-setup}
+options(knitr.table.format = "latex")
+```
+
 **`r table("physig")`** Results of tests for phylogenetic signal (Blomberg’s *K* and Pagel’s λ) in desiccation tolerance (DT) and photosynthetic parameters of filmy ferns from Moorea, French Polynesia by generation
 
-```{r table-physig, results = "asis"}
-# Format phylogenetic signal results as a pretty table
+```{r physig-table, results = "asis"}
+# Format phylogenetic signal results as a pretty table with kableExtra
+
+# Make helper table for formatting by groups
+phylosig_group_locs <-
+phylosig %>% mutate(row_num = 1:nrow(.)) %>% group_by(generation) %>%
+  summarize(
+    start = min(row_num),
+    end = max(row_num),
+    .groups = "drop"
+  )
+
 phylosig %>%
   mutate(k_pval_stars = case_when(
     k_pval < 0.001 ~ "***",
@@ -594,15 +608,22 @@ phylosig %>%
     kval = ifelse(kval < 0.001, format(kval, digits = 3), round_t(kval, 3)) %>% paste0(., k_pval_stars),
     lambda = ifelse(lambda < 0.001, format(lambda, digits = 3), round_t(lambda, 3)) %>% paste0(., lambda_pval_stars),
     trait = str_replace_all(trait, "recovery_mean", "Recovery") %>%
-      str_replace_all("etr_mean", "ETR~max~") %>%
-      str_replace_all("par_mean", "PPFD~95%~"),
+      str_replace_all("etr_mean", "ETR\\\\textsubscript{max}") %>%
+      str_replace_all("par_mean", "PPFD\\\\textsubscript{95\\\\%}"),
     generation = str_to_sentence(generation)
   ) %>%
-  select(generation, trait, kval, lambda) %>%
-  group_by(generation) %>%
-  gt(rowname_col = "species") %>%
-  cols_label(kval = md("*K*"), lambda = "λ", trait = "") %>%
-  as_latex()
+  select(trait, kval, lambda) %>%
+  kbl(format = "latex", booktabs = TRUE, col.names = c("", "\\textit{K}", "λ"), escape = FALSE) %>%
+  pack_rows(
+    "Sporophytes", 
+    phylosig_group_locs %>% filter(generation == "sporophyte") %>% pull(start),
+    phylosig_group_locs %>% filter(generation == "sporophyte") %>% pull(end),
+    escape = FALSE) %>%
+  pack_rows(
+    "Gametophytes", 
+    phylosig_group_locs %>% filter(generation == "gametophyte") %>% pull(start),
+    phylosig_group_locs %>% filter(generation == "gametophyte") %>% pull(end),
+    escape = FALSE)
 ```
 
 Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa; ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached.
@@ -613,44 +634,8 @@ Asterisks indicate significance of phylogenetic signal: \*\*, \pval{ }< 0.01, \*
 
 **`r table("glmm")`** Deviance information criterion (DIC) and delta DIC for general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to generation and growth habit in filmy ferns from Moorea, French Polynesia
 
-```{r glmm-summary, results = "asis"}
-# Format GLMM summary for printing
-glmm_summary %>%
-  mutate(
-    fixed_effects = case_when(
-      fixed_effects == "both" ~ "Generation + habit",
-      fixed_effects == "intersect" ~ "Generation + habit + Generation:habit",
-      TRUE ~ str_to_sentence(fixed_effects)
-    ),
-    response = str_replace_all(response, "recovery", "Recovery") %>%
-      str_replace_all("etr", "ETR~max~") %>%
-      str_replace_all("par", "PPFD~95%~")
-  ) %>%
-  group_by(response) %>%
-  gt() %>%
-  cols_label(
-    fixed_effects = "Fixed effects", 
-    response = "Response", 
-    delta_DIC = "delta DIC") %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_body(
-      columns = everything(),
-      rows = delta_DIC == 0)) %>%
-  fmt_number(
-    columns = vars(DIC, delta_DIC)
-  ) %>%
-  as_latex()
-```
-
-ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
-
-Best model (that with the lowest DIC) for each response variable in bold
-
-\newpage
-
-```{r glmm-table-kableextra, results = "asis"}
-group_locs <-
+```{r glmm-table, results = "asis"}
+glmm_summ_group_locs <-
 glmm_summary %>% mutate(row_num = 1:nrow(.)) %>% group_by(response) %>%
   summarize(
     start = min(row_num),
@@ -665,59 +650,85 @@ glmm_summary %>%
       fixed_effects == "intersect" ~ "Generation + habit + Generation:habit",
       TRUE ~ str_to_sentence(fixed_effects)
     ),
-    response = str_replace_all(response, "recovery", "Recovery") %>%
-      str_replace_all("etr", "ETR~max~") %>%
-      str_replace_all("par", "PPFD~95%~"),
     DIC = round_t(DIC, 2),
     delta_DIC = round_t(delta_DIC, 2)
   ) %>%
-  select(fixed_effects, response, DIC, delta_DIC) %>%
-  kbl(format = "latex", booktabs = TRUE, col.names = c("Fixed effects", "Response", "DIC", "delta DIC")) %>%
+  select(fixed_effects, DIC, delta_DIC) %>%
+  kbl(format = "latex", booktabs = TRUE, col.names = c("Fixed effects", "DIC", "delta DIC"), escape = TRUE) %>%
   row_spec(which(glmm_summary$delta_DIC == 0), bold = TRUE) %>%
   pack_rows(
-    "ETR\\textsubscript{max}", 
-    group_locs %>% filter(response == "etr") %>% pull(start),
-    group_locs %>% filter(response == "etr") %>% pull(end),
+    "ETR\\\\textsubscript{max}", 
+    glmm_summ_group_locs %>% filter(response == "etr") %>% pull(start),
+    glmm_summ_group_locs %>% filter(response == "etr") %>% pull(end),
+    escape = FALSE) %>%
+  pack_rows(
+    "PPFD\\\\textsubscript{95\\\\%}", 
+    glmm_summ_group_locs %>% filter(response == "par") %>% pull(start),
+    glmm_summ_group_locs %>% filter(response == "par") %>% pull(end),
+    escape = FALSE) %>%
+  pack_rows(
+    "Recovery", 
+    glmm_summ_group_locs %>% filter(response == "recovery") %>% pull(start),
+    glmm_summ_group_locs %>% filter(response == "recovery") %>% pull(end),
     escape = FALSE)
 ```
 
+ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
+
+Best model (that with the lowest DIC) for each response variable in bold
 
 \newpage
 
 **`r table("glmm-pars")`** Predictor effects, lower and upper 95% confidence interval (CI), effective sample size, and significance of model parameters for the best general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to generation and growth habit in filmy ferns from Moorea, French Polynesia
 
 ```{r glmm-params, results = "asis"}
-# Format summary of best GLMM parameters for printing
+# Make helper table for formatting by groups
+glmm_params_group_locs <-
+glmm_params %>% mutate(row_num = 1:nrow(.)) %>% group_by(response) %>%
+  summarize(
+    start = min(row_num),
+    end = max(row_num),
+    .groups = "drop"
+  )
+
+glmm_params_cols <-
+  c(
+    "Fixed effects" = "fixed_effects", 
+    "Predictor" = "predictor",
+    "Mean effect" = "post.mean",
+    "Lower 95\\% CI" = "l-95% CI",
+    "Upper 95\\% CI" = "u-95% CI",
+    "Ef. sample size" = "eff.samp",
+    "\\textit{P} MCMC" = "pMCMC"
+  )
+
 glmm_params %>%
   mutate(
     fixed_effects = str_to_sentence(fixed_effects),
-    response = str_replace_all(response, "recovery", "Recovery") %>%
-      str_replace_all("etr", "ETR~max~") %>%
-      str_replace_all("par", "PPFD~95%~"),
     predictor = str_replace_all(predictor, "generationsporophyte", "Sporophyte") %>%
       str_replace_all("habitLow_Epiphyte", "Low Epiphyte") %>%
       str_replace_all("habitSaxicolous", "Saxicolous") %>%
       str_replace_all("habitTerrestrial", "Terrestrial")
   ) %>%
-  group_by(response) %>%
-  gt() %>%
-  cols_label(
-    fixed_effects = "Fixed effects", 
-    predictor = "Predictor", 
-    post.mean = "Mean effect",
-    `l-95% CI` = "Lower 95% CI",
-    `u-95% CI` = "Upper 95% CI",
-    eff.samp = "Ef. sample size",
-    pMCMC = md("*P* MCMC")) %>%
-  tab_style(
-    style = cell_text(weight = "bold"),
-    locations = cells_body(
-      columns = everything(),
-      rows = pMCMC < 0.05)) %>%
-  fmt_number(columns = vars(post.mean, `l-95% CI`, `u-95% CI`)) %>%
-  fmt_number(columns = vars(eff.samp), decimals = 0) %>%
-  fmt_number(columns = vars(pMCMC), decimals = 3, drop_trailing_zeros = TRUE) %>%
-as_latex()
+  select(all_of(glmm_params_cols)) %>%
+  kbl(format = "latex", booktabs = TRUE, escape = FALSE) %>%
+  kable_styling(latex_options = "scale_down") %>%
+  row_spec(which(glmm_params$pMCMC < 0.05), bold = TRUE) %>%
+  pack_rows(
+    "ETR\\\\textsubscript{max}", 
+    glmm_params_group_locs %>% filter(response == "etr") %>% pull(start),
+    glmm_params_group_locs %>% filter(response == "etr") %>% pull(end),
+    escape = FALSE) %>%
+  pack_rows(
+    "PPFD\\\\textsubscript{95\\\\%}", 
+    glmm_params_group_locs %>% filter(response == "par") %>% pull(start),
+    glmm_params_group_locs %>% filter(response == "par") %>% pull(end),
+    escape = FALSE) %>%
+  pack_rows(
+    "Recovery", 
+    glmm_params_group_locs %>% filter(response == "recovery") %>% pull(start),
+    glmm_params_group_locs %>% filter(response == "recovery") %>% pull(end),
+    escape = FALSE)
 ```
 
 ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
@@ -728,9 +739,9 @@ Significant predictors in bold
 
 \newpage
 
-**`r table("pglm")`** Phylogenetic generalized least squares (PLGS) models of desiccation tolerance as a function of environmental water potential (VPD) or the range of gametophytes beyond sporophytes (G beyond S) in filmy ferns from Moorea, French Polynesia
+**`r table("pgls")`** Phylogenetic generalized least squares (PLGS) models of desiccation tolerance as a function of environmental water potential (VPD) or the range of gametophytes beyond sporophytes (G beyond S) in filmy ferns from Moorea, French Polynesia
 
-```{r pglm, results = "asis"}
+```{r pgls, results = "asis"}
 env_range_dt_model_summary %>%
   mutate(generation = case_when(
     str_detect(model, "sporo") ~ "S",
