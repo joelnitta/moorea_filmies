@@ -399,15 +399,15 @@ load_filmy_dt <- function (file) {
 
 load_filmy_dt_chamber <- function (file) {
   readr::read_csv(file,
-  col_types = cols(
-    date_time = col_datetime(format = ""),
-    temp = col_double(),
-    rh = col_double(),
-    salt = col_character(),
-    generation = col_character(),
-    year = col_double(),
-    serial_no = col_character()
-  )
+                  col_types = cols(
+                    date_time = col_datetime(format = ""),
+                    temp = col_double(),
+                    rh = col_double(),
+                    salt = col_character(),
+                    generation = col_character(),
+                    year = col_double(),
+                    serial_no = col_character()
+                  )
   )
 }
 
@@ -550,99 +550,100 @@ process_community_matrix <- function (community_matrix_path, species_list, moore
     spread(site, abundance)
 }
 
-
-
-calculate_indiv_etr <- function (data) {
-  
-  # Calculate maximum ETR for each individual
+#' Fight light curve models to light curve data
+#'
+#' @param data Light curve data, with columns for 
+#' `coll_num`, `individual`, `species`, `generation`, `condition`, `date`
+#'
+#' @return Tibble with list-columns for `data`, `nls_mod` (model), 
+#' `k_stats` (model parameters), and `fitted` (fitted data points)
+#' 
+fit_lc_model <- function (data) {
   data %>%
-    assert(not_na, etr) %>%
-    group_by(species, generation, individual) %>%
-    summarize(
-      etr_max = max(etr),
-      .groups = "drop"
-    )
-  
-}
-
-calculate_mean_etr <- function (data) {
-  
-  # Calculate mean ETR max by species and generation
-  data %>%
-    assert(not_na, etr_max) %>%
-    group_by(generation, species) %>%
-    summarize(
-      etr_mean = mean(etr_max),
-      etr_sd = sd(etr_max),
-      etr_n = n()
-    ) %>%
-    ungroup()
-  
-}
-
-calculate_indiv_par <- function (data) {
-  
-  # Calculate critical PAR value for each individual
-  data %>%
-    select(species, generation, individual, par, etr) %>%
+    select(species, generation, individual, coll_num, condition, date, par, etr) %>%
+    # some sporophytes lack collection numbers, but
+    # we need to keep this column for differentiating between
+    # multiple individuals within gametophyte collections
+    mutate(coll_num = replace_na(coll_num, "nc")) %>%
+    assert(not_na, everything()) %>%
+    # Group into measurements by individual
+    # (`individual` column only applies *within* a species/generation, 
+    # so there are many `1`, `2`, etc)
+    group_by(coll_num, individual, species, generation, condition, date) %>%
+    # Make sure the number of measurements per individual is
+    # within the expected range (5-9, after removing outliers)
+    add_count() %>%
+    verify(n < 10 & n > 4) %>%
+    # Nest by individual, loop model fitting
     nest(data = c(par, etr)) %>%
     mutate(
+      # Fit nonlinear least-squares model
       nls_mod = map(
         data, 
-        # nonlinear least-squares estimates of parameters of the subsetted data
         ~nls(
           etr~max(etr)*(1-exp(-k*par)),
+          # fit K starting from 0.04
           start = list(k = 0.04),
           data =.,
           trace = FALSE,
-          control = list(maxiter = 500))
+          control = list(maxiter = 10000))
       ),
+      # Extract model parameters
       k_stats = map(nls_mod, broom::tidy)
     ) %>%
-    select(species, generation, individual, k_stats) %>%
-    unnest(cols = c(k_stats)) %>%
-    # calculate critical par (par where reach 95% of max etr)
-    mutate(par_critical = -log(0.05)/estimate)
-  
+    # Extract fitted data points
+    mutate(fitted = map(nls_mod, ~fitted(.) %>% tibble(etr_fit = .)))
 }
 
-calculate_mean_par <- function (data) {
-  
-  # Next calculate the mean value by species and generation
+#' Extract maximum ETR and PPFD95% from light curve models
+#'
+#' @param data Tibble including light curve models and fitted data points
+#'
+#' @return Tibble with rows as individuals, including `etr` (maximum ETR
+#' estimated from the fitted model) and `par` (PPFD at 95% of ETRmax)
+#' 
+extract_lc_model_params <- function (data) {
   data %>%
-    group_by(generation, species) %>%
+    select(-nls_mod, -data) %>%
+    # Unroll fitted light curve points
+    unnest(cols = fitted) %>%
+    # Get maximum estimated etr fit for each individual
+    group_by(coll_num, individual, species, generation, condition, date) %>%
+    mutate(etr = max(etr_fit)) %>%
+    ungroup %>%
+    select(-etr_fit) %>%
+    unique() %>%
+    # Calculate critical par value
+    unnest(cols = k_stats) %>%
+    # Double check that all models have significant fit
+    verify(p.value < 0.05) %>%
+    # Calculate critical PAR value (PPFD95%)
+    mutate(par = -log(0.05)/estimate)
+}
+
+#' Calculate mean ETRmax and PPFD95% by species and generation from individuals
+#'
+#' @param data Tibble with estimated ETRmax and PPFD95% at the individual level
+#'
+#' @return Tibble with columns for `generation`, `species`, and
+#' mean, sd, and n for ETRmax and PPFD95%
+#' 
+calculate_mean_light <- function (data) {
+  data %>%
+    assert(not_na, etr, par) %>%
+    group_by(species, generation) %>%
     summarize(
-      par_mean = mean(par_critical),
-      par_sd = sd(par_critical),
-      par_n = n()
-    ) %>%
-    ungroup()
-  
+      across(
+        c(etr, par), 
+        list(
+          mean = mean, 
+          sd = sd,
+          n = length),
+        .names = "{.col}_{.fn}"
+      ),
+      .groups = "drop"
+    )
 }
-
-combine_mean_phys_traits <- function (recovery_species_means, etr_species_means, par_species_means) {
-  
-  recover_filtered <-
-    recovery_species_means %>%
-    mutate(
-      keep = case_when(
-        # For sporophytes, use only recovery after 48 hr for 2-day drying treatment with MgNO3
-        # But make exception for A. dentatum, which was NaCl
-        species == "Abrodictyum_dentatum" & generation == "sporophyte" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
-        salt == "MgNO3" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
-        TRUE ~ FALSE
-      )
-    ) %>%
-    filter(keep) %>%
-    select(species, generation, starts_with("recover"))
-  
-  list(
-    recover_filtered, etr_species_means, par_species_means
-  ) %>%
-    reduce(left_join, by = c("species", "generation"))
-  
-}
-
 
 #' Calculate mean VPD from climate data
 #'
@@ -790,7 +791,6 @@ calculate_indiv_water <- function (data) {
 #' @return Dataframe
 #' 
 calculate_mean_water <- function (data) {
-  
   data %>%
     group_by(salt, species, rec_time, dry_time) %>%
     summarize(
@@ -798,7 +798,30 @@ calculate_mean_water <- function (data) {
       sd = sd(rel_water_content),
       .groups = "drop"
     )
+}
+
+#' Combine species mean values for recovery from desiccation and light responses
+#'
+#' @param recovery_species_means Data on recovery from desiccation at species level
+#' @param light_species_means Data on light responses at species level
+#'
+#' @return Tibble
+combine_mean_phys_traits <- function (recovery_species_means, light_species_means) {
+  recover_filtered <-
+    recovery_species_means %>%
+    mutate(
+      keep = case_when(
+        # For sporophytes, use only recovery after 48 hr for 2-day drying treatment with MgNO3
+        # But make exception for A. dentatum, which was NaCl
+        salt == "MgNO3" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
+        species == "Abrodictyum_dentatum" & generation == "sporophyte" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
+        TRUE ~ FALSE
+      )
+    ) %>%
+    filter(keep) %>%
+    select(species, generation, starts_with("recover"))
   
+  left_join(recover_filtered, light_species_means, by = c("species", "generation"))
 }
 
 #' Make a dataframe combining range size, vpd, and recovery
@@ -811,20 +834,20 @@ calculate_mean_water <- function (data) {
 #' @return Datafrmae
 #'
 combine_env_env_range_recover <- function (combined_species_means, env_range_data) {
-
+  
   combined_species_means %>%
-  filter(!is.na(recovery_mean)) %>%
-  select(species, generation, recovery = recovery_mean) %>%
-  pivot_wider(names_from = "generation", values_from = "recovery", names_prefix = "recovery_") %>%
-  left_join(
-    select(env_range_data, 
-           species, 
-           vpd_sporophyte = vpd_sporophyte_mean, 
-           vpd_gametophyte = vpd_gametophyte_mean,
-           gameto_beyond_sporo
-    ), 
-    by = "species") %>%
-  as.data.frame()
+    filter(!is.na(recovery_mean)) %>%
+    select(species, generation, recovery = recovery_mean) %>%
+    pivot_wider(names_from = "generation", values_from = "recovery", names_prefix = "recovery_") %>%
+    left_join(
+      select(env_range_data, 
+             species, 
+             vpd_sporophyte = vpd_sporophyte_mean, 
+             vpd_gametophyte = vpd_gametophyte_mean,
+             gameto_beyond_sporo
+      ), 
+      by = "species") %>%
+    as.data.frame()
 }
 
 # Convert genus to just first letter
@@ -872,96 +895,104 @@ transfer_bs <- function(filmy_phy_bs, filmy_phy) {
 #' 
 #' Helper function for run_t_test()
 #'
-#' @param data Data with response variable (DT recovery, ETRmax or PAR95) for
-#' filmy fern sporophytes and gametophytes in wide format. Three columns: `species`,
-#' `gameto`, and `sporo`. `gameto` and `sporo` are each list-columns, where each
-#' element of the list is a character vector of response variables.
+#' @param data Dataframe in wide format with one row per individual, and a
+#' column `generation` with values either "sporophyte" or "gametophyte"
+#' @param trait Unquoted name of trait to compare between sporophytes and gametophytes
 #'
-#' @return The results of running a two-sided t-test comparing response variables
-#' between gametophytes and sporophytes.
+#' @return T-test results as a dataframe
 #' 
-run_t_test_gs <- function (data) {
+t_test_by_gen <- function (data, trait) {
   
-  data %>%
-    # Count number of samples per species per generation
-    mutate(
-      n_gameto = map_dbl(gametophyte, length),
-      n_sporo = map_dbl(sporophyte, length)
-    ) %>%
-    # Only keep those with multiple samples
-    filter(n_gameto > 1, n_sporo > 1) %>%
-    # Run two-sided t-test, looping over species
-    # see https://cran.r-project.org/web/packages/broom/vignettes/broom_and_dplyr.html
-    # for more info
-    nest(data = c(gametophyte, sporophyte)) %>%
-    mutate(
-      t_test_res = map(data, ~t.test(x = .$sporophyte[[1]], y = .$gametophyte[[1]], paired = FALSE)),
-      tidy_res = map(t_test_res, broom::tidy)
-    ) %>%
-    select(species, tidy_res) %>%
-    unnest(cols = c(tidy_res)) %>%
+  # Make sure generation column is formatted correctly
+  assert(data, not_na, generation, success_fun = success_logical)
+  assert(data, in_set("sporophyte", "gametophyte"), generation, success_fun = success_logical)
+  assert(data, not_na, {{trait}}, success_fun = success_logical)
+  
+  # Extract sporophyte and gametophyte values of the trait
+  sporo_vals <- data %>% filter(generation == "sporophyte") %>% pull({{trait}})
+  gameto_vals <- data %>% filter(generation == "gametophyte") %>% pull({{trait}})
+  
+  # Return NULL if there are not enough observations of either sporophytes or gametophytes
+  # - need at least 2 obs of each
+  if(length(sporo_vals) < 2) return(NULL)
+  if(length(gameto_vals) < 2) return(NULL)
+  
+  # Run t-test
+  t.test(x = sporo_vals, y = gameto_vals, paired = FALSE) %>% 
+    broom::tidy() %>%
+    rename(est_sporo = estimate1, est_gameto = estimate2, est_diff_sporo_gameto = estimate) %>%
     janitor::clean_names()
-  
 }
 
 #' Run a t-test comparing response values between gametophytes and sporophytes
 #' for DT recovery, PAR95, and ETRmax
 #'
+#' @param filmy_lc_model_params Tibble with estimated ETRmax and PPFD95% at the individual level
 #' @param recovery_data Data with recovery from desiccation treatment with
 #' one value per individual. Includes columns `species`, `salt`, `dry_time`, `rec_time`,
 #' `recover`, and `generation`.
-#' @param par_indiv Data with critical PAR (PAR where reach 95% of max ETR). One row
-#' per individual. Includes columns `species`, `generation`, and `par_critical`
-#' @param etr_indiv Data with maximum ETR. One row per individual. Includes columns
-#' `species`, `generation`, and `etr_max`.
 #'
 #' @return Tibble. Columns include:
-#' - `estimate`: estimate of difference between means (sporo value - gameto value)
-#' - `estimate1`: estimate of mean value of sporophytes
-#' - `estimate2`: estimate of mean value of gametophytes
+#' - `est_diff_sporo_gameto`: estimate of difference between means (sporo value - gameto value)
+#' - `est_sporo`: estimate of mean value of sporophytes
+#' - `est_gameto`: estimate of mean value of gametophytes
 #' - `statistic`: t-value
 #' - `p_value`: p-value for the t-test
 #' - `response`: response type ("recover", "par", or "etr")
 #' 
-run_t_test <- function (recovery_data, par_indiv, etr_indiv) {
-  
-  # Run t-test for DT recovery between sporophytes and gametophytes
-  dt_t_test <-
-    recovery_data %>%
-    # Only compare recovery after 48hr between sporos and gametos dried using MgNO3 
-    filter(salt == "MgNO3", rec_time == "48hr", dry_time == "2") %>%
-    select(species, recovery, generation) %>%
-    # Remove NA values
-    filter(!is.na(recovery), !is.infinite(recovery)) %>%
-    # Convert to wide format. Values in columns are now a list of numeric vectors
-    # (recovery values)
-    pivot_wider(names_from = "generation", values_from = "recovery", values_fn = list) %>% 
-    run_t_test_gs() %>%
-    mutate(response = "recovery")
-  
-  # Run t-test for PAR95 between sporophytes and gametophytes
-  par_t_test <-
-    par_indiv %>%
-    select(species, generation, par_critical) %>%
-    pivot_wider(names_from = "generation", values_from = "par_critical", values_fn = list) %>%
-    run_t_test_gs() %>%
-    mutate(response = "par")
+run_t_test <- function(filmy_lc_model_params, recovery_indiv) {
   
   # Run t-test for ETRmax between sporophytes and gametophytes
   etr_t_test <-
-    etr_indiv %>%
-    select(species, generation, etr_max) %>%
-    pivot_wider(names_from = "generation", values_from = "etr_max", values_fn = list) %>%
-    run_t_test_gs() %>%
+    filmy_lc_model_params %>%
+    group_by(species) %>%
+    nest() %>%
+    ungroup() %>%
+    mutate(t_test_res = map(data, ~t_test_by_gen(., etr))) %>%
+    filter(map_lgl(t_test_res, is.null) == FALSE) %>%
+    select(-data) %>%
+    unnest(cols = c(t_test_res)) %>%
     mutate(response = "etr")
+  
+  # Run t-test for PAR95 between sporophytes and gametophytes
+  par_t_test <-
+    filmy_lc_model_params %>%
+    group_by(species) %>%
+    nest() %>%
+    ungroup() %>%
+    mutate(t_test_res = map(data, ~t_test_by_gen(., par))) %>%
+    filter(map_lgl(t_test_res, is.null) == FALSE) %>%
+    select(-data) %>%
+    unnest(cols = c(t_test_res)) %>%
+    mutate(response = "par")
+  
+  # Run t-test for DT recovery between sporophytes and gametophytes
+  dt_t_test <-
+    recovery_indiv %>%
+    # Compare gameto/sporo recovery after 2d values only for 2d drying at MgNO3
+    # except for A. dentatum sporos, which were NaCl
+    mutate(keep = case_when(
+      salt == "MgNO3" & dry_time == "2" & rec_time == "48hr" ~ TRUE,
+      species == "Abrodictyum_dentatum" & salt == "NaCl" & dry_time == "2" & rec_time == "48hr" & generation == "sporophyte" ~ TRUE,
+      TRUE ~ FALSE
+    )) %>%
+    filter(keep == TRUE, !is.na(recovery)) %>%
+    group_by(species) %>%
+    nest() %>%
+    ungroup() %>%
+    mutate(t_test_res = map(data, ~t_test_by_gen(., recovery))) %>%
+    filter(map_lgl(t_test_res, is.null) == FALSE) %>%
+    select(-data) %>%
+    unnest(cols = c(t_test_res)) %>%
+    mutate(response = "recovery")
   
   # Combine the results
   bind_rows(
-    dt_t_test,
+    etr_t_test,
     par_t_test,
-    etr_t_test
-  )
-  
+    dt_t_test
+  ) %>%
+    select(-method, -alternative)
 }
 
 # Phylogentic signal ----
@@ -1216,7 +1247,7 @@ run_pgls <- function (env_range_recover_data, phy) {
     sporo_vpd_model = caper::pgls(recovery_sporophyte ~ vpd_sporophyte, env_range_recover_data_comp),
     gameto_vpd_model = caper::pgls(recovery_gametophyte ~ vpd_gametophyte, env_range_recover_data_comp),
     gameto_range_model = caper::pgls(recovery_gametophyte ~ gameto_beyond_sporo, env_range_recover_data_comp)
-    )
+  )
   
 }
 
@@ -1434,7 +1465,7 @@ make_sporo_dt_plot <- function  (recovery_species_means, traits) {
   percent_formatter <- function(x) {
     lab <- x*100
   }
-
+  
   # Set colors for desiccation intensity
   col <- c(cbPalette[7], cbPalette[5], cbPalette[6])
   
@@ -1627,7 +1658,7 @@ latex2docx <- function (latex, docx, template = NULL, lua_filter = NULL, wd = ge
       "-f", "latex+raw_tex", # Input format
       "-t", "docx", # Output format
       latex # Input file
-      ),
+    ),
     wd = wd
   )
   

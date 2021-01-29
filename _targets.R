@@ -109,38 +109,33 @@ tar_plan(
     by = "species"
   ),
   
-  # - calculate PAR95 by individual
-  par_indiv = calculate_indiv_par(light_data),
+  # - fit light curve models to data
+  light_models = fit_lc_model(light_data),
   
-  # - calculate ETRmax by individual
-  etr_indiv = calculate_indiv_etr(light_data),
+  # - extract model parameters: 
+  # critical PAR, and ETR at 95% of estimated max value
+  filmy_lc_model_params = extract_lc_model_params(light_models),
   
+  # - calculate mean light curve parameters by species and generation
+  light_species_means = calculate_mean_light(filmy_lc_model_params),
+
   # - calculate mean DT recovery by species and generation
   recovery_species_means = calc_mean_recovery(recovery_indiv),
   
   # - calculate relative water content by species (sporophytes only)
   rel_water_species_means = calculate_mean_water(rel_water_indiv),
   
-  # - calculate mean ETR max by species and generation
-  etr_species_means = calculate_mean_etr(etr_indiv),
-  
-  # - calculate mean PAR95 by species and generation
-  par_species_means = calculate_mean_par(par_indiv),
-  
   # - combine the species means into a single df
   combined_species_means = combine_mean_phys_traits(
     recovery_species_means = recovery_species_means,
-    etr_species_means = etr_species_means,
-    par_species_means = par_species_means
+    light_species_means = light_species_means
   ),
   
   # t-test ----
-  
   # Perform two-sided t-test on DT and light responses across generations
   t_test_results = run_t_test(
-    recovery_data = recovery_indiv, 
-    par_indiv = par_indiv, 
-    etr_indiv = etr_indiv),
+    filmy_lc_model_params = filmy_lc_model_params, 
+    recovery_indiv = recovery_indiv),
   
   # Phylogenetic signal ----
   phylosig = analyze_phylosig_by_generation(
