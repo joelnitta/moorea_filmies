@@ -645,16 +645,19 @@ calculate_mean_light <- function (data) {
     )
 }
 
-#' Calculate mean VPD from climate data
+#' Calculate mean of daily env_range_dt_model VPD from climate data
 #'
 #' @param climate Dataframe with climate data including
 #' relative humidity, temperature, and VPD calculated from these measured
 #' once every 15 minutes by site and growth habit (terrestrial or epiphytic)
 #'
-#' @return Tibble with mean VPD by site and growth habit 
-calculate_mean_vpd <- function (climate) {
+#' @return Tibble with mean of daily env_range_dt_model VPD by site and growth habit 
+calculate_mean_max_vpd <- function (climate) {
   climate %>% 
-    group_by(site, habit) %>% 
+    group_by(site, habit, date) %>% 
+    summarize(vpd = max(vpd), .groups = "drop") %>% 
+    assert(not_na, vpd) %>%
+    group_by(site, habit) %>%
     summarize(vpd = mean(vpd), .groups = "drop") %>% 
     assert(not_na, vpd)
 }

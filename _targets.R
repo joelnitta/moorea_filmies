@@ -71,8 +71,8 @@ tar_plan(
   # - calculate water content during DT test per individual
   rel_water_indiv = calculate_indiv_water(filmy_dt),
   
-  # - calculate mean VPD per datalogger
-  mean_vpd = calculate_mean_vpd(climate),
+  # - calculate mean maximum daily VPD per datalogger
+  mean_vpd = calculate_mean_max_vpd(climate),
   
   # - calculate mean VPD per species for gametophytes
   mean_vpd_gameto = calculate_mean_vpd_gameto(
