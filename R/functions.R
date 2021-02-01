@@ -1438,9 +1438,10 @@ match_comm_and_tree <- function (comm, phy, return = c("comm", "tree")) {
 # Plots ----
 
 # Format legend (include title, but get rid of boxes)
-legend_theme <- theme (legend.background = element_rect(colour = "transparent", fill = "transparent", size = 0.5),
-                       legend.key = element_rect(colour = "white", fill = "white", size = 0.5),
-                       legend.text = element_text(size = 12))
+legend_theme <- ggplot2::theme(
+  legend.background = ggplot2::element_rect(colour = "transparent", fill = "transparent", size = 0.5),
+  legend.key = ggplot2::element_rect(colour = "white", fill = "white", size = 0.5),
+  legend.text = ggplot2::element_text(size = 12))
 
 make_sporo_dt_plot <- function  (recovery_species_means, traits) {
   # Define color-blind palette
@@ -1664,3 +1665,33 @@ latex2docx <- function (latex, docx, template = NULL, lua_filter = NULL, wd = ge
   
 }
 
+# Captions ----
+
+# Follow Journal of Plant Research (JPR) style:
+# - All figures are to be numbered using Arabic numerals.
+# - Figures should always be cited in text in consecutive numerical order.
+# - Figure parts should be denoted by lowercase letters (a, b, c, etc.).
+# - If an appendix appears in your article and it contains one or more figures, 
+#   continue the consecutive numbering of the main text. 
+# - Do not number the appendix figures, "A1, A2, A3, etc." 
+# - Figures in online appendices (Electronic Supplementary Material) should, 
+#   however, be numbered separately
+
+# - First define the "full" version, which would include a caption
+# (except I never use the caption in the function, and instead replace with 'blank')
+figure_full <- captioner::captioner(prefix = "Fig.", suffix = "")
+table_full <- captioner::captioner(prefix = "Table")
+s_figure_full <- captioner::captioner(prefix = "Fig. S", auto_space = FALSE, suffix = "")
+s_table_full <- captioner::captioner(prefix = "Table S", auto_space = FALSE, suffix = "")
+
+# - Make a short function that prints only the object type and number, e.g., "Fig. 1"
+figure <- pryr::partial(figure_full, display = "cite", caption = "blank")
+table <- pryr::partial(table_full, display = "cite", caption = "blank")
+s_figure <- pryr::partial(s_figure_full, display = "cite", caption = "blank")
+s_table <- pryr::partial(s_table_full, display = "cite", caption = "blank")
+
+# - Make a short function that prints only the number (e.g., "1")
+figure_num <- function (name) {figure(name) %>% str_remove("Fig. ")}
+table_num <- function (name) {table(name) %>% str_remove("Table ")}
+s_figure_num <- function (name) {s_figure(name) %>% str_remove("Fig. ")}
+s_table_num <- function (name) {s_table(name) %>% str_remove("Table ")}
