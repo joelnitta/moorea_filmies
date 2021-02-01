@@ -635,12 +635,23 @@ Asterisks indicate significance of phylogenetic signal: \*\*, \pval{ }< 0.01, \*
 **`r table("glmm")`** Deviance information criterion (DIC) and delta DIC for general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to generation and growth habit in filmy ferns from Moorea, French Polynesia
 
 ```{r glmm-table, results = "asis"}
+# Make helper table for formatting by groups
 glmm_summ_group_locs <-
 glmm_summary %>% mutate(row_num = 1:nrow(.)) %>% group_by(response) %>%
   summarize(
     start = min(row_num),
     end = max(row_num),
     .groups = "drop"
+  )
+
+# Format column names.
+# left side is new name (with latex formatting)
+# right side is original name
+glmm_summary_cols <-
+  c(
+    "Fixed effects" = "fixed_effects", 
+    "DIC" = "DIC",
+    "delta DIC" = "delta_DIC"
   )
 
 glmm_summary %>%
@@ -653,8 +664,8 @@ glmm_summary %>%
     DIC = round_t(DIC, 2),
     delta_DIC = round_t(delta_DIC, 2)
   ) %>%
-  select(fixed_effects, DIC, delta_DIC) %>%
-  kbl(format = "latex", booktabs = TRUE, col.names = c("Fixed effects", "DIC", "delta DIC"), escape = TRUE) %>%
+  select(all_of(glmm_summary_cols)) %>%
+  kbl(format = "latex", booktabs = TRUE, escape = TRUE) %>%
   row_spec(which(glmm_summary$delta_DIC == 0), bold = TRUE) %>%
   pack_rows(
     "ETR\\\\textsubscript{max}", 
@@ -691,6 +702,9 @@ glmm_params %>% mutate(row_num = 1:nrow(.)) %>% group_by(response) %>%
     .groups = "drop"
   )
 
+# Format column names.
+# left side is new name (with latex formatting)
+# right side is original name
 glmm_params_cols <-
   c(
     "Fixed effects" = "fixed_effects", 
@@ -702,18 +716,29 @@ glmm_params_cols <-
     "\\textit{P} MCMC" = "pMCMC"
   )
 
+# Format cell values
 glmm_params %>%
   mutate(
-    fixed_effects = str_to_sentence(fixed_effects),
+    fixed_effects = case_when(
+      fixed_effects == "both" ~ "Generation + habit",
+      fixed_effects == "intersect" ~ "Generation + habit + Generation:habit",
+      TRUE ~ str_to_sentence(fixed_effects)
+    ),
     predictor = str_replace_all(predictor, "generationsporophyte", "Sporophyte") %>%
       str_replace_all("habitLow_Epiphyte", "Low Epiphyte") %>%
       str_replace_all("habitSaxicolous", "Saxicolous") %>%
-      str_replace_all("habitTerrestrial", "Terrestrial")
+      str_replace_all("habitTerrestrial", "Terrestrial"),
+    # Round off long numeric values
+    across(c(post.mean, `l-95% CI`, `u-95% CI`, pMCMC), ~round_t(., 3)),
+    eff.samp = as.integer(eff.samp)
   ) %>%
+  # Format column names
   select(all_of(glmm_params_cols)) %>%
   kbl(format = "latex", booktabs = TRUE, escape = FALSE) %>%
   kable_styling(latex_options = "scale_down") %>%
+  # Make significant rows bold
   row_spec(which(glmm_params$pMCMC < 0.05), bold = TRUE) %>%
+  # Add group rows
   pack_rows(
     "ETR\\\\textsubscript{max}", 
     glmm_params_group_locs %>% filter(response == "etr") %>% pull(start),
@@ -742,6 +767,20 @@ Significant predictors in bold
 **`r table("pgls")`** Phylogenetic generalized least squares (PLGS) models of desiccation tolerance as a function of environmental water potential (VPD) or the range of gametophytes beyond sporophytes (G beyond S) in filmy ferns from Moorea, French Polynesia
 
 ```{r pgls, results = "asis"}
+# Format column names.
+# left side is new name (with latex formatting)
+# right side is original name
+pgls_cols <-
+  c(
+    "Generation" = "generation", 
+    "Predictor" = "predictor",
+    "df" = "df",
+    "\\textit{F}" = "f_value",
+    "adj. \\textit{R}\\textsuperscript{2}" = "adj_r_squared",
+    "\\textit{P}" = "p_value"
+  )
+
+# Format cell values
 env_range_dt_model_summary %>%
   mutate(generation = case_when(
     str_detect(model, "sporo") ~ "S",
@@ -755,13 +794,14 @@ env_range_dt_model_summary %>%
     )
   ) %>%
   assert(not_na, predictor) %>%
-  select(generation, predictor, df, f_value, adj_r_squared, p_value) %>%
   mutate(
     f_value = round_t(f_value, 3),
     p_value = round_t(p_value, 3),
     adj_r_squared = round_t(adj_r_squared, 3)
   ) %>%
-  kbl(col.names = c("Generation", "Predictor", "df", "$F$", "adj. $R^2$", "$P$"), escape = FALSE, booktabs = TRUE)
+  # Format column names
+  select(all_of(pgls_cols)) %>%
+  kbl(format = "latex", escape = FALSE, booktabs = TRUE)
 ```
 
 S, sporophyte; G, gametophyte
