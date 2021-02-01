@@ -66,7 +66,7 @@ tar_plan(
     filter(section == "main") %>%
     # Filter out individuals with low pre-treatment yields
     filter(!is.na(yield_pre), yield_pre > 400) %>%
-    calc_recovery(),
+    calculate_recovery(),
   
   # - calculate water content during DT test per individual
   rel_water_indiv = calculate_indiv_water(filmy_dt),
@@ -120,7 +120,7 @@ tar_plan(
   light_species_means = calculate_mean_light(filmy_lc_model_params),
 
   # - calculate mean DT recovery by species and generation
-  recovery_species_means = calc_mean_recovery(recovery_indiv),
+  recovery_species_means = calculate_mean_recovery(recovery_indiv),
   
   # - calculate relative water content by species (sporophytes only)
   rel_water_species_means = calculate_mean_water(rel_water_indiv),

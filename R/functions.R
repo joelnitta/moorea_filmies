@@ -494,41 +494,6 @@ add_clusters <- function(data, col, k) {
   mutate(data, cluster = kmeans_uni_groups$cluster)
 }
 
-#' Calculate % recovery from desiccation in a desiccation tolerance (DT) experiment
-#'
-#' @param data Dataframe; data read in from DT experiment
-#'
-#' @return Dataframe
-calc_recovery <- function (data) {
-  data %>%
-    # Make sure pre-treatment yield must be greater than zero, or recovery will be Inf
-    verify(yield_pre > 0) %>%
-    assert(not_na, yield_pre) %>%
-    select(species, salt, dry_time, individual, generation, contains("yield")) %>%
-    select(-yield_72hr, -contains("yield_dry")) %>%
-    pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
-    mutate(
-      rec_time = str_remove_all(rec_time, "yield_"),
-      recovery = yield_recover / yield_pre) %>%
-    select(-contains("yield"))
-}
-
-#' Calculate mean % recovery from desiccation in a desiccation tolerance (DT) experiment
-#'
-#' @param data Dataframe; DT data
-#'
-#' @return Dataframe
-calc_mean_recovery <- function (data) {
-  data %>%
-    mutate(rec_time = factor(rec_time, levels = c("30min", "24hr", "48hr"))) %>%
-    group_by(species, salt, dry_time, rec_time, generation) %>%
-    summarize(
-      recovery_mean = mean(recovery, na.rm = TRUE),
-      recovery_sd = sd(recovery, na.rm = TRUE),
-      recovery_n = n(),
-      .groups = "drop")
-}
-
 #' Process raw community matrix 
 #'
 #' @param community_matrix_path Path to community matrix of Nitta et al 2017
@@ -619,6 +584,109 @@ extract_lc_model_params <- function (data) {
     verify(p.value < 0.05) %>%
     # Calculate critical PAR value (PPFD95%)
     mutate(par = -log(0.05)/estimate)
+}
+
+
+#' Determine which species have widespread gametophytes
+#'
+#' @param raw_community_matrix Community matrix of Nitta et al 2017
+#' @param filmy_species Character vector of filmy fern species names
+#' @param phy Phylogeny including filmy ferns of Moorea and Tahiti
+#' @param moorea_sites Site data for plots on Moorea including elevation
+#' 
+#' @return Dataframe
+#' 
+analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moorea_sites) {
+  
+  # Convert raw community data to long format by sporophyte and gametophyte
+  # min and max elevational range.
+  range_long <-
+    community_matrix_raw %>%
+    rename(site = X1) %>% 
+    gather(species, abundance, -site) %>%
+    filter(species %in% filmy_species) %>%
+    mutate(generation = case_when(
+      str_detect(site, "_S") ~ "sporophyte",
+      str_detect(site, "_G") ~ "gametophyte"
+    )) %>%
+    mutate(site = str_remove_all(site, "_S") %>% str_remove_all("_G")) %>%
+    # Keep only sites on Moorea
+    filter(site %in% moorea_sites$site) %>%
+    left_join(moorea_sites, by = "site") %>%
+    filter(abundance > 0) %>%
+    assert(not_na, el) %>%
+    group_by(species, generation) %>%
+    summarize(
+      min_range = min(el),
+      max_range = max(el),
+      .groups = "drop"
+    )
+  
+  # Compare ranges to see which species have gametophytes beyond sporophytes
+  full_join(
+    range_long %>%
+      gather(variable, value, -species, -generation) %>%
+      filter(generation == "sporophyte") %>% 
+      select(-generation) %>%
+      spread(variable, value) %>%
+      rename_at(vars(max_range, min_range), ~paste("sporo", ., sep = "_")),
+    range_long %>%
+      gather(variable, value, -species, -generation) %>%
+      filter(generation == "gametophyte") %>% 
+      select(-generation) %>%
+      spread(variable, value) %>%
+      rename_at(vars(max_range, min_range), ~paste("gameto", ., sep = "_")),
+    by = "species"
+  ) %>%
+    assert(is_uniq, species) %>%
+    mutate(
+      # Calculate elevational range of gametophytes beyond sporophytes
+      gameto_beyond_sporo_min = sporo_min_range - gameto_min_range,
+      gameto_beyond_sporo_max = gameto_max_range - sporo_max_range,
+      # If observed sporo range exceeds observed gameto range, consider
+      # range of gameto beyond sporo to be zero
+      gameto_beyond_sporo_min = ifelse(gameto_beyond_sporo_min < 0, 0, gameto_beyond_sporo_min),
+      gameto_beyond_sporo_max = ifelse(gameto_beyond_sporo_max < 0, 0, gameto_beyond_sporo_max)
+    ) %>%
+    rowwise() %>%
+    mutate(gameto_beyond_sporo = sum(gameto_beyond_sporo_min, gameto_beyond_sporo_max)) %>%
+    select(-gameto_beyond_sporo_min, -gameto_beyond_sporo_max)
+  
+}
+
+#' Calculate % recovery from desiccation in a desiccation tolerance (DT) experiment
+#'
+#' @param data Dataframe; data read in from DT experiment
+#'
+#' @return Dataframe
+calculate_recovery <- function (data) {
+  data %>%
+    # Make sure pre-treatment yield must be greater than zero, or recovery will be Inf
+    verify(yield_pre > 0) %>%
+    assert(not_na, yield_pre) %>%
+    select(species, salt, dry_time, individual, generation, contains("yield")) %>%
+    select(-yield_72hr, -contains("yield_dry")) %>%
+    pivot_longer(names_to = "rec_time", values_to = "yield_recover", matches("30|24|48")) %>%
+    mutate(
+      rec_time = str_remove_all(rec_time, "yield_"),
+      recovery = yield_recover / yield_pre) %>%
+    select(-contains("yield"))
+}
+
+#' Calculate mean % recovery from desiccation in a desiccation tolerance (DT) experiment
+#'
+#' @param data Dataframe; DT data
+#'
+#' @return Dataframe
+calculate_mean_recovery <- function (data) {
+  data %>%
+    mutate(rec_time = factor(rec_time, levels = c("30min", "24hr", "48hr"))) %>%
+    group_by(species, salt, dry_time, rec_time, generation) %>%
+    summarize(
+      recovery_mean = mean(recovery, na.rm = TRUE),
+      recovery_sd = sd(recovery, na.rm = TRUE),
+      recovery_n = n(),
+      .groups = "drop")
 }
 
 #' Calculate mean ETRmax and PPFD95% by species and generation from individuals
@@ -851,14 +919,6 @@ combine_env_env_range_recover <- function (combined_species_means, env_range_dat
       ), 
       by = "species") %>%
     as.data.frame()
-}
-
-# Convert genus to just first letter
-abbrev_sp <- function(data) {
-  data %>%
-    separate(species, c("genus", "epithet")) %>%
-    mutate(genus = substr(genus, 1, 1)) %>%
-    unite("species", genus, epithet)
 }
 
 #' Transfer bootstrap values from BS tree to time tree
@@ -1446,141 +1506,19 @@ legend_theme <- ggplot2::theme(
   legend.key = ggplot2::element_rect(colour = "white", fill = "white", size = 0.5),
   legend.text = ggplot2::element_text(size = 12))
 
-make_sporo_dt_plot <- function  (recovery_species_means, traits) {
-  # Define color-blind palette
-  cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-  
-  plot_data <-
-    recovery_species_means %>%
-    # Use only sporophytes
-    filter(generation == "sporo") %>%
-    # Don't plot control
-    filter(salt != "Control") %>%
-    # Add growth habit data
-    left_join(traits, by = "species") %>%
-    assert(not_na, habit, range) %>%
-    # Abbreviate species names to G. species
-    mutate(species = str_replace_all(species, "[a-z]+_", ". ")) %>%
-    # Reorder levels for species: alphabetical within growth habit
-    mutate(species = fct_reorder2(species, habit, species, .desc = FALSE)) %>%
-    rename(recover = recover_mean, sd = recover_sd, n = recover_n)
-  
-  # Self-defined formatting function for percent
-  percent_formatter <- function(x) {
-    lab <- x*100
-  }
-  
-  # Set colors for desiccation intensity
-  col <- c(cbPalette[7], cbPalette[5], cbPalette[6])
-  
-  # Set offset of datapoints (dodge)
-  pd <- position_dodge(.3)
-  
-  # Make plot
-  ggplot(data = plot_data, aes(x = rec_time, y = recover, group = interaction(dry_time, salt), shape = salt, fill = salt)) +
-    geom_line(position = pd, aes(linetype = dry_time)) +
-    geom_errorbar(
-      aes(ymin = recover - sd, ymax = recover + sd), 
-      colour = "grey50", width = 0, 
-      position = pd) +
-    geom_point(position = pd, size = 1.5) +
-    scale_linetype_manual(name = "Desiccation Time",
-                          values = c("solid", "dashed"),
-                          breaks = c("15d", "2d"),
-                          labels = c("15 days", "2 days")) +
-    scale_shape_manual(name = "Desiccation Intensity",
-                       values = c(23,24,21),
-                       breaks = c("NaCl", "MgNO3",  "LiCl"),
-                       labels = c("-38 MPa", "-86 MPa", "-282 Mpa")) + 
-    scale_fill_manual(name = "Desiccation Intensity",
-                      values = col, 
-                      breaks = c("NaCl", "MgNO3",  "LiCl"),
-                      labels = c("-38 MPa", "-86 MPa", "-282 Mpa")) + 
-    scale_y_continuous(label = percent_formatter, limits = c(0,1.1), expand = c(0,0), breaks=c(0,.2,.4,.6,.8,1.0)) +
-    scale_x_discrete(limits = c("30min","24hr","48hr"),
-                     labels = c("0.5", "24", "48")) +
-    xlab("Recovery Time (hr)") +
-    ylab("Recovery (%)") +
-    theme_bw() +
-    legend_theme +
-    theme(legend.position="bottom",
-          panel.grid.minor=element_blank(), 
-          panel.grid.major=element_blank()) + 
-    facet_wrap( ~ species, ncol=3)
-}
-
-#' Determine which species have widespread gametophytes
-#'
-#' @param raw_community_matrix Community matrix of Nitta et al 2017
-#' @param filmy_species Character vector of filmy fern species names
-#' @param phy Phylogeny including filmy ferns of Moorea and Tahiti
-#' @param moorea_sites Site data for plots on Moorea including elevation
-#' 
-#' @return Dataframe
-#' 
-analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moorea_sites) {
-  
-  # Convert raw community data to long format by sporophyte and gametophyte
-  # min and max elevational range.
-  range_long <-
-    community_matrix_raw %>%
-    rename(site = X1) %>% 
-    gather(species, abundance, -site) %>%
-    filter(species %in% filmy_species) %>%
-    mutate(generation = case_when(
-      str_detect(site, "_S") ~ "sporophyte",
-      str_detect(site, "_G") ~ "gametophyte"
-    )) %>%
-    mutate(site = str_remove_all(site, "_S") %>% str_remove_all("_G")) %>%
-    # Keep only sites on Moorea
-    filter(site %in% moorea_sites$site) %>%
-    left_join(moorea_sites, by = "site") %>%
-    filter(abundance > 0) %>%
-    assert(not_na, el) %>%
-    group_by(species, generation) %>%
-    summarize(
-      min_range = min(el),
-      max_range = max(el),
-      .groups = "drop"
-    )
-  
-  # Compare ranges to see which species have gametophytes beyond sporophytes
-  full_join(
-    range_long %>%
-      gather(variable, value, -species, -generation) %>%
-      filter(generation == "sporophyte") %>% 
-      select(-generation) %>%
-      spread(variable, value) %>%
-      rename_at(vars(max_range, min_range), ~paste("sporo", ., sep = "_")),
-    range_long %>%
-      gather(variable, value, -species, -generation) %>%
-      filter(generation == "gametophyte") %>% 
-      select(-generation) %>%
-      spread(variable, value) %>%
-      rename_at(vars(max_range, min_range), ~paste("gameto", ., sep = "_")),
-    by = "species"
-  ) %>%
-    assert(is_uniq, species) %>%
-    mutate(
-      # Calculate elevational range of gametophytes beyond sporophytes
-      gameto_beyond_sporo_min = sporo_min_range - gameto_min_range,
-      gameto_beyond_sporo_max = gameto_max_range - sporo_max_range,
-      # If observed sporo range exceeds observed gameto range, consider
-      # range of gameto beyond sporo to be zero
-      gameto_beyond_sporo_min = ifelse(gameto_beyond_sporo_min < 0, 0, gameto_beyond_sporo_min),
-      gameto_beyond_sporo_max = ifelse(gameto_beyond_sporo_max < 0, 0, gameto_beyond_sporo_max)
-    ) %>%
-    rowwise() %>%
-    mutate(gameto_beyond_sporo = sum(gameto_beyond_sporo_min, gameto_beyond_sporo_max)) %>%
-    select(-gameto_beyond_sporo_min, -gameto_beyond_sporo_max)
-  
-}
-
 # Define function for formatting text in legends
 pretty_text <- function (x) {
   x %>%
     str_replace_all("_", " ") %>%
     str_to_sentence()
+}
+
+# Convert genus to just first letter
+abbrev_sp <- function(data) {
+  data %>%
+    separate(species, c("genus", "epithet")) %>%
+    mutate(genus = substr(genus, 1, 1)) %>%
+    unite("species", genus, epithet)
 }
 
 # Manuscript ----
