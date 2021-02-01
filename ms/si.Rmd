@@ -52,7 +52,7 @@ knitr::purl(here::here("ms/manuscript.Rmd"), output = temp_file)
 # Trim this R script down to only functions that define figure and table captions
 read_lines(temp_file) %>%
   magrittr::extract(
-    str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(")
+    str_detect(., "^figure\\(|^table\\(|^s_figure\\(|^s_table\\(|^figure_num\\(|^table_num\\(|^s_figure_num\\(|^s_table_num\\(")
   ) %>%
   unique %>%
   write_lines(temp_file)
