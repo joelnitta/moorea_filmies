@@ -317,7 +317,7 @@ We refer to these here as *C. minutum* var. 1, 2, and 3.
 Similarly, two members of the *Abrodictyum asae-grayi* (Bosch) Ebihara & K. Iwats. complex (also including *Abrodictyum caudatum* (Brack.) Ebihara & K. Iwats. in our tree; `r s_figure("tree")`) were observed on the basis of *rbcL* and morphology, but as taxonomic treatment is beyond the scope of the current study we refer to them as *A. asae-grayi* var. 1 and 2.
 
 In several species, gametophytes exceeded the maximum or minimum elevational range of sporophytes including *Callistopteris apiifolia* (C. Presl) Copel., *Crepidomanes minutum* var. 2 and 3, *Hymenophyllum digitatum* (Sw.) Fosberg, *Hymenophyllum javanicum* Spreng., *Hymenophyllum pallidum* (Blume) Ebihara & K.
-Iwats., and *Polyphlebium borbonicum* (Bosch) Ebihara & Dubuisson.
+Iwats., and *Polyphlebium borbonicum* (Bosch) Ebihara & Dubuisson (`r s_figure("range")`).
 All of these have sporophytes that are normally only found in cloud forest (\circa{ }500--1200 m), but gametophytes that are distributed to lower elevations.
 
 Sporophytes of two taxa, *C. minutum* var. 3 and *Hymenophyllum braithwaitei* (Ebihara & K. Iwats.), did not occur in the study plots, but each was observed from a single population on Mt. Tohiea, at \circa{ }1000 m and near the summit (1206 m), respectively.
