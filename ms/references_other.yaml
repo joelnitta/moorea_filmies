@@ -42,24 +42,3 @@ references:
   title-short: Caper
   note: R package version 1.0.1
   URL: https://CRAN.R-project.org/package=caper
-
-- id: Nitta2020b
-  type: webpage
-  author:
-  - family: Nitta
-    given: Joel
-    middle: H.
-  - family: Ebihara
-    given: Atsushi
-  - family: Smith
-    given: Alan
-    middle: R.
-  issued:
-    year: 2020
-  accessed:
-    year: 2020
-    month: 03
-    day: 01
-  title: 'Data from: A taxonomic and molecular survey of the pteridophytes of the Nectandra Cloud Forest Reserve, Costa Rica'
-  container-title: 'Dryad Digital Repository'
-  URL: https://doi.org/10.5061/dryad.bnzs7h477
