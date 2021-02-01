@@ -1590,7 +1590,7 @@ pretty_text <- function (x) {
 #' @param p_check Boolean: should the p-value be required to be less than 0.05?
 #'
 #' @return A p-value for the selected species and response
-ttest_pval <- function(species_select, response_select, data = t_test_results, p_check = TRUE) {
+ttest_pval <- function(species_select, response_select, data, p_check = TRUE) {
   data %>% 
     # Filter to appropriate species and response
     filter(species == species_select, response == response_select) %>%
@@ -1599,7 +1599,7 @@ ttest_pval <- function(species_select, response_select, data = t_test_results, p
     # Format the p-value
     mutate(
       p_value = case_when(
-        p_value < 0.001 ~ "<0.001",
+        p_value < 0.001 ~ "< 0.001",
         TRUE ~ jntools::round_t(p_value, digits = 3))
     ) %>% 
     pull(p_value)
