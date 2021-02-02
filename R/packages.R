@@ -16,7 +16,6 @@ library(scales)
 library(ggtext)
 suppressPackageStartupMessages(library(ggtree))
 library(kableExtra)
-library(gt)
 suppressPackageStartupMessages(library(tidyverse))
 
 conflict_prefer("col_factor", "readr")
