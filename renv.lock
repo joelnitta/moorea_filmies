@@ -201,6 +201,18 @@
       "Repository": "CRAN",
       "Hash": "1bf627f1f77313e345f71e779b658578"
     },
+    "breakerofchains": {
+      "Package": "breakerofchains",
+      "Version": "0.0.92",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "MilesMcBain",
+      "RemoteRepo": "breakerofchains",
+      "RemoteRef": "main",
+      "RemoteSha": "8a800fb37fabf40226cc5794cead6bb2eb01e4db",
+      "Hash": "827bd4af588c248700e0c88ccdb591b1"
+    },
     "broom": {
       "Package": "broom",
       "Version": "0.7.0",
@@ -240,13 +252,6 @@
       "Source": "Repository",
       "Repository": "RSPM",
       "Hash": "f61dbaec772ccd2e17705c1e872e9e7c"
-    },
-    "checkmate": {
-      "Package": "checkmate",
-      "Version": "2.0.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "a667800d5f0350371bedeb8b8b950289"
     },
     "cli": {
       "Package": "cli",
@@ -296,13 +301,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "f0acb9dcb71a9cd9d5ae233c5035b1c5"
-    },
-    "commonmark": {
-      "Package": "commonmark",
-      "Version": "1.7",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Hash": "0f22be39ec1d141fd03683c06f3a6e67"
     },
     "conflicted": {
       "Package": "conflicted",
@@ -558,18 +556,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "5ae1f617531ca2ae244647d9b21b5e74"
-    },
-    "gt": {
-      "Package": "gt",
-      "Version": "0.2.2",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteUsername": "rstudio",
-      "RemoteRepo": "gt",
-      "RemoteRef": "master",
-      "RemoteSha": "bae32f432f190a904e26c3d1396b63ea65e5106a",
-      "Hash": "f053965636a9f052cee3113ce02b9638"
     },
     "gtable": {
       "Package": "gtable",
@@ -1099,13 +1085,6 @@
       "Repository": "RSPM",
       "Hash": "a9795ccb2d608330e841998b67156764"
     },
-    "sass": {
-      "Package": "sass",
-      "Version": "0.3.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "3ef1adfe46b7b144b970d74ce33ab0d6"
-    },
     "scales": {
       "Package": "scales",
       "Version": "1.1.1",
@@ -1133,6 +1112,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "4079070fc210c7901c0832a3aeab894f"
+    },
+    "sourcetools": {
+      "Package": "sourcetools",
+      "Version": "0.1.7",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "947e4e02a79effa5d512473e10f41797"
     },
     "sp": {
       "Package": "sp",
