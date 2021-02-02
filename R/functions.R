@@ -515,6 +515,26 @@ process_community_matrix <- function (community_matrix_path, species_list, moore
     spread(site, abundance)
 }
 
+#' Tidy raw specimen data
+#' 
+#' and filter to only filmy ferns from Moorea
+#'
+#' @param specimens_raw Specimen collection data for ferns from Moorea and Tahiti
+#' @param filmy_species Character vector of species names of filmy ferns from Moorea and Tahiti
+#'
+#' @return Dataframe
+tidy_filmy_specimens <- function (specimens_raw, filmy_species) {
+  specimens_raw %>%
+    # only use needed columns
+    select(specimen, genus, specific_epithet, generation, county, site, locality, elevation, starts_with("gameto")) %>%
+    mutate(species = paste(genus, specific_epithet, sep = "_")) %>%
+    # subset to filmy ferns on Moorea
+    assert(not_na, county) %>%
+    assert(in_set("Moorea", "Tahiti"), county) %>%
+    filter(species %in% filmy_species, county == "Moorea") %>%
+    select(species, specimen, generation, site, locality, elevation, starts_with("gameto"))
+}
+
 #' Fight light curve models to light curve data
 #'
 #' @param data Light curve data, with columns for 
@@ -736,7 +756,7 @@ calculate_mean_max_vpd <- function (climate) {
 #'
 #' @param mean_vpd Mean Vapor Pressure Deficit (VPD) measured with dataloggers
 #' at each site
-#' @param specimens_raw Raw specimen collection data
+#' @param filmy_specimens Raw specimen collection data
 #' @param moorea_sites Dataframe of collection sites on Moorea
 #' @param filmy_species Vector of filmy fern species names
 #'
@@ -744,30 +764,22 @@ calculate_mean_max_vpd <- function (climate) {
 #' 
 calculate_mean_vpd_gameto <- function(
   mean_vpd,
-  specimens_raw,
+  filmy_specimens,
   moorea_sites,
   filmy_species
 ) {
   
-  gameto_filmy_specimens <-
-    specimens_raw %>%
-    # only use needed columns
-    select(starts_with("gameto"), specimen, genus, specific_epithet, generation, site) %>%
-    mutate(
-      species = paste(genus, specific_epithet, sep = "_"),
-      # **Important**: treat epipteric as epiphytic
-      gameto_habit = str_to_lower(gameto_habit) %>% str_replace_all("epipetric", "epiphytic")) %>%
+  filmy_specimens %>%
+    # **Important**: treat epipteric as epiphytic
+    mutate(gameto_habit = str_to_lower(gameto_habit) %>% str_replace_all("epipetric", "epiphytic")) %>%
     # subset to filmy fern gametophytes in plots on Moorea
     filter(
-      species %in% filmy_species, 
       generation == "gametophyte",
       !is.na(gameto_habit),
       site %in% moorea_sites$site) %>%
-    select(specimen, species, site, habit = gameto_habit)
-  
-  # Calculate mean VPD based on occurrences of gametophytes, including
-  # growth habit (treating epipetric as epiphytic)
-  gameto_filmy_specimens %>%
+    select(specimen, species, site, habit = gameto_habit) %>%
+    # Calculate mean VPD based on occurrences of gametophytes, including
+    # growth habit (treating epipetric as epiphytic)
     left_join(mean_vpd, by = c("site", "habit")) %>%
     group_by(species) %>%
     # there are several sites that are missing a datalogger,

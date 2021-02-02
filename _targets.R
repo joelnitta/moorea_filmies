@@ -60,6 +60,11 @@ tar_plan(
   
   # Process data ----
   
+  # - subset collection data to just filmy ferns on Moorea
+  filmy_specimens = tidy_filmy_specimens(
+    specimens_raw = specimens_raw,
+    filmy_species = filmy_species),
+  
   # - calculate recovery during DT test per individual
   recovery_indiv = filmy_dt %>%
     # Only include samples that should be presented in the main MS
@@ -77,7 +82,7 @@ tar_plan(
   # - calculate mean VPD per species for gametophytes
   mean_vpd_gameto = calculate_mean_vpd_gameto(
     mean_vpd = mean_vpd,
-    specimens_raw = specimens_raw,
+    filmy_specimens = filmy_specimens,
     moorea_sites = moorea_sites,
     filmy_species = filmy_species
   ),
@@ -95,6 +100,7 @@ tar_plan(
   range_comparison = analyze_dist_pattern(
     community_matrix_raw = community_matrix_raw,
     filmy_species = filmy_species,
+    filmy_specimens = filmy_specimens,
     phy = filmy_phy,
     moorea_sites = moorea_sites
   ),
