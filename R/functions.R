@@ -997,6 +997,20 @@ transfer_bs <- function(filmy_phy_bs, filmy_phy) {
   
 }
 
+
+#' Extract fitted data points from light curve models
+#'
+#' @param light_models Tibble with light curve models.
+#' Ouput of fit_lc_model()
+#'
+#' @return Tibble
+#' 
+extract_fitted_lc_data <- function (light_models) {
+  light_models %>%
+  select(-nls_mod, -k_stats) %>%
+  unnest(cols = c(data, fitted))
+}
+
 # t-test ----
 
 #' Run a t-test comparing response values between gametophytes and sporophytes.
@@ -1564,6 +1578,28 @@ abbrev_sp <- function(data) {
     separate(species, c("genus", "epithet")) %>%
     mutate(genus = substr(genus, 1, 1)) %>%
     unite("species", genus, epithet)
+}
+
+# Convert genus to just first letter: character vector version
+str_abbrev_sp <- function(chr) {
+  tibble(species = chr) %>%
+    abbrev_sp %>%
+    pull(species)
+}
+
+# Convert genus to just first letter: character vector version, make italics
+# with period between genus and species
+str_abbrev_sp_pretty <- function(chr) {
+  tibble(species = chr) %>%
+    separate(species, c("genus", "epithet")) %>%
+    mutate(genus = substr(genus, 1, 1)) %>%
+    mutate(species = glue("*{genus}. {epithet}*")) %>%
+    pull(species)
+}
+
+# Facet labeller that doesn't print on multiple lines
+label_value_2 <- function(labels) {
+  label_value(labels = labels, multi_line = FALSE)
 }
 
 # Manuscript ----

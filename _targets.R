@@ -118,6 +118,9 @@ tar_plan(
   # - fit light curve models to data
   light_models = fit_lc_model(light_data),
   
+  # - extract fitted data points
+  filmy_lc_model_fitted_data = extract_fitted_lc_data(light_models),
+  
   # - extract model parameters: 
   # critical PAR, and ETR at 95% of estimated max value
   filmy_lc_model_params = extract_lc_model_params(light_models),

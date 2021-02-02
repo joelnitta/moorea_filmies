@@ -209,7 +209,7 @@ Unlike sporophytes, fern gametophytes are cryptic and cannot be identified to sp
 Therefore, we used DNA barcoding to identify filmy fern gametophytes to species as described in @Nitta2017.
 Briefly, DNA extraction was performed using a modified CTAB protocol [@Doyle1987] or the Plant Mini DNEasy kit (Qiagen, Valencia, California, USA) following the manufacturer's protocol.
 Chloroplast *rbcL* and *trnH--psbA* were amplified and sequenced using primers and protocols following @Nitta2017.
-For each marker, a reference library was constructed from sporophyte sequences using the 'makeblastDB' command in BLAST [@Altschul1997].
+For each marker, a reference library was constructed from sporophyte sequences using the \function{makeblastDB} command in BLAST [@Altschul1997].
 Field-collected gametophytes were identified by a local BLAST query against the reference library.
 Gametophytes matching > 99.5 % with a single reference sequence and no others were identified as that species; those that did not match any reference sequence or matched > 99.5 % with multiple reference sequences were not identified and excluded from further analysis.
 For this study, only gametophytes that could be identified as belonging to Hymenophyllaceae were used, and others were excluded from analysis.
@@ -245,7 +245,7 @@ Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitaji
 Plants were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100 % RH), and water withheld for either a short (2 d) or long (15 d) interval [@Testo2013].
 Conditions inside the desiccation chambers were monitored during the experiment using Hobo ProV2 dataloggers.
 The desiccation chambers were kept in an air-conditioned room, and temperature inside the chambers ranged from 22 °C to 25 °C (\figs `r s_figure_num("chamber-s")`, `r s_figure_num("chamber-g")`).
-Salts used for desiccation and their corresponding mean water potentials are as follows: LiCl (-282 MPa), Mg(NO~3~)~2~ (-86 MPa), and NaCl (-38 MPa).
+Salts used for desiccation and their corresponding mean water potentials and approximate relative humidity are as follows: LiCl (-282 MPa, 18 % RH), Mg(NO~3~)~2~ (-86 MPa, 58 % RH), and NaCl (-38 MPa, 80 % RH).
 Following the desiccation treatment, plants were rewetted by wrapping them in wet tissues using water from a local stream.
 Plants were allowed to rehydrate, and F~v~/F~m~ was again measured at 0.5 h, 24 h, and 48 h following rewetting.
 Ability to recover from desiccation was quantified by comparing pre- and post-treatment F~v~/F~m~ [@WatkinsJr.2007c].
@@ -265,7 +265,7 @@ Briefly, the maximum yield (F~m~) was first measured in the absence of actinic l
 Next, plants were equilibrated to the actinic light for 30 s, and photosynthetic yield (∆F/F~m~) measured with a 0.8 s saturating pulse.
 This was repeated for each photosynthetic photon flux density (PPFD) level, up to ca.
 500 µmol·m^-2^·s^-1^.
-Response curves were fitted using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (RETR), *x* is PPFD, *A* is the asymptote of the curve, and *k* is a slope parameter; outliers at high PPFD likely to distort the curve were discarded [@Proctor2012].
+Response curves were fitted using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (RETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter; outliers at high PPFD likely to distort the curve were discarded [@Proctor2012].
 The PPFD at 95 % saturation of RETR (PPFD~95%~) and maximum RETR (ETR~max~) were then calculated from the curve.
 Light responses were measured in 8--16 field-collected sporophyte individuals for each species, and on single gametophyte individuals in the field, which were later identified to species using the DNA barcodes.
 
@@ -492,7 +492,7 @@ mean_etr_gameto <- light_overall_means %>% filter(generation == "gametophyte") %
 
 Light responses were measured in sporophytes of `r n_light_species_sporo` species and gametophytes of `r n_light_species_gameto` species, including `r n_light_species_both` species with both life phases.
 
-Photosynthetic optima tended to vary between life phases, but not across growth habits or range type: sporophytes were adapted for higher light levels, whereas gametophytes were adapted for lower light levels (`r figure("combined")`).
+Photosynthetic optima tended to vary between life phases, but not across growth habits or range type: sporophytes were adapted for higher light levels, whereas gametophytes were adapted for lower light levels (\figs `r figure_num("combined")`, `r s_figure_num("light-curves")`).
 Sporophytes reached their maximum photosynthetic rate (PPFD~95%~) at light levels ca.
 `r mean_par_sporo` µmol·m^--2^ ·s^--1^ , whereas gametophytes did so at `r mean_par_gameto` µmol·m^--2^ ·s^--1^.
 Similarly, sporophytes attained higher rates of electron transport (ETR~max~; `r mean_etr_sporo` µmol·m^--2^ ·s^--1^) than gametophytes (`r mean_etr_gameto` µmol·m^--2^ ·s^--1^).
