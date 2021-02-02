@@ -428,7 +428,8 @@ load_filmy_lc <- function (file) {
     sporo_site = col_character(),
     condition = col_character(),
     date = col_date(format = ""),
-    outlier = col_logical()
+    outlier = col_logical(),
+    light_id = col_integer()
   )
   )
 }
@@ -545,16 +546,10 @@ tidy_filmy_specimens <- function (specimens_raw, filmy_species) {
 #' 
 fit_lc_model <- function (data) {
   data %>%
-    select(species, generation, individual, coll_num, condition, date, par, etr) %>%
-    # some sporophytes lack collection numbers, but
-    # we need to keep this column for differentiating between
-    # multiple individuals within gametophyte collections
-    mutate(coll_num = replace_na(coll_num, "nc")) %>%
+    select(species, generation, individual, coll_num, condition, date, par, etr, light_id) %>%
     assert(not_na, everything()) %>%
     # Group into measurements by individual
-    # (`individual` column only applies *within* a species/generation, 
-    # so there are many `1`, `2`, etc)
-    group_by(coll_num, individual, species, generation, condition, date) %>%
+    group_by(light_id) %>%
     # Make sure the number of measurements per individual is
     # within the expected range (5-9, after removing outliers)
     add_count() %>%
@@ -577,7 +572,8 @@ fit_lc_model <- function (data) {
       k_stats = map(nls_mod, broom::tidy)
     ) %>%
     # Extract fitted data points
-    mutate(fitted = map(nls_mod, ~fitted(.) %>% tibble(etr_fit = .)))
+    mutate(fitted = map(nls_mod, ~fitted(.) %>% tibble(etr_fit = .))) %>%
+    ungroup()
 }
 
 #' Extract maximum ETR and PPFD95% from light curve models
@@ -593,7 +589,7 @@ extract_lc_model_params <- function (data) {
     # Unroll fitted light curve points
     unnest(cols = fitted) %>%
     # Get maximum estimated etr fit for each individual
-    group_by(coll_num, individual, species, generation, condition, date) %>%
+    group_by(light_id) %>%
     mutate(etr = max(etr_fit)) %>%
     ungroup %>%
     select(-etr_fit) %>%

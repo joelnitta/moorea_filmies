@@ -301,11 +301,13 @@ filmy_all_lc_plot_filtered <-
 ggsave(plot = filmy_all_lc_plot_filtered, file = "data_raw/intermediates/all_light_curves_filtered.pdf", height = 40, width = 40)
 
 # INTERACTIVE STEP:
+# To run, uncomment the lines below
 # In RStudio, go through data by increasing row selected one at a time,
 # select outliers, and save each as CSV
-filmy_lc_models_filtered %>%
-  filter(str_detect(id, "2479_1_2013-06-10")) %>%
-  select_lc_points()
+
+# filmy_lc_models_filtered %>%
+#   filter(str_detect(id, "2479_1_2013-06-10")) %>%
+#   select_lc_points()
   
 # Read in outliers, flag them in the filtered data
 
@@ -340,7 +342,18 @@ filmy_lc_data_filtered_outliers_flagged <-
   # make sure join didn't duplicate any values
   # (number of rows should be the same before and after)
   verify(nrow(.) == nrow(filmy_lc_data_filtered)) %>%
-  mutate(outlier = replace_na(outlier, FALSE))
+  mutate(outlier = replace_na(outlier, FALSE)) %>%
+  # Add a light-curve ID number for each sample:
+  # unique to combination of: species, generation, individual, coll_num, condition, date
+  # - replace NA values in collection number with "sn" (no number)
+  mutate(coll_num = replace_na(coll_num, "sn")) %>%
+  assert(not_na, species, generation, individual, coll_num, condition, date, yield, par, etr, outlier) %>%
+  group_by(species, generation, individual, coll_num, condition, date) %>%
+  mutate(light_id = cur_group_id()) %>%
+  ungroup() %>%
+  assert(not_na, light_id) %>%
+  # Don't need p-value any more after flagging outliers
+  select(-p.value)
 
 # Write out final cleaned dataset ----
 write_csv(filmy_lc_data_filtered_outliers_flagged, "data/filmy_light_curves.csv")
