@@ -611,16 +611,17 @@ extract_lc_model_params <- function (data) {
 #'
 #' @param raw_community_matrix Community matrix of Nitta et al 2017
 #' @param filmy_species Character vector of filmy fern species names
+#' @param filmy_specimens Dataframe of specimen voucher data for filmy ferns from Moorea
 #' @param phy Phylogeny including filmy ferns of Moorea and Tahiti
 #' @param moorea_sites Site data for plots on Moorea including elevation
 #' 
 #' @return Dataframe
 #' 
-analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moorea_sites) {
+analyze_dist_pattern <- function(community_matrix_raw, filmy_species, filmy_specimens, phy, moorea_sites) {
   
   # Convert raw community data to long format by sporophyte and gametophyte
   # min and max elevational range.
-  range_long <-
+  range_long_plots_only <-
     community_matrix_raw %>%
     rename(site = X1) %>% 
     gather(species, abundance, -site) %>%
@@ -637,39 +638,75 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, phy, moore
     assert(not_na, el) %>%
     group_by(species, generation) %>%
     summarize(
-      min_range = min(el),
-      max_range = max(el),
+      min_el = min(el),
+      max_el = max(el),
+      mean_el = mean(el),
+      n = n(),
       .groups = "drop"
     )
   
-  # Compare ranges to see which species have gametophytes beyond sporophytes
+  # Add observations of sporophytes that occurred outside of the plots
+  # for species that were missing from plot data
+  sporos_missing_from_plot_data <-
+    anti_join(filmy_specimens, range_long_plots_only, by = c("generation", "species")) %>%
+    filter(generation == "sporophyte") %>%
+    rename(el = elevation) %>%
+    group_by(species, generation) %>%
+    summarize(
+      min_el = min(el),
+      max_el = max(el),
+      mean_el = mean(el),
+      n = n(),
+      .groups = "drop"
+    )
+  
+  range_long <- bind_rows(range_long_plots_only, sporos_missing_from_plot_data)
+  
+  # Calculate range of gametophytes beyond sporophytes
+  
+  # Convert data to wide format
   full_join(
     range_long %>%
       gather(variable, value, -species, -generation) %>%
       filter(generation == "sporophyte") %>% 
       select(-generation) %>%
       spread(variable, value) %>%
-      rename_at(vars(max_range, min_range), ~paste("sporo", ., sep = "_")),
+      rename_at(vars(max_el, min_el, mean_el, n), ~paste("sporo", ., sep = "_")),
     range_long %>%
       gather(variable, value, -species, -generation) %>%
       filter(generation == "gametophyte") %>% 
       select(-generation) %>%
       spread(variable, value) %>%
-      rename_at(vars(max_range, min_range), ~paste("gameto", ., sep = "_")),
+      rename_at(vars(max_el, min_el, mean_el, n), ~paste("gameto", ., sep = "_")),
     by = "species"
   ) %>%
     assert(is_uniq, species) %>%
     mutate(
       # Calculate elevational range of gametophytes beyond sporophytes
-      gameto_beyond_sporo_min = sporo_min_range - gameto_min_range,
-      gameto_beyond_sporo_max = gameto_max_range - sporo_max_range,
-      # If observed sporo range exceeds observed gameto range, consider
-      # range of gameto beyond sporo to be zero
-      gameto_beyond_sporo_min = ifelse(gameto_beyond_sporo_min < 0, 0, gameto_beyond_sporo_min),
-      gameto_beyond_sporo_max = ifelse(gameto_beyond_sporo_max < 0, 0, gameto_beyond_sporo_max)
+      # (as a positive value on either end)
+      gameto_beyond_sporo_min = sporo_min_el - gameto_min_el, # at bottom of gradient
+      gameto_beyond_sporo_max = gameto_max_el - sporo_max_el, # at top of gradient
+      gameto_beyond_sporo_min = case_when(
+        # If no gameto was observed,
+        # consider range of gameto beyond sporo to be zero
+        is.na(gameto_min_el) ~ 0,
+        # If observed sporo range exceeds observed gameto range, 
+        # consider range of gameto beyond sporo to be zero
+        gameto_beyond_sporo_min < 0 ~ 0,
+        # Otherwise, gameto range extends beyond sporo range
+        TRUE ~ gameto_beyond_sporo_min
+      ),
+      gameto_beyond_sporo_max = case_when(
+        is.na(gameto_max_el) ~ 0,
+        gameto_beyond_sporo_max < 0 ~ 0,
+        TRUE ~ gameto_beyond_sporo_max
+      )
     ) %>%
+    assert(not_na, gameto_beyond_sporo_min, gameto_beyond_sporo_max) %>% 
     rowwise() %>%
+    # Calculate sum of G beyond S at either end of gradient
     mutate(gameto_beyond_sporo = sum(gameto_beyond_sporo_min, gameto_beyond_sporo_max)) %>%
+    ungroup %>%
     select(-gameto_beyond_sporo_min, -gameto_beyond_sporo_max)
   
 }

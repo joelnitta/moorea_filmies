@@ -427,26 +427,65 @@ chamber_gameto_2013_temp_plot + chamber_gameto_2013_rh_plot + dt_times_gameto_20
 \newpage
 
 ```{r range-plot, fig.height = 4.5, fig.width = 7, fig.cap = ""}
+# Make plot showing range of gametophytes beyond sporophytes
+plot_data <-
 range_comparison %>%
   left_join(filmy_habit, by = "species") %>%
-  mutate(species = factor(species) %>% fct_reorder(sporo_min_range)) %>%
-  ggplot(aes(y = species)) +
-  geom_linerange(aes(xmin = gameto_min_range, xmax = gameto_max_range)) +
-  geom_linerange(aes(xmin = sporo_min_range, xmax = sporo_max_range, color = habit), size = 3) +
+  mutate(species = fct_reorder(species, sporo_mean_el)) %>%
+  mutate(
+    gameto_max_el = case_when(
+      is.na(gameto_max_el) ~ sporo_max_el,
+      sporo_max_el > gameto_max_el ~ sporo_max_el,
+      TRUE ~ gameto_max_el
+    ),
+    gameto_min_el = case_when(
+      is.na(gameto_min_el) ~ sporo_min_el,
+      sporo_min_el < gameto_min_el ~ sporo_min_el,
+      TRUE ~ gameto_min_el
+    )
+  )
+  
+ggplot(plot_data, aes(y = species)) +
+  # Gameto range as line for those with different min/max elevation
+  geom_linerange(aes(xmin = gameto_min_el, xmax = gameto_max_el), color = "grey10") +
+  # Gameto range as point for those with single elevation, if different from sporo elevation
   geom_point(
-    data = filter(range_comparison, gameto_min_range < sporo_min_range), 
-    aes(x = gameto_min_range)) +
+    data = filter(
+      plot_data,
+      gameto_min_el == gameto_max_el, gameto_min_el != sporo_min_el, gameto_max_el != sporo_max_el),
+    aes(x = sporo_mean_el), 
+    fill = "grey10"
+  ) +
+  # Sporo range as fat line for those with different min/max elevation
+  geom_linerange(
+    data = filter(plot_data, sporo_min_el != sporo_max_el),
+    aes(xmin = sporo_min_el, xmax = sporo_max_el, color = habit), 
+    size = 3, fill = "grey10") +
+  # Sporo range as point for those with single elevation
   geom_point(
-    data = filter(range_comparison, gameto_max_range > sporo_max_range),
-    aes(x = gameto_max_range)) +
+    data = filter(plot_data, sporo_min_el == sporo_max_el),
+    aes(x = sporo_mean_el, color = habit)
+  ) +
+  # Diamond for gameto min el below sporo min el
+  geom_point(
+    data = filter(range_comparison, gameto_min_el < sporo_min_el), 
+    aes(x = gameto_min_el),
+    shape = 23, fill = "grey10") +
+  # Diamond for gameto min el above sporo max el
+  geom_point(
+    data = filter(range_comparison, gameto_max_el > sporo_max_el),
+    aes(x = gameto_max_el),
+    shape = 23, fill = "grey10") +
   scale_color_manual(values = habit_colors, labels = pretty_text) +
-  labs(x = "Elevation (m)", y = "Species") +
+  scale_y_discrete(labels = pretty_text) +
+  labs(x = "Elevation (m)", y = "Species", color = "Growth habit") +
   theme(
-    legend.position = "bottom"
+    legend.position = "bottom",
+    axis.text.y = element_text(face = "italic")
   )
 ```
 
-**`r s_figure("range")`**. Elevational range of sporophytes and gametophytes of filmy ferns on Moorea, French Polynesia. Observed elevational range width of sporophytes shown with colored bars; range of gametophytes occuring beyond sporophytes shown with lines and dots. Color indicates growth habit.
+**`r s_figure("range")`**. Elevational range (m) of sporophytes and gametophytes of filmy ferns on Moorea, French Polynesia. Elevational range width shown with colored bars (sporophytes) or black lines (gametophytes). Species observed only at a single elevation (not a range) shown with points. Extent of range of gametophytes beyond sporophytes shown with black diamonds. Color indicates growth habit. Presence of gametophytes assumed at sites where sporophytes were observed, even if gametophytes of that species were not collected from that site.
 
 ```{r water-content-prep}
 # Define color-blind palette
