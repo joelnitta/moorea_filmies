@@ -1,5 +1,5 @@
 ---
-title: "SI"
+title: ""
 bibliography: 
   - references.bib
   - references_other.yaml
@@ -246,6 +246,41 @@ habit_colors <- c(
   "High_Epiphyte" = cbPalette[["blue"]])
 ```
 
+
+**Electronic supplementary materials** 
+
+**Title:** Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)
+
+**Authors:** Nitta JH; Watkins JE; Holbrook NM; Taputuarai R; Wang T; Davis CC
+
+**Journal:** Journal of Plant Research 
+
+**Corresponding author:** Joel H. Nitta  
+Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo, 113-0032, Japan  
+Phone: +81-  
+Fax: +81-  
+email: joelnitta\@gmail.com
+
+**Content:** \figs `r s_figure_num("tree")`--`r s_figure_num("light-curves")`
+
+**`r s_figure("tree")`**. Maximum likelihood ultrametric phylogenetic tree including all Moorean filmy fern species.
+
+**`r s_figure("chamber-s")`**. Conditions inside desiccation chamber and duration of desiccation treatment for sporophytes.
+
+**`r s_figure("chamber-g")`**. Conditions inside desiccation chamber and duration of desiccation treatment for gametophytes.
+
+**`r s_figure("range")`**. Elevational range (m) of sporophytes and gametophytes of filmy ferns on Moorea, French Polynesia.
+
+**`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy ferns from Moorea, French Polynesia. 
+
+**`r s_figure("water-all")`**. Relative water content (RWC) of sporophytes after desiccation by duration of desiccation treatment (2 or 15 days).
+
+**`r s_figure("water-s")`**. Relative water content (RWC) of sporophytes during desiccation tolerance test.
+
+**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia.
+
+\newpage
+
 ```{r full-phylo, fig.height = 4.5, fig.width = 7, fig.cap = ""}
 # Copy phylogeny and species means data so they
 # can be manipulated for this plot
@@ -408,7 +443,7 @@ temp_plot_2013 + temp_plot_2014 +
 # ggsave(here::here("results/S2_fig.png"))
 ```
 
-**`r s_figure("chamber-s")`**. Conditions inside desiccation chamber and duration of desiccation treatment for sporophytes at most intense desiccation level. LiCl was used to maintain constant humidity at \circa{ }18%.
+**`r s_figure("chamber-s")`**. Conditions inside desiccation chamber and duration of desiccation treatment for sporophytes. LiCl was used to maintain constant humidity at \circa{ }18%.
 
 \newpage
 
