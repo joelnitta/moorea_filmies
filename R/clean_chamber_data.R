@@ -15,7 +15,11 @@ sporo_2012_chamber <- bind_rows(
   parse_logger_dat("data_raw/2012/filmyDT2_MgNO3.csv") %>% mutate(salt = "MgNO3"),
   parse_logger_dat("data_raw/2012/filmyDT2_NaCl.csv") %>% mutate(salt = "NaCl")
 ) %>%
-  mutate(generation = "sporophyte", year = 2012, species = "mixed")
+  mutate(generation = "sporophyte", year = 2012, species = "mixed") %>%
+  # It appears that data before 2012-07-31 18:10:00 UTC was prelminary (NaCl datalogger
+  # stabilizes to a different RH than 18%, 58%, or 80%). 
+  # Consider the period after this to be the correct data
+  filter(date_time > "2012-07-31 18:10:00 UTC")
   
 # 2012 gametophytes
 gameto_2012_chamber <-
@@ -45,7 +49,7 @@ hobo_chamber_data <-
     )
   ) %>%
   # Add metadata
-  left_join(hobo_metadata, by = "file") %>%
+  left_join(select(hobo_metadata, -serial_no), by = "file") %>%
   mutate(data = map(file, read_hobo)) %>%
   unnest(data) %>%
   # Exclude data not marked "keep" in metadata
