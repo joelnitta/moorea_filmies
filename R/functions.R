@@ -707,6 +707,25 @@ analyze_dist_pattern <- function(community_matrix_raw, filmy_species, filmy_spec
   
 }
 
+#' Filter light data to exclude outliers and only use sporophytes 
+#' measured in the lab (not field)
+#'
+#' @param light_data_all Full light data
+#'
+#' @return Filtered light data
+#' 
+filter_light_data <- function (light_data_all) {
+  light_data_all %>%
+    mutate(keep = case_when(
+      outlier == TRUE ~ FALSE,
+      generation == "sporophyte" & condition == "field" ~ FALSE,
+      TRUE ~ TRUE
+    )) %>%
+    filter(keep == TRUE) %>%
+    select(-keep, -outlier)
+}
+
+
 #' Calculate % recovery from desiccation in a desiccation tolerance (DT) experiment
 #'
 #' @param data Dataframe; data read in from DT experiment
