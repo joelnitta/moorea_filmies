@@ -23,6 +23,9 @@ output:
 header-includes: 
   \usepackage{float}
   \makeatletter\renewcommand*{\fps@figure}{H}\makeatother
+  \usepackage{pdflscape}
+  \newcommand{\blandscape}{\begin{landscape}}
+  \newcommand{\elandscape}{\end{landscape}}
 editor_options: 
   markdown: 
     wrap: sentence
@@ -105,7 +108,7 @@ plot_chamber_temp <- function (data, time_limits) {
 }
 
 plot_sporo_chamber_time <- function (data, time_limits) {
-    ggplot(data, aes(x = species, ymin = pre, ymax = post, y = post, group = species_duration, linetype = dry_time)) +
+  ggplot(data, aes(x = species, ymin = pre, ymax = post, y = post, group = species_duration, linetype = dry_time)) +
     geom_linerange(position = position_dodge(0.5)) +
     geom_point(position = position_dodge(0.5)) +
     scale_y_datetime(limits = time_limits) +
@@ -124,8 +127,8 @@ plot_sporo_chamber_time <- function (data, time_limits) {
 make_facet_lc_plot <- function(light_data, lc_model_fitted_data, lc_model_params) {
   
   cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
-               green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
-               red = "#D55E00", purple = "#CC79A7")
+                 green = "#009E73", yellow = "#F0E442", blue = "#0072B2", 
+                 red = "#D55E00", purple = "#CC79A7")
   
   ggplot(mapping = aes(x = par)) +
     geom_point(
@@ -177,7 +180,7 @@ cluster_sporo_times <- function (sporo_time_data, salt_select, k_select) {
     add_clusters("pre", k_select) %>% # choose K by inspecting raw data first
     group_by(species, cluster, salt, dry_time) %>%
     summarize(pre = mean(pre), post = mean(post), n = n(), .groups = "drop") # %>%
-    # select(-cluster)
+  # select(-cluster)
   
   sporo_15d_clusters <- 
     sporo_time_data %>%
@@ -185,7 +188,7 @@ cluster_sporo_times <- function (sporo_time_data, salt_select, k_select) {
     add_clusters("pre", k_select) %>%
     group_by(species, cluster, salt, dry_time) %>%
     summarize(pre = mean(pre), post = mean(post), n = n(), .groups = "drop") # %>%
-    # select(-cluster)
+  # select(-cluster)
   
   bind_rows(sporo_2d_clusters, sporo_15d_clusters) %>%
     mutate(species_duration = paste(species, dry_time))
@@ -311,9 +314,9 @@ ggtree(phy) %<+% filmy_habit %<+% bs_tibble +
   # Need to remove clip so that species names print properly
   coord_cartesian(clip = "off") +
   theme(
-  plot.margin = margin(t = 0, r = 2.2, b = 0, l = 0, unit = "in"),
-  legend.position = "bottom"
-)
+    plot.margin = margin(t = 0, r = 2.2, b = 0, l = 0, unit = "in"),
+    legend.position = "bottom"
+  )
 ```
 
 **`r s_figure("tree")`**. Maximum likelihood ultrametric phylogenetic tree including all Moorean filmy fern species.
@@ -322,7 +325,7 @@ Bootstrap support values >50% shown at nodes.
 Growth habit indicated by colored dots. 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
 
-\newpage
+\blandscape
 
 ```{r sporophyte-dt-prep}
 # Extract pre- and post-DT treatment times for sporophytes
@@ -342,7 +345,7 @@ sporo_times <-
   pivot_wider(names_from = "condition", values_from = "date_time")
 ```
 
-```{r sporophyte-dt-2013-LiCl, fig.height = 4.5, fig.width = 7, fig.cap = ""}
+```{r sporophyte-dt-LiCl, fig.height = 7, fig.width = 9.5, fig.cap = ""}
 # Get mean times of each cluster of DT test samples for the selected drying salt
 licl_clusters_2013 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2013")), "LiCl", 3)
 licl_clusters_2014 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2014")), "LiCl", 1)
@@ -364,14 +367,14 @@ licl_time_range_2012 <- c(min = min(licl_chamber_data_2012$date_time), max = max
 
 licl_chamber_data_2013 <-
   filter(filmy_dt_chamber, 
-    date_time >= licl_time_range_2013[["min"]], 
-    date_time <= licl_time_range_2013[["max"]], 
-    salt == "LiCl")
+         date_time >= licl_time_range_2013[["min"]], 
+         date_time <= licl_time_range_2013[["max"]], 
+         salt == "LiCl")
 licl_chamber_data_2014 <- 
   filter(filmy_dt_chamber, 
-    date_time >= licl_time_range_2014[["min"]], 
-    date_time <= licl_time_range_2014[["max"]], 
-    salt == "LiCl") %>%
+         date_time >= licl_time_range_2014[["min"]], 
+         date_time <= licl_time_range_2014[["max"]], 
+         salt == "LiCl") %>%
   # There are two sets of times: 2014-06-17 to 2014-07-02, and 2014-07-06 to 2014-07-08
   # Add a group for these so ggplot doesn't connect lines betweeen them
   mutate(
@@ -441,10 +444,115 @@ licl_temp_plot_2014 + licl_temp_plot_2013 + licl_temp_plot_2012 +
   licl_rh_plot_2014 + licl_rh_plot_2013 + licl_rh_plot_2012 +
   licl_time_plot_2014 + licl_time_plot_2013 + plot_spacer() +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
-  plot_annotation(title = "a")
+  plot_annotation(title = "a") &
+  theme(plot.tag = element_text(face = "bold"))
 ```
 
-```{r sporophyte-dt-2013-NaCl, fig.height = 7, fig.width = 7, fig.cap = ""}
+```{r sporophyte-dt-MgNO3, fig.height = 7, fig.width = 9.5, fig.cap = ""}
+# Get mean times of each cluster of DT test samples for the selected drying salt
+mgno3_clusters_2013 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2013")), "MgNO3", 3)
+mgno3_clusters_2014 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2014")), "MgNO3", 1)
+
+mgno3_clusters <- bind_rows(mgno3_clusters_2013, mgno3_clusters_2014)
+
+# Calculate time range for the clustered data
+mgno3_time_range_2013 <- c(min = min(mgno3_clusters_2013$pre), max = max(mgno3_clusters_2013$post))
+mgno3_time_range_2014 <- c(min = min(mgno3_clusters_2014$pre), max = max(mgno3_clusters_2014$post))
+
+# Subset DT chamber data
+mgno3_chamber_data_2012 <- 
+  filter(filmy_dt_chamber, 
+         date_time > "2012-07-31 18:10:00 UTC", 
+         date_time < "2013-01-01 00:10:00 UTC",
+         salt == "MgNO3")
+
+mgno3_time_range_2012 <- c(min = min(mgno3_chamber_data_2012$date_time), max = max(mgno3_chamber_data_2012$date_time))
+
+mgno3_chamber_data_2013 <-
+  filter(filmy_dt_chamber, 
+         serial_no == "10342564",
+         date_time >= mgno3_time_range_2013[["min"]], 
+         date_time <= mgno3_time_range_2013[["max"]], 
+         salt == "MgNO3")
+mgno3_chamber_data_2014 <- 
+  filter(filmy_dt_chamber, 
+         date_time >= mgno3_time_range_2014[["min"]], 
+         date_time <= mgno3_time_range_2014[["max"]], 
+         salt == "MgNO3") %>%
+  # There are two sets of times: 2014-06-17 to 2014-07-02, and 2014-07-06 to 2014-07-08
+  # Add a group for these so ggplot doesn't connect lines betweeen them
+  mutate(
+    day = yday(date_time),
+    group = ifelse(day < 185, "a", "b"))
+
+mgno3_chamber_data <- bind_rows(mgno3_chamber_data_2012, mgno3_chamber_data_2013, mgno3_chamber_data_2014)
+mgno3_temp_range <- c(min(mgno3_chamber_data$temp), max(mgno3_chamber_data$temp))
+mgno3_rh_range <- c(min(mgno3_chamber_data$rh), max(mgno3_chamber_data$rh))*0.01
+
+# Temp plots
+mgno3_temp_plot_2014 <- ggplot(mgno3_chamber_data_2014, aes(x = date_time, y = temp, group = group)) +
+  geom_line(size = 0.25) +
+  scale_x_datetime(limits = mgno3_time_range_2014) +
+  scale_y_continuous(
+    label = label_number(suffix = "\u00b0C", accuracy = 1), 
+    limits = mgno3_temp_range) +
+  labs(
+    y = "Temperature",
+    title = "2014") +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 11),
+    legend.position = "none") +
+  blank_x_theme()
+
+mgno3_temp_plot_2013 <- plot_chamber_temp(mgno3_chamber_data_2013, mgno3_time_range_2013) +
+  scale_y_continuous(limits = mgno3_temp_range) +
+  labs(title = "2013") +
+  theme(plot.title = element_text(hjust = 0.5, size = 11)) +
+  blank_y_theme() +
+  blank_x_theme()
+
+mgno3_temp_plot_2012 <- plot_chamber_temp(mgno3_chamber_data_2012, mgno3_time_range_2012) +
+  scale_y_continuous(limits = mgno3_temp_range) +
+  labs(title = "2012") +
+  theme(plot.title = element_text(hjust = 0.5, size = 11)) +
+  blank_y_theme() +
+  blank_x_theme()
+
+# RH plots
+mgno3_rh_plot_2014 <- ggplot(mgno3_chamber_data_2014, aes(x = date_time, y = 0.01*rh, group = group)) +
+  geom_line(size = 0.25) +
+  scale_x_datetime(limits = mgno3_time_range_2014) +
+  scale_y_continuous(
+    label = label_percent(accuracy = 1), 
+    limits = mgno3_rh_range) +
+  labs(y = "Relative humidity") +
+  theme(legend.position = "none") +
+  blank_x_theme()
+
+mgno3_rh_plot_2013 <- plot_chamber_rh(mgno3_chamber_data_2013, mgno3_time_range_2013) +
+  scale_y_continuous(limits = mgno3_rh_range, label = label_percent(accuracy = 1)) +
+  blank_y_theme() +
+  blank_x_theme()
+
+mgno3_rh_plot_2012 <- plot_chamber_rh(mgno3_chamber_data_2012, mgno3_time_range_2012) +
+  scale_y_continuous(limits = mgno3_rh_range, label = label_percent(accuracy = 1)) +
+  blank_y_theme()
+
+# Dry times plot
+mgno3_time_plot_2013 <- plot_sporo_chamber_time(mgno3_clusters, mgno3_time_range_2013) +
+  blank_y_theme()
+mgno3_time_plot_2014 <- plot_sporo_chamber_time(mgno3_clusters, mgno3_time_range_2014)
+
+# Combine plots
+mgno3_temp_plot_2014 + mgno3_temp_plot_2013 + mgno3_temp_plot_2012 +
+  mgno3_rh_plot_2014 + mgno3_rh_plot_2013 + mgno3_rh_plot_2012 +
+  mgno3_time_plot_2014 + mgno3_time_plot_2013 + plot_spacer() +
+  plot_layout(ncol = 3, nrow = 3, guides = "collect") +
+  plot_annotation(title = "b") &
+  theme(plot.tag = element_text(face = "bold"))
+```
+
+```{r sporophyte-dt-NaCl, fig.height = 7, fig.width = 9.5, fig.cap = ""}
 # Subset desiccation duration data
 # H_polyanthos shows n=1, but this is only because pre/post were available for only one sample
 # (actually had 8 samples total)
@@ -495,13 +603,13 @@ nacl_clusters_2013 <- mutate(
   serial_no = fct_expand(serial_no, nacl_all_sn) %>% fct_inseq,
   # sort species in reverse-alphabetical order (so 'A' is on top in plot)
   species = fct_expand(species, nacl_all_species) %>% fct_relevel(function (x) sort(x, decreasing = TRUE))
-  )
+)
 
 nacl_clusters_2014 <- mutate(
   nacl_clusters_2014, 
   serial_no = fct_expand(serial_no, nacl_all_sn) %>% fct_inseq,
   species = fct_expand(species, nacl_all_species) %>% fct_relevel(function (x) sort(x, decreasing = TRUE))
-  )
+)
 
 # Calculate time range for the clustered data
 # to standardize x-axis
@@ -510,7 +618,7 @@ nacl_time_range_2014 <- c(min = min(nacl_clusters_2014$pre), max = max(nacl_clus
 
 # Subset DT chamber data
 nacl_chamber_data_2012 <- 
-filmy_dt_chamber %>% 
+  filmy_dt_chamber %>% 
   filter(salt == "NaCl", date_time > "2012-07-31 18:10:00 UTC", date_time < "2013-01-01 00:10:00 UTC")
 
 nacl_time_range_2012 <- c(min = min(nacl_chamber_data_2012$date_time), max = max(nacl_chamber_data_2012$date_time))
@@ -540,7 +648,7 @@ nacl_temp_range <- filter(filmy_dt_chamber, salt == "NaCl") %>%
   pivot_longer(everything()) %>%
   arrange(value) %>%
   pull(value)
-  
+
 nacl_rh_range <- filter(filmy_dt_chamber, salt == "NaCl") %>%
   mutate(rh = rh * 0.01) %>%
   summarize(min = min(rh), max = max(rh)) %>%
@@ -730,11 +838,17 @@ nacl_temp_plot_2014 + nacl_temp_plot_2013 + nacl_temp_plot_2012 +
   nacl_rh_plot_2014 + nacl_rh_plot_2013 + nacl_rh_plot_2012 +
   nacl_time_plot_2014 + nacl_time_plot_2013 + plot_spacer() +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
-  plot_annotation(title = "b") &
-  theme(legend.position = "bottom")
+  plot_annotation(title = "c") &
+  theme(
+    plot.tag = element_text(face = "bold"),
+    legend.position = "bottom")
 ```
 
-**`r s_figure("chamber-s")`**. Temperature, relative humidity (RH), and duration of desiccation treatment for sporophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH; **c**. Temperature and RH measured with Hobo ProV2 dataloggers (Onset Computer Corporation, Bourne, Massachusetts, USA) in 2013 and 2014 and **--FIXME: add datalogger model--** dataloggers in 2012. For bottom-most panels (duration of desiccation treatment), line indicates duration and point indicates removal of sample from chamber. For **b** and **c**, multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color. "missing" indicates data were not collected on the correspondence between samples and data loggers (chambers).
+\elandscape
+
+\newpage
+
+**`r s_figure("chamber-s")`**. Temperature, relative humidity (RH), and duration of desiccation treatment for sporophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH; **c**. Temperature and RH measured with Hobo ProV2 dataloggers (Onset Computer Corporation, Bourne, Massachusetts, USA) in 2013 and 2014 and **--FIXME: add datalogger model--** dataloggers in 2012. For bottom-most panels (duration of desiccation treatment), line indicates duration and point indicates removal of sample from chamber. For **c**, multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color. "missing" indicates data were not collected on the correspondence between samples and data loggers (chambers).
 
 \newpage
 
@@ -758,7 +872,7 @@ gameto_mean_times <-
   mutate(cluster = as.factor(cluster)) %>%
   group_by(cluster) %>%
   summarize(pre = mean(pre), post = mean(post), n = n(), .groups = "drop")
-  
+
 gameto_time_limits <- c(min = min(gameto_mean_times$pre), max = max(gameto_mean_times$post))
 
 # DT start/end times plot
@@ -780,7 +894,7 @@ chamber_gameto_2013 <- filmy_dt_chamber %>% filter(generation == "gametophyte", 
 # RH plot
 chamber_gameto_2013_rh_plot <-
   plot_chamber_rh(chamber_gameto_2013, gameto_time_limits)
-  
+
 # Temp plot
 chamber_gameto_2013_temp_plot <-
   plot_chamber_temp(chamber_gameto_2013, gameto_time_limits)
@@ -797,7 +911,7 @@ chamber_gameto_2013_temp_plot + chamber_gameto_2013_rh_plot + dt_times_gameto_20
 ```{r range-plot, fig.height = 4.5, fig.width = 7, fig.cap = ""}
 # Make plot showing range of gametophytes beyond sporophytes
 plot_data <-
-range_comparison %>%
+  range_comparison %>%
   left_join(filmy_habit, by = "species") %>%
   mutate(species = fct_reorder(species, sporo_mean_el)) %>%
   mutate(
@@ -812,7 +926,7 @@ range_comparison %>%
       TRUE ~ gameto_min_el
     )
   )
-  
+
 ggplot(plot_data, aes(y = species)) +
   # Gameto range as line for those with different min/max elevation
   geom_linerange(aes(xmin = gameto_min_el, xmax = gameto_max_el), color = "grey10") +
@@ -873,7 +987,7 @@ salt_shapes <- c(
   "MgNO3" = 24, # triangle
   "LiCl" = 23, # diamond
   "Control" = 22 # square
-  )
+)
 ```
 
 ```{r sporo-dt-controls, fig.height = 8, fig.width = 7, fig.cap = ""}
@@ -971,9 +1085,9 @@ b <-
     position = pd) +
   facet_wrap(vars(habit, species)) +
   scale_shape_manual(name = "Desiccation Time",
-                        values = c(24, 21),
-                        breaks = c("15", "2"),
-                        labels = c("15 days", "2 days")) +
+                     values = c(24, 21),
+                     breaks = c("15", "2"),
+                     labels = c("15 days", "2 days")) +
   scale_y_continuous(label = label_percent(accuracy = 1)) +
   scale_x_discrete(limits = c("30min","24hr","48hr"),
                    labels = c("0.5", "24", "48")) +
@@ -981,10 +1095,10 @@ b <-
   ylab("Recovery (%)") +
   theme_bw() +
   theme(
-        panel.grid.minor = element_blank(), 
-        panel.grid.major.x = element_blank(),
-        strip.text = element_markdown()
-) +
+    panel.grid.minor = element_blank(), 
+    panel.grid.major.x = element_blank(),
+    strip.text = element_markdown()
+  ) +
   # Use guides to make the legend go away
   # otherwise it will be duplicated by patchwork
   # https://github.com/thomasp85/patchwork/issues/170#issuecomment-641310103
@@ -1001,7 +1115,7 @@ a + b + plot_layout(guides = "collect", ncol = 1, heights = c(85, 15)) + plot_an
 ```{r water-content-desiccated, fig.height = 4.5, fig.width = 7, fig.cap = ""}
 # Plot relative water content in desiccated state for all species
 rel_water_species_means_desic <<-
-rel_water_species_means %>%
+  rel_water_species_means %>%
   filter(rec_time == "desiccated") %>%
   select(-rec_time)
 
@@ -1094,7 +1208,7 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
     legend.box="vertical", 
     legend.margin=margin()
   )
-  
+
 # ggsave(here::here("results/S_fig_water_content_full.png"))
 ```
 
@@ -1131,8 +1245,8 @@ n_gameto_lc_pages <- n_pages(lc_plots_gameto)
 ### Print sporos in the lab ###
 # first with title "a"
 lc_plots_sporo_lab +
-labs(title = "**a**") +
-facet_wrap_paginate(
+  labs(title = "**a**") +
+  facet_wrap_paginate(
     vars(str_abbrev_sp_pretty(species), light_id),
     ncol = 4, nrow = 6, page = 1,
     scales = "free", labeller = label_value_2)
@@ -1152,8 +1266,8 @@ for(i in 2:n_sporo_lab_lc_pages) {
 ### Print sporos in the field ###
 # first with title "b"
 lc_plots_sporo_field +
-labs(title = "**b**") +
-facet_wrap_paginate(
+  labs(title = "**b**") +
+  facet_wrap_paginate(
     vars(str_abbrev_sp_pretty(species), light_id),
     ncol = 4, nrow = 6, page = 1,
     scales = "free", labeller = label_value_2)
@@ -1173,8 +1287,8 @@ for(i in 2:n_sporo_field_lc_pages) {
 ### Print the gametos ###
 # first with title "c"
 lc_plots_gameto +
-labs(title = "**c**") +
-facet_wrap_paginate(
+  labs(title = "**c**") +
+  facet_wrap_paginate(
     vars(str_abbrev_sp_pretty(species), light_id),
     ncol = 4, nrow = 6, page = 1,
     scales = "free", labeller = label_value_2)

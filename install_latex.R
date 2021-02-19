@@ -39,6 +39,7 @@ latex_packages <- c(
   "mdwtools",
   "multirow",
   "pdfescape",
+  "pdflscape",
   "pdftexcmds",
   "refcount",
   "rerunfilecheck",
