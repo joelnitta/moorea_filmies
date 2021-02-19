@@ -576,6 +576,48 @@ fit_lc_model <- function (data) {
     ungroup()
 }
 
+#' Estimate PPFD95 from a model
+#' 
+#' See: https://stackoverflow.com/questions/23957486/calibration-inverse-prediction-from-loess-object-in-r
+#'
+#' @param model Model fitting ETR to PAR; nonlinear regression model of 
+#' form `etr ~ max(etr) * (1 - exp(-k * par))`
+#' @param data Data used to fit model in a dataframe with column names
+#' "par" and "etr"
+#' @param fitted Fitted data points in a dataframe with column name "etr_fit"
+#' @param ... Dummy arguments
+#'
+#' @return Number; Estimate of PAR that will result in 95% of the maximum ETR
+#' 
+estimate_ppfd95 <- function(model, data, fitted, ...) {
+  fitted <- fitted$etr_fit
+  given_y <- 0.95*max(fitted)
+  suppressWarnings(approx(x = fitted, y = data$par, xout = given_y)$y)
+}
+
+#' Estimate maximum ETR from fitted data points
+#'
+#' @param fitted Fitted data points in a dataframe with column name "etr_fit"
+#' @param ... Dummy arguments
+#'
+#' @return Number; Maximum ETR of fitted data
+#' 
+estimate_etrmax <- function(fitted, ...) {
+  max(fitted$etr_fit)
+}
+
+#' Predict ETR given a model and a PAR value
+#'
+#' @param model Model fitting ETR to PAR; nonlinear regression model of 
+#' form `etr ~ max(etr) * (1 - exp(-k * par))`
+#' @param par PAR value to predict ETR from
+#'
+#' @return Number; ETR estimated from the model
+#' 
+predict_etr <- function(model, par) {
+  predict(model, data.frame(par = par))
+}
+
 #' Extract maximum ETR and PPFD95% from light curve models
 #'
 #' @param data Tibble including light curve models and fitted data points
@@ -585,23 +627,22 @@ fit_lc_model <- function (data) {
 #' 
 extract_lc_model_params <- function (data) {
   data %>%
-    select(-nls_mod, -data) %>%
-    # Unroll fitted light curve points
-    unnest(cols = fitted) %>%
-    # Get maximum estimated etr fit for each individual
-    group_by(light_id) %>%
-    mutate(etr = max(etr_fit)) %>%
-    ungroup %>%
-    select(-etr_fit) %>%
-    unique() %>%
-    # Calculate critical par value
-    unnest(cols = k_stats) %>%
     # Double check that all models have significant fit
+    unnest(cols = k_stats) %>%
     verify(p.value < 0.05) %>%
-    # Calculate critical PAR value (PPFD95%)
-    mutate(par = -log(0.05)/estimate)
+    mutate(
+      # Estimate critical PAR value (PPFD95%) 
+      # by interpolating between fitted points
+      par = pmap_dbl(., estimate_ppfd95),
+      # Estimate ETR max from fitted data points
+      etr = pmap_dbl(., estimate_etrmax)) %>%
+    # Make sure that worked
+    assert(not_na, etr, par) %>%
+    select(
+      species, generation, individual, 
+      coll_num, condition, date, light_id, n,
+      par, etr)
 }
-
 
 #' Determine which species have widespread gametophytes
 #'
