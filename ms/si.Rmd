@@ -1173,11 +1173,12 @@ rel_water_species_means_with_rec <-
 
 pd <- position_dodge(.5)
 
-# Define color-blind palette
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
 # Set colors for desiccation intensity
-salt_cols <- c("NaCl" = cbPalette[7], "MgNO3" = cbPalette[5], "LiCl" = cbPalette[6], "Control" = "white")
+salt_cols <- c(
+  "NaCl" = cbPalette[["blue"]], 
+  "MgNO3" = cbPalette[["yellow"]], 
+  "LiCl" = cbPalette[["red"]], 
+  "Control" = "white")
 
 ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group = interaction(dry_time, salt))) +
   geom_errorbar(
