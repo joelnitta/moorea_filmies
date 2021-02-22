@@ -827,6 +827,8 @@ calculate_mean_light <- function (data) {
 }
 
 #' Calculate mean of daily env_range_dt_model VPD from climate data
+#' 
+#' Exclude outlier Rotui_800m_slope site
 #'
 #' @param climate Dataframe with climate data including
 #' relative humidity, temperature, and VPD calculated from these measured
@@ -835,6 +837,7 @@ calculate_mean_light <- function (data) {
 #' @return Tibble with mean of daily env_range_dt_model VPD by site and growth habit 
 calculate_mean_max_vpd <- function (climate) {
   climate %>% 
+    filter(site != "Rotui_800m_slope") %>%
     group_by(site, habit, date) %>% 
     summarize(vpd = max(vpd), .groups = "drop") %>% 
     assert(not_na, vpd) %>%
@@ -1319,6 +1322,8 @@ run_glmm <- function(combined_species_means, traits, phy) {
   
   # set number of iterations
   num <- 500000
+  n_burnin = 0.0002*num
+  n_thin = 0.0002*0.5*num
   
   # define prior list. Need one G for each random effect, one R for each fixed effect
   my_prior <- list(G=list(G1=list(V=1,nu=0.02)),
@@ -1350,7 +1355,7 @@ run_glmm <- function(combined_species_means, traits, phy) {
           family = "gaussian", 
           prior = my_prior, 
           data = as.data.frame(.y),
-          nitt = num, burnin = 1000, thin = 500,
+          nitt = num, burnin = n_burnin, thin = n_thin,
           verbose = FALSE)
       )
     )
@@ -1382,7 +1387,7 @@ run_glmm <- function(combined_species_means, traits, phy) {
           ginverse = list(species = dt_phy_inv$Ainv), 
           prior = my_prior, 
           data = as.data.frame(.y),
-          nitt = num, burnin = 1000, thin = 500,
+          nitt = num, burnin = n_burnin, thin = n_thin,
           verbose = FALSE)
       )
     )

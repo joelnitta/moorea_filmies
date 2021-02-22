@@ -83,6 +83,7 @@ tar_load(light_data_all)
 tar_load(light_models)
 tar_load(filmy_lc_model_params)
 tar_load(filmy_lc_model_fitted_data)
+tar_load(combined_species_means)
 ```
 
 ```{r si-load-functions, cache = FALSE}
@@ -147,8 +148,8 @@ make_facet_lc_plot <- function(light_data, lc_model_fitted_data, lc_model_params
       aes(xintercept = par), color = cbPalette[["red"]]) +
     scale_alpha_manual(values = c("TRUE" = 0.2, "FALSE" = 1.0)) +
     labs(
-      y = "ETR<sub>max</sub>", 
-      x = "PPFD (µmol·m<sup>-2</sup>·s<sup>-1</sup>)", 
+      y = "ETR<sub>max</sub> (µmol m<sup>-2</sup>·s<sup>-1</sup>)", 
+      x = "PPFD (µmol m<sup>-2</sup>·s<sup>-1</sup>)", 
       alpha = "Outlier") +
     theme(
       axis.title.x = element_markdown(),
@@ -206,9 +207,7 @@ cluster_sporo_times <- function (sporo_time_data, salt_select, k_select) {
 # Set overall theme, saving default theme
 default_theme <- theme_set(
   theme_bw(base_size = 10) +
-    theme(
-      panel.grid.minor = element_blank()
-    ))
+    theme(panel.grid.minor = element_blank()))
 
 # Define color-blind palette
 cbPalette <- c(grey = "#999999", gold = "#E69F00", skyblue = "#56B4E9", 
@@ -850,7 +849,7 @@ nacl_temp_plot_2014 + nacl_temp_plot_2013 + nacl_temp_plot_2012 +
 
 \newpage
 
-**`r s_figure("chamber-s")`**. Temperature, relative humidity (RH), and duration of desiccation treatment for sporophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH; **c**. Temperature and RH measured with Hobo ProV2 dataloggers (Onset Computer Corporation, Bourne, Massachusetts, USA) in 2013 and 2014 and **--FIXME: add datalogger model--** dataloggers in 2012. For bottom-most panels (duration of desiccation treatment), line indicates duration and point indicates removal of sample from chamber. For **c**, multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color. "missing" indicates data were not collected on the correspondence between samples and data loggers (chambers).
+**`r s_figure("chamber-s")`**. Temperature, relative humidity (RH), and duration of desiccation treatment for sporophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH; **c**. Temperature and RH measured with Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 30 min (2012) or Hobo ProV2 dataloggers logging every 5 min (2013, 2014). For bottom-most panels (duration of desiccation treatment), line indicates duration of treatment and point indicates removal of sample from chamber. For **c**, multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color. "missing" indicates data were not collected on the correspondence between samples and data loggers (chambers).
 
 \newpage
 
@@ -1310,3 +1309,90 @@ for(i in 2:n_gameto_lc_pages) {
 ```
 
 **`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes measured in the lab; **b**, sporophytes measured in the field; **c** gametophytes measured in the field (no gametophytes were measured in the lab). Title of each subplot indicates species followed by light curve ID number assigned to each sample. Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % saturation of ETR (PPFD~95%~).
+
+\newpage
+
+```{r traits-box, fig.height = 5, fig.width = 7, fig.cap = ""}
+combined_species_means_habit <-
+  combined_species_means %>%
+  left_join(filmy_habit, by = "species") %>%
+  mutate(
+    habit = case_when(
+      habit == "High_Epiphyte" ~ "HE",
+      habit == "Low_Epiphyte" ~ "LE",
+      habit == "Saxicolous" ~ "S",
+      habit == "Terrestrial" ~ "T"
+    ) %>% factor(., levels = c("HE", "LE", "S", "T"))
+  ) 
+
+generation_colors <- c(
+  "gametophyte" = cbPalette[["skyblue"]],
+  "sporophyte" = cbPalette[["red"]]
+)
+
+plot_sp_mean <- function(data, var_name, var_label) {
+  
+  ggplot(data, 
+         aes(x = habit, y = {{var_name}}, fill = generation)) +
+    geom_boxplot(outlier.size = 0) +
+    geom_point(pch = 21, position = position_jitterdodge(jitter.width = 0.2)) +
+    scale_fill_manual(values = generation_colors, labels = str_to_sentence) +
+    labs(
+      y = var_label,
+      x = "Growth Habit",
+      fill = "Generation"
+    )
+  
+}
+
+a <- plot_sp_mean(combined_species_means_habit, etr_mean, "ETR<sub>max<sub>") +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_markdown())
+
+b <- plot_sp_mean(combined_species_means_habit, par_mean, "PPFD<sub>95%<sub>") +
+  theme(axis.title.y = element_markdown())
+
+c <- plot_sp_mean(combined_species_means_habit, recovery_mean, "Recovery") +
+  scale_y_continuous(labels = percent)
+
+a + b + c + guide_area() + plot_layout(ncol = 2, guides = 'collect') + plot_annotation(tag_levels = "a")
+```
+
+**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species.
+
+\newpage
+
+```{r capi-water, fig.height = 4, fig.width = 4, fig.cap = ""}
+# Calculate recovery from 100% RH treatment for Callistopteris apiifolia gametophytes
+cal_water_recovery <- filmy_dt %>%
+  # Only include samples that should be presented in the main MS
+  filter(salt == "H2O", species == "Callistopteris_apiifolia") %>%
+  # Filter out individuals with low pre-treatment yields
+  filter(!is.na(yield_pre), yield_pre > 400) %>%
+  calculate_recovery() %>%
+  calculate_mean_recovery() %>%
+  rename(recovery = recovery_mean, sd = recovery_sd) %>%
+  verify(length(unique(recovery_n)) == 1)
+
+cal_water_n <- cal_water_recovery$recovery_n %>% unique()
+
+# Plot recovery
+ggplot(cal_water_recovery, aes(x = rec_time, y = recovery, group = interaction(dry_time, salt))) +
+  geom_line() +
+  geom_errorbar(
+    aes(ymin = recovery - sd, ymax = recovery + sd), 
+    colour = "grey50", width = 0.1) +
+  geom_point(size = 1.5) +
+  scale_y_continuous(label = label_percent(accuracy = 1), limits = c(-0.1,1.2), expand = c(0,0), breaks=c(0,.25,.5,.75,1.0)) +
+  scale_x_discrete(limits = c("30min","24hr","48hr"),
+                   labels = c("0.5", "24", "48")) +
+  xlab("Recovery Time (hr)") +
+  ylab("Recovery (%)") +
+  labs(
+    x = "Recovery Time (hr)",
+    y = "Recovery (%)"
+  )
+```
+
+**`r s_figure("capi-water")`**. Recovery of *Callistopteris apiifolia* gametophytes from Moorea, French Polynesia from desiccation treatment at 100 % RH (water used in place of desiccation salt). *n* = `r cal_water_n`.
