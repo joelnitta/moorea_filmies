@@ -20,6 +20,8 @@ output:
     pandoc_args: [ "--csl", "journal-of-plant-research.csl"]
     includes:
       in_header: journal-of-plant-research-si.sty
+# enable landscape mode selectively with pdflscape and newcommand 
+# https://stackoverflow.com/questions/25849814/rstudio-rmarkdown-both-portrait-and-landscape-layout-in-a-single-pdf
 header-includes: 
   \usepackage{float}
   \makeatletter\renewcommand*{\fps@figure}{H}\makeatother
@@ -325,8 +327,6 @@ Bootstrap support values >50% shown at nodes.
 Growth habit indicated by colored dots. 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
 
-\blandscape
-
 ```{r sporophyte-dt-prep}
 # Extract pre- and post-DT treatment times for sporophytes
 sporo_times <-
@@ -345,7 +345,9 @@ sporo_times <-
   pivot_wider(names_from = "condition", values_from = "date_time")
 ```
 
-```{r sporophyte-dt-LiCl, fig.height = 7, fig.width = 9.5, fig.cap = ""}
+\blandscape
+
+```{r sporophyte-dt-LiCl, fig.height = 6.5, fig.width = 9, fig.cap = ""}
 # Get mean times of each cluster of DT test samples for the selected drying salt
 licl_clusters_2013 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2013")), "LiCl", 3)
 licl_clusters_2014 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2014")), "LiCl", 1)
@@ -448,7 +450,7 @@ licl_temp_plot_2014 + licl_temp_plot_2013 + licl_temp_plot_2012 +
   theme(plot.tag = element_text(face = "bold"))
 ```
 
-```{r sporophyte-dt-MgNO3, fig.height = 7, fig.width = 9.5, fig.cap = ""}
+```{r sporophyte-dt-MgNO3, fig.height = 6.5, fig.width = 9, fig.cap = ""}
 # Get mean times of each cluster of DT test samples for the selected drying salt
 mgno3_clusters_2013 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2013")), "MgNO3", 3)
 mgno3_clusters_2014 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2014")), "MgNO3", 1)
@@ -552,7 +554,7 @@ mgno3_temp_plot_2014 + mgno3_temp_plot_2013 + mgno3_temp_plot_2012 +
   theme(plot.tag = element_text(face = "bold"))
 ```
 
-```{r sporophyte-dt-NaCl, fig.height = 7, fig.width = 9.5, fig.cap = ""}
+```{r sporophyte-dt-NaCl, fig.height = 6.5, fig.width = 9, fig.cap = ""}
 # Subset desiccation duration data
 # H_polyanthos shows n=1, but this is only because pre/post were available for only one sample
 # (actually had 8 samples total)
