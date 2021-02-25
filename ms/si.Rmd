@@ -20,7 +20,6 @@ output:
     pandoc_args: [ "--csl", "journal-of-plant-research.csl"]
     includes:
       in_header: journal-of-plant-research-si.sty
-# enable landscape mode selectively with pdflscape and newcommand 
 # https://stackoverflow.com/questions/25849814/rstudio-rmarkdown-both-portrait-and-landscape-layout-in-a-single-pdf
 header-includes: 
   \usepackage{float}
@@ -84,6 +83,7 @@ tar_load(light_models)
 tar_load(filmy_lc_model_params)
 tar_load(filmy_lc_model_fitted_data)
 tar_load(combined_species_means)
+tar_load(gameto_indiv_times)
 ```
 
 ```{r si-load-functions, cache = FALSE}
@@ -222,7 +222,7 @@ habit_colors <- c(
   "High_Epiphyte" = cbPalette[["blue"]])
 ```
 
-**Electronic supplementary materials** 
+**Electronic supplementary materials: Online Resource 1** 
 
 **Title:** Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)
 
@@ -236,13 +236,11 @@ Phone: +81-
 Fax: +81-  
 email: joelnitta\@gmail.com
 
-**Content:** \figs `r s_figure_num("tree")`--`r s_figure_num("light-curves")`
+**Content:** \figs `r s_figure_num("tree")`--`r s_figure_num("capi-water")`
 
-**`r s_figure("tree")`**. Maximum likelihood ultrametric phylogenetic tree including all Moorean filmy fern species.
+**`r s_figure("tree")`**. Maximum likelihood ultrametric phylogenetic tree including all filmy fern species from Moorea, French Polynesia.
 
-**`r s_figure("chamber-s")`**. Conditions inside desiccation chamber and duration of desiccation treatment for sporophytes.
-
-**`r s_figure("chamber-g")`**. Conditions inside desiccation chamber and duration of desiccation treatment for gametophytes.
+**`r s_figure("chamber")`**. Temperature, relative humidity (RH), and duration of desiccation treatment of filmy ferns from Moorea, French Polynesia.
 
 **`r s_figure("range")`**. Elevational range (m) of sporophytes and gametophytes of filmy ferns on Moorea, French Polynesia.
 
@@ -253,6 +251,10 @@ email: joelnitta\@gmail.com
 **`r s_figure("water-s")`**. Relative water content (RWC) of sporophytes during desiccation tolerance test.
 
 **`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia.
+
+**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia.
+
+**`r s_figure("capi-water")`**. Recovery of *Callistopteris apiifolia* gametophytes from Moorea, French Polynesia from desiccation treatment at 100 % RH (water used in place of desiccation salt).
 
 \newpage
 
@@ -320,7 +322,7 @@ ggtree(phy) %<+% filmy_habit %<+% bs_tibble +
   )
 ```
 
-**`r s_figure("tree")`**. Maximum likelihood ultrametric phylogenetic tree including all Moorean filmy fern species.
+**`r s_figure("tree")`**. Maximum likelihood ultrametric phylogenetic tree including all filmy fern species from Moorea, French Polynesia.
 Tree obtained by extracting Hymenophyllaceae from the tree of Nitta et al. (2016) with the extract.clade function of the ape package in R (Paradis et al., 2004).
 Bootstrap support values >50% shown at nodes.
 Growth habit indicated by colored dots. 
@@ -685,6 +687,7 @@ nacl_time_plot_2013 <-
   scale_x_discrete(labels = str_abbrev_sp_pretty, drop = FALSE) +
   # Print all levels of 'serial no' in the legend using `drop = false`
   scale_color_manual(values = serial_no_cols, drop = FALSE) +
+  labs(x = "Species", color = "Serial no.") +
   coord_flip() +
   theme(
     axis.title = element_blank(),
@@ -702,7 +705,7 @@ nacl_time_plot_2014 <-
   scale_x_discrete(labels = str_abbrev_sp_pretty, drop = FALSE) +
   scale_color_manual(values = serial_no_cols) +
   coord_flip() +
-  labs(x = "Species") +
+  labs(x = "Species", color = "Serial no.") +
   theme(
     axis.title = element_blank(),
     axis.text.y = element_markdown()) +
@@ -721,7 +724,7 @@ nacl_rh_plot_2012 <-
     limits = nacl_rh_range) +
   labs(
     y = "Relative humidity",
-    color = "Data logger\nserial no.") +
+    color = "Serial no.") +
   guides(color = "none") +
   theme(axis.title.x = element_blank()) +
   blank_y_theme()
@@ -739,7 +742,7 @@ nacl_rh_plot_2013 <-
     limits = nacl_rh_range) +
   labs(
     y = "Relative humidity",
-    color = "Data logger\nserial no.") +
+    color = "Serial no.") +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
@@ -760,7 +763,7 @@ nacl_rh_plot_2014 <-
     limits = nacl_rh_range) +
   labs(
     y = "Relative humidity",
-    color = "Data logger\nserial no.") +
+    color = "Serial no.") +
   theme(
     axis.title.x = element_blank(),
     axis.text.x = element_blank(),
@@ -780,7 +783,7 @@ nacl_temp_plot_2012 <-
     limits = nacl_temp_range) +
   labs(
     y = "Temperature",
-    color = "Data logger\nserial no.",
+    color = "Serial no.",
     title = "2012") +
   theme(
     plot.title = element_text(hjust = 0.5, size = 11),
@@ -803,7 +806,7 @@ nacl_temp_plot_2013 <-
     limits = nacl_temp_range) +
   labs(
     y = "Temperature",
-    color = "Data logger\nserial no.",
+    color = "Serial no.",
     title = "2013") +
   theme(
     plot.title = element_text(hjust = 0.5, size = 11),
@@ -826,7 +829,7 @@ nacl_temp_plot_2014 <-
     limits = nacl_temp_range) +
   labs(
     y = "Temperature",
-    color = "Data logger\nserial no.",
+    color = "Serial no.",
     title = "2014") +
   theme(
     plot.title = element_text(hjust = 0.5, size = 11),
@@ -849,32 +852,31 @@ nacl_temp_plot_2014 + nacl_temp_plot_2013 + nacl_temp_plot_2012 +
 
 \newpage
 
-**`r s_figure("chamber-s")`**. Temperature, relative humidity (RH), and duration of desiccation treatment for sporophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH; **c**. Temperature and RH measured with Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 30 min (2012) or Hobo ProV2 dataloggers logging every 5 min (2013, 2014). For bottom-most panels (duration of desiccation treatment), line indicates duration of treatment and point indicates removal of sample from chamber. For **c**, multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color. "missing" indicates data were not collected on the correspondence between samples and data loggers (chambers).
-
-\newpage
-
-```{r gametophyte-dt-2013, fig.height = 4.5, fig.width = 7, fig.cap = ""}
-# Calculate mean start/end times for gametophyte DT groups
+```{r gametophyte-dt, fig.height = 4.5, fig.width = 7, fig.cap = ""}
+# Combine and calculate mean start/end times by group (cluster)
 gameto_mean_times <-
-  filmy_dt %>%
-  filter(generation == "gametophyte") %>%
-  select(individual, contains("time_")) %>%
-  pivot_longer(names_to = "condition", values_to = "date_time", -individual) %>%
-  filter(!is.na(date_time)) %>%
-  mutate(condition = str_remove_all(condition, "time_") %>%
-           str_replace_all("30min", "post")) %>%
-  filter(condition %in% c("pre", "post")) %>%
-  add_count(individual) %>%
-  filter(n > 1) %>%
-  select(-n) %>%
-  pivot_wider(names_from = "condition", values_from = "date_time") %>%
-  # Cluster starts times into groups (here, I know there are 10 groups)
-  add_clusters("pre", 10) %>%
+  gameto_indiv_times %>%
   mutate(cluster = as.factor(cluster)) %>%
   group_by(cluster) %>%
   summarize(pre = mean(pre), post = mean(post), n = n(), .groups = "drop")
 
-gameto_time_limits <- c(min = min(gameto_mean_times$pre), max = max(gameto_mean_times$post))
+# Set time limits so plots line up vertically
+gameto_times_2012 <- gameto_mean_times %>% filter(pre < "2013-01-01")
+gameto_times_2013 <- gameto_mean_times %>% filter(pre > "2013-01-01")
+gameto_time_limits_2013 <- c(min = min(gameto_times_2013$pre), max = max(gameto_times_2013$post))
+gameto_time_limits_2012 <- c(min = min(gameto_times_2012$pre), max = max(gameto_times_2012$post))
+
+# Subset DT chamber data
+chamber_gameto_2013 <- filmy_dt_chamber %>% filter(generation == "gametophyte", year == "2013")
+chamber_gameto_2012 <- filmy_dt_chamber %>% 
+  filter(
+    salt == "MgNO3", 
+    year == "2012",
+    generation == "gametophyte") %>%
+  mutate(group = case_when(
+    date_time < "2012-07-17 00:00:00" ~ "a",
+    date_time > "2012-07-17 00:00:00" ~ "b"
+  ))
 
 # DT start/end times plot
 dt_times_gameto_2013_plot <- ggplot(
@@ -882,30 +884,73 @@ dt_times_gameto_2013_plot <- ggplot(
   aes(x = cluster, ymin = pre, ymax = post, y = post, group = cluster)) +
   geom_linerange(position = position_dodge(0.5)) +
   geom_point(position = position_dodge(0.5)) +
-  scale_y_datetime(limits = gameto_time_limits) +
+  scale_y_datetime(limits = gameto_time_limits_2013) +
   coord_flip() +
-  labs(x = "Group") +
+  labs(x = "Batch") +
   theme(
     axis.title.x = element_blank()
   )
 
-# Subset DT chamber data
-chamber_gameto_2013 <- filmy_dt_chamber %>% filter(generation == "gametophyte", year == "2013")
+dt_times_gameto_2012_plot <- ggplot(
+  gameto_mean_times, 
+  aes(x = cluster, ymin = pre, ymax = post, y = post, group = cluster)) +
+  geom_linerange(position = position_dodge(0.5)) +
+  geom_point(position = position_dodge(0.5)) +
+  scale_y_datetime(limits = gameto_time_limits_2012) +
+  coord_flip() +
+  labs(x = "Batch") +
+  theme(
+    axis.title.x = element_blank()
+  ) +
+  blank_y_theme()
 
 # RH plot
 chamber_gameto_2013_rh_plot <-
-  plot_chamber_rh(chamber_gameto_2013, gameto_time_limits)
+  plot_chamber_rh(chamber_gameto_2013, gameto_time_limits_2013)
+
+chamber_gameto_2012_rh_plot <-
+  ggplot(chamber_gameto_2012, aes(x = date_time, y = 0.01*rh, group = group)) +
+  geom_line(size = 0.25) +
+  scale_x_datetime(limits = gameto_time_limits_2012) +
+  scale_y_continuous(label = label_percent(accuracy = 1)) +
+  labs(y = "Relative humidity") +
+  theme(
+    legend.position = "none",
+    axis.title.x = element_blank()) +
+  blank_y_theme()
 
 # Temp plot
 chamber_gameto_2013_temp_plot <-
-  plot_chamber_temp(chamber_gameto_2013, gameto_time_limits)
+  plot_chamber_temp(chamber_gameto_2013, gameto_time_limits_2013) +
+  labs(title = "2013") +
+  theme(plot.title = element_text(hjust = 0.5, size = 11))
 
-chamber_gameto_2013_temp_plot + chamber_gameto_2013_rh_plot + dt_times_gameto_2013_plot + plot_layout(ncol = 1)
+chamber_gameto_2012_temp_plot <-
+  ggplot(chamber_gameto_2012, aes(x = date_time, y = temp, group = group)) +
+  geom_line(size = 0.25) +
+  scale_x_datetime(limits = gameto_time_limits_2012) +
+  scale_y_continuous(label = label_number(suffix = "\u00b0C", accuracy = 1)) +
+  labs(
+    y = "Temperature",
+    title = "2012") +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, size = 11),
+    axis.title.x = element_blank()) +
+  blank_y_theme()
 
-# ggsave(here::here("results/S1_fig.png"))
+# Combine into final plot
+chamber_gameto_2013_temp_plot + chamber_gameto_2012_temp_plot +
+  chamber_gameto_2013_rh_plot + chamber_gameto_2012_rh_plot + 
+  dt_times_gameto_2013_plot + dt_times_gameto_2012_plot + 
+  plot_layout(ncol = 2, nrow = 3) +
+  plot_annotation(title = "d") &
+  theme(plot.tag = element_text(face = "bold"))
 ```
 
-**`r s_figure("chamber-g")`**. Conditions inside desiccation chamber and duration of desiccation treatment for gametophytes. MgNO~3~ was used to maintain constant humidity at \circa{ }58%. All gametophytes were treated to desiccation for 2 days, except for group 8, which was treated for four days unintentionally
+\newpage
+
+**`r s_figure("chamber")`**. Temperature, relative humidity (RH), and duration of desiccation treatment of filmy ferns from Moorea, French Polynesia. **a**--**c**, sporophytes; **d**, gametophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, **d**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH). Temperature and RH measured with Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012) or Hobo ProV2 dataloggers logging every 5 min (2013, 2014). For **c**, multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color; "missing" indicates data were not collected on the correspondence between samples and data loggers (chambers). For bottom-most panels (duration of desiccation treatment), line indicates duration of treatment and point indicates removal of sample from chamber. Gametophytes were measured in batches; membership of individual gametophytes to each batch can be found in `r s_table("gameto-batches")` (Online Resource 2).
 
 \newpage
 
@@ -1359,7 +1404,7 @@ c <- plot_sp_mean(combined_species_means_habit, recovery_mean, "Recovery") +
 a + b + c + guide_area() + plot_layout(ncol = 2, guides = 'collect') + plot_annotation(tag_levels = "a")
 ```
 
-**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species.
+**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species.
 
 \newpage
 
@@ -1387,11 +1432,9 @@ ggplot(cal_water_recovery, aes(x = rec_time, y = recovery, group = interaction(d
   scale_y_continuous(label = label_percent(accuracy = 1), limits = c(-0.1,1.2), expand = c(0,0), breaks=c(0,.25,.5,.75,1.0)) +
   scale_x_discrete(limits = c("30min","24hr","48hr"),
                    labels = c("0.5", "24", "48")) +
-  xlab("Recovery Time (hr)") +
-  ylab("Recovery (%)") +
   labs(
     x = "Recovery Time (hr)",
-    y = "Recovery (%)"
+    y = "Recovery"
   )
 ```
 

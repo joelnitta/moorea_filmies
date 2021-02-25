@@ -192,7 +192,7 @@ n_hymeno_sp <- str_remove_all(filmy_species, "[0-9]") %>%
 We selected the island of Moorea, French Polynesia (17°32' S, 149°50' W) for our survey of filmy fern ecophysiology.
 Moorea is a small (135 km^2^; maximum elevation 1206 m) tropical oceanic island, located \circa{ }15 km NW of its larger sister island, Tahiti.
 Despite its small size, it hosts a range of habitats including coastal strand, low elevation rainforest, and high elevation cloud forest.
-A total of `r n_filmy_sp` filmy fern species are known from Moorea, including multiple terrestrial, saxicolous, and epiphytic species [@Murdock2003; @Ranker2005; @Nitta2011b; @Nitta2017; @Florence] (\figs `r figure_num("habit")`, `r s_figure_num("tree")`).
+A total of `r n_filmy_sp` filmy fern species are known from Moorea, including multiple terrestrial, saxicolous, and epiphytic species [@Murdock2003; @Ranker2005; @Nitta2011b; @Nitta2017; @Florence] (\figs `r figure_num("habit")`, `r s_figure_num("tree")`; all supplemental figures available in Online Resource 1).
 The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages [@Pryer2001a], are represented on Moorea by `r n_hymeno_sp` and `r n_trich_sp` species, respectively.
 We follow the taxonomic system of @Ebihara2006 for Hymenophyllaceae.
 
@@ -246,9 +246,9 @@ All experiments were initiated within 48 h of collection.
 Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitajima1975] was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM fluorometer (Walz Gmbh, Effeltrich, Germany).
 Any samples with pre-treatment F~v~/F~m~ < 0.4 were excluded from analysis, as typical values of F~v~/F~m~ in healthy plants tend to be \circa{ }0.8 [@Bjorkman1987].
 Samples were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100 % RH), and water withheld for either a short (2 d) or long (15 d) interval [@Testo2013].
-Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 30 min (2012 field season) or Hobo ProV2 dataloggers logging every 5 min (2013, 2014 field seasons).
+Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012 field season) or Hobo ProV2 dataloggers logging every 5 min (2013, 2014 field seasons).
 The desiccation chambers were kept in an air-conditioned room. 
-Temperature inside the chambers was mean `mean(filmy_dt_chamber$temp) %>% round(1)` ± SD `r sd(filmy_dt_chamber$temp) %>% round(2)` °C (\figs `r s_figure_num("chamber-s")`, `r s_figure_num("chamber-g")`).
+Temperature inside the chambers was mean `mean(filmy_dt_chamber$temp) %>% round(1)` ± SD `r sd(filmy_dt_chamber$temp) %>% round(2)` °C (\figs `r s_figure_num("chamber")`).
 Salts used for desiccation and their corresponding mean water potentials and approximate relative humidity and VPD are as follows: LiCl (-282 MPa, 18 % RH, 2.45 kPa), Mg(NO~3~)~2~ (-86 MPa, 58 % RH, 1.25 kPa), and NaCl (-38 MPa, 80 % RH, 0.60 kPa).
 Following the desiccation treatment, plants were rewetted by wrapping them in wet tissues using water from a local stream.
 Plants were allowed to rehydrate, and F~v~/F~m~ was again measured at 0.5 h, 24 h, and 48 h following rewetting.
@@ -258,7 +258,7 @@ We measured relative water content (RWC) in a subset of samples by recording the
 Relative water content was calculated as \(RWC = \frac{TM - DM}{FM - DM} \times 100\), where *TM* is turgid mass, *DM* is dry mass, and *FM* is fresh mass.
 
 Because field-collected gametophytes could not be identified to species prior to DNA extraction, no planned replication by species was possible.
-We therefore applied the same treatment for all gametophytes (2 d at -86 MPa), and verified species of each individual after the experiment using the DNA barcode approach described above.
+We therefore applied the same treatment for all gametophytes (2 d at -86 MPa) in batches of individuals (`r s_table("gameto-batches")`), and verified the species of each individual after the experiment using the DNA barcode approach described above.
 Thus, experiments involving gametophytes were sampled many times for some species whereas other species were not.
 Relative water content was not calculated for gametophytes, as these were too small to measure accurately with the balances available.
 
@@ -438,7 +438,7 @@ DT of gametophytes did not significantly exceed that of sporophytes for any spec
 
 Gametophytes of low elevation epiphytes had the highest DT (\circa{ }80% recovery), followed by high elevation epiphytes and saxicolous species (both with recovery from \circa{ }25% to 75%), with terrestrial species essentially non-tolerant (less than 20% recovery; `r figure("dt")`b).
 
-Relative humidity in the growth chambers was high when samples were first inserted, then gradually decreased to the target value maintained by each drying salt (\figs{ }`r s_figure_num("chamber-s")`, `r s_figure_num("chamber-g")`).
+Relative humidity in the growth chambers was high when samples were first inserted, then gradually decreased to the target value maintained by each drying salt (\figs{ }`r s_figure_num("chamber")`).
 Brief fluctuations to higher humidities were observed when chambers were opened to insert or remove samples (`r s_figure("chamber-s")`).
 
 The GLMM including the effect of generation only was selected as the best-fitting model for DT (`r table("glmm")`). 

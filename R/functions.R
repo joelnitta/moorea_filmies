@@ -477,6 +477,24 @@ unzip_nitta_2017 <- function (zipped_path, unzip_path, ...) {
   
 }
 
+#' Load data on gametophyte DT test times from 2012
+#'
+#' @param file Path to data file with start and end times for gametophyte DT test in 2012
+#'
+#' @return Dataframe
+load_gameto_time_summary_2012 <- function(file) {
+  read_csv(
+    file,
+  col_types = cols(
+    date_time = col_datetime(format = ""),
+    event = col_character(),
+    group = col_character(),
+    cluster = col_double()
+  )) %>%
+  pivot_wider(values_from = "date_time", names_from = event) %>%
+  rename(pre = start, post = end)
+}
+
 # Data wrangling ----
 
 #' Cluster rows of a dataframe based on a single column
@@ -1072,6 +1090,116 @@ extract_fitted_lc_data <- function (light_models) {
   light_models %>%
   select(-nls_mod, -k_stats) %>%
   unnest(cols = c(data, fitted))
+}
+
+#' Format gametophyte DT data to include membership in treatment batches
+#'
+#' @param filmy_dt Cleaned DT data
+#' @param gameto_time_summary_2012 Data including start and end times of DT test for
+#' gametophytes in 2012
+#' @param filmy_specimens Filmy fern specimen data
+#'
+#' @return Dataframe
+#' 
+prepare_gameto_dt_groups <- function(filmy_dt, gameto_time_summary_2012, filmy_specimens) {
+  
+  # For gametophytes in 2012, individual level data is not available for start/end times,
+  # but there is data for start/end times of groups. So merge this by individual membership in groups.
+  gameto_times_2012 <-
+    filmy_dt %>%
+    filter(generation == "gametophyte") %>%
+    mutate(individual = parse_number(individual)) %>%
+    assert(not_na, individual) %>%
+    filter(individual < 1863 & individual > 984) %>% # lowest and highest collection numbers in 2012
+    mutate(
+      cluster = case_when(
+        individual < 1093 ~ 1, # epi/ter plots 1-3
+        individual >= 1093 ~ 2, # epi/ter plots 4-6
+        TRUE ~ NaN
+      )
+    ) %>%
+    select(individual, cluster) %>%
+    assert(not_na, everything()) %>%
+    assert(is_uniq, individual) %>%
+    left_join(gameto_time_summary_2012, by = "cluster") %>%
+    select(individual, pre, post, cluster) %>%
+    mutate(individual = as.character(individual))
+  
+  # Calculate start/end times for gametophyte DT groups in 2013 by individual
+  gameto_times_2013 <-
+    filmy_dt %>%
+    filter(generation == "gametophyte") %>%
+    select(individual, contains("time_")) %>%
+    pivot_longer(names_to = "condition", values_to = "date_time", -individual) %>%
+    # only gametos from 2013 have date_time data, so this filters to 2013
+    filter(!is.na(date_time)) %>%
+    mutate(condition = str_remove_all(condition, "time_") %>%
+             str_replace_all("30min", "post")) %>%
+    filter(condition %in% c("pre", "post")) %>%
+    add_count(individual) %>%
+    filter(n > 1) %>%
+    select(-n) %>%
+    pivot_wider(names_from = "condition", values_from = "date_time") %>%
+    # Cluster start times into groups (here, I know there are 10 groups)
+    add_clusters("pre", 10) %>%
+    # Need to make space for two more clusters from 2012
+    mutate(cluster = cluster + 2)
+  
+  # Parse collection number in specimens
+  filmy_specimens <-
+  filmy_specimens %>%
+    mutate(individual = str_remove_all(specimen, "Nitta ")) %>%
+    filter(generation == "gametophyte")
+  
+  # Combine into single df (will write this out later as a table)
+  bind_rows(gameto_times_2012, gameto_times_2013) %>%
+    left_join(select(filmy_specimens, individual, species), by = "individual") %>%
+    assert(is_uniq, individual) %>%
+    assert(not_na, individual, species) %>%
+    select(species, individual, pre, post, cluster)
+}
+
+#' Write out a table of membership in DT treatment batches for gametophytes
+#' 
+#' Data written out as CSV with metadata in comments
+#'
+#' @param gameto_indiv_times Data with gametophyte DT data to include membership in treatment batches
+#' @param file_out Path to write file
+#'
+#' @return Path to output file
+#' 
+write_gameto_times <- function(gameto_indiv_times, file_out) {
+  
+  # In order to include metadata as commented lines above CSV, first
+  # write out to plain temporary CSV file,
+  # then read in, add comments, and write out as raw text lines
+  temp_file <- tempfile()
+  write_csv(gameto_indiv_times, temp_file)
+  gameto_indiv_times_lines <- read_lines(temp_file)
+  fs::file_delete(temp_file)
+  
+  # Add metadata
+  gameto_indiv_times_lines <- c(
+    "# Electronic supplementary materials: Online Resource 2",
+    "# Title: Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)",
+    "# Authors: Nitta JH; Watkins JE; Holbrook NM; Taputuarai R; Wang T; Davis CC",
+    "# Journal: Journal of Plant Research",
+    "# Corresponding author: Joel H. Nitta (joelnitta@gmail.com)",
+    "# Contents: start and end times of desiccation tolerance test on gametophytes of filmy ferns from Moorea French Polynesia",
+    "# --- BEGIN COLUMN METADATA ---",
+    "# species: Species name",
+    "# individual: J.H. Nitta specimen collection number of gametophyte individual",
+    "# pre: start time of desiccation",
+    "# post: end time of desiccation",
+    "# cluster: number indicating membership in treatment cluster. Individuals in the same cluster were subjected to desiccation test together",
+    "# --- END COLUMN METADATA ---",
+    gameto_indiv_times_lines
+  )
+  
+  write_lines(gameto_indiv_times_lines, file_out)
+  
+  file_out
+  
 }
 
 # t-test ----

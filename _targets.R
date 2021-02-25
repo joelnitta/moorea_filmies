@@ -59,6 +59,10 @@ tar_plan(
   tar_file(specimens_raw_file, "data/fern_specimens.csv"),
   specimens_raw = read_csv(specimens_raw_file),
   
+  # - gametophyte DT groups
+  tar_file(gameto_times_2012_file, "data/2012_gameto_dt_times.csv"),
+  gameto_time_summary_2012 = load_gameto_time_summary_2012(gameto_times_2012_file),
+  
   # Process data ----
   
   # - subset collection data to just filmy ferns on Moorea
@@ -141,6 +145,9 @@ tar_plan(
     light_species_means = light_species_means
   ),
   
+  # - make table of gametophyte DT treatment batches (groups)
+  gameto_indiv_times = prepare_gameto_dt_groups(filmy_dt, gameto_time_summary_2012, filmy_specimens),
+  
   # t-test ----
   # Perform two-sided t-test on DT and light responses across generations
   t_test_results = run_t_test(
@@ -203,7 +210,12 @@ tar_plan(
     depends = manuscript_pdf
   ),
   
-  # SI
-  tar_render(si_pdf, "ms/si.Rmd", output_dir = here::here("results/ms"))
+  # SI: figures (ESM 1)
+  tar_render(si_pdf, "ms/si.Rmd", output_file = "ESM_1.pdf", output_dir = here::here("results/si")),
+  
+  # SI: tables (ESM 2)
+  tar_file(
+    gameto_indiv_times_table,
+    write_gameto_times(gameto_indiv_times, "results/si/ESM_2.csv"))
   
 )
