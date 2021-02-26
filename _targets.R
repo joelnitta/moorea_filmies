@@ -63,6 +63,10 @@ tar_plan(
   tar_file(gameto_times_2012_file, "data/2012_gameto_dt_times.csv"),
   gameto_time_summary_2012 = load_gameto_time_summary_2012(gameto_times_2012_file),
   
+  # - sporophyte DT times entered manually
+  tar_file(sporo_dt_times_file, "data/2012_sporo_dt_times.csv"),
+  sporo_dt_times = load_sporo_dt_times(sporo_dt_times_file),
+  
   # Process data ----
   
   # - subset collection data to just filmy ferns on Moorea

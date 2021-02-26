@@ -495,6 +495,27 @@ load_gameto_time_summary_2012 <- function(file) {
   rename(pre = start, post = end)
 }
 
+#' Load manually entered sporophyte DT times
+#'
+#' @param file Path to CSV file with manually entered sporophyte DT times
+#'
+#' @return Dataframe
+load_sporo_dt_times <- function(file) {
+  read_csv(
+    file, 
+    col_types = cols(
+      date_time = col_datetime(format = ""),
+      event = col_character(),
+      salt = col_character(),
+      dry_time = col_factor(),
+      species = col_character()
+    )) %>%
+    separate_rows(species, sep = ",") %>%
+    mutate(species = str_trim(species, "both")) %>%
+    pivot_wider(values_from = date_time, names_from = event) %>%
+    rename(pre = start, post = end)
+}
+
 # Data wrangling ----
 
 #' Cluster rows of a dataframe based on a single column
