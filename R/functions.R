@@ -20,10 +20,14 @@
 #' 
 read_hobo <- function(file) {
   
+  # Check for extra line with plot title, skip this if present
+  lines_raw <- read_lines(file)
+  skip_title = sum(any(str_detect(lines_raw, "Plot Title")))
+  
   # Get original column names
   # these contain the serial number, so will be different for each file
   col_names <-
-    suppressMessages(suppressWarnings(readr::read_csv(file))) %>%
+    suppressMessages(suppressWarnings(readr::read_csv(file, skip = skip_title))) %>%
     janitor::clean_names() %>%
     colnames()
   
@@ -37,23 +41,46 @@ read_hobo <- function(file) {
   # for any hobo csv file
   clean_col_names <-
     col_names %>%
-    str_match("date|time|temp|rh|coupler_detached|coupler_attached|stopped|host_connected|end_of_file") %>%
+    str_match("number|date|time|temp|rh|coupler_detached|coupler_attached|stopped|host_connected|end_of_file") %>%
     magrittr::extract(,1)
   
   # Read in the csv file using the clean column names
-  readr::read_csv(
-    file,
-    skip = 1,
-    col_names = clean_col_names,
-    col_types = cols(
-      date = col_character(),
-      time = col_time(format = ""),
-      temp = col_double(),
-      rh = col_double(),
-      .default = col_character()
-    )) %>%
-    # parse date_time
-    dplyr::mutate(date_time = paste(date, time) %>% lubridate::ymd_hms()) %>%
+  
+  # There are two versions of storing date and time depending on Hoboware.
+  # In the older version, date and time are two separate columns.
+  # In the newer version, each gets its own column.
+  
+  if(any(str_detect(clean_col_names, "time"))) {
+    data_inital <- readr::read_csv(
+      file,
+      skip = 1 + skip_title,
+      col_names = clean_col_names,
+      col_types = cols(
+        date = col_character(),
+        time = col_time(format = ""),
+        temp = col_double(),
+        rh = col_double(),
+        .default = col_character()
+      )
+    ) %>%
+      # parse date_time
+      dplyr::mutate(date_time = paste(date, time) %>% lubridate::ymd_hms())
+  } else {
+    data_inital <- readr::read_csv(
+      file,
+      skip = 1 + skip_title,
+      col_names = clean_col_names,
+      col_types = cols(
+        date = col_character(),
+        temp = col_double(),
+        rh = col_double(),
+        .default = col_character()
+      )) %>%
+      # parse date_time
+      dplyr::mutate(date_time =  lubridate::mdy_hms(date))
+  }
+  
+  data_inital %>%
     # only include date_time, temperature, rel. humidity, and serial number
     dplyr::select(date_time, temp, rh) %>%
     ggplot2::remove_missing(na.rm = TRUE) %>%
@@ -485,14 +512,14 @@ unzip_nitta_2017 <- function (zipped_path, unzip_path, ...) {
 load_gameto_time_summary_2012 <- function(file) {
   read_csv(
     file,
-  col_types = cols(
-    date_time = col_datetime(format = ""),
-    event = col_character(),
-    group = col_character(),
-    cluster = col_double()
-  )) %>%
-  pivot_wider(values_from = "date_time", names_from = event) %>%
-  rename(pre = start, post = end)
+    col_types = cols(
+      date_time = col_datetime(format = ""),
+      event = col_character(),
+      group = col_character(),
+      cluster = col_double()
+    )) %>%
+    pivot_wider(values_from = "date_time", names_from = event) %>%
+    rename(pre = start, post = end)
 }
 
 #' Load manually entered sporophyte DT times
@@ -1109,8 +1136,8 @@ transfer_bs <- function(filmy_phy_bs, filmy_phy) {
 #' 
 extract_fitted_lc_data <- function (light_models) {
   light_models %>%
-  select(-nls_mod, -k_stats) %>%
-  unnest(cols = c(data, fitted))
+    select(-nls_mod, -k_stats) %>%
+    unnest(cols = c(data, fitted))
 }
 
 #' Format gametophyte DT data to include membership in treatment batches
@@ -1168,7 +1195,7 @@ prepare_gameto_dt_groups <- function(filmy_dt, gameto_time_summary_2012, filmy_s
   
   # Parse collection number in specimens
   filmy_specimens <-
-  filmy_specimens %>%
+    filmy_specimens %>%
     mutate(individual = str_remove_all(specimen, "Nitta ")) %>%
     filter(generation == "gametophyte")
   

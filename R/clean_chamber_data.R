@@ -6,19 +6,19 @@ source(here::here("R/packages.R"))
 # Load functions
 source("R/functions.R")
 
-# 2012 data were measured with __
-# FIXME: check name of datalogger
-# They lack serial numbers.
+# 2012 data were measured with Track-It RH/Temp dataloggers (no serial numbers) 
+# for most samples, and Hobo ProV2 dataloggers (with serial numbers) for
+# Callistopteris apiifolia only
 # 2012 sporophytes
 sporo_2012_chamber <- bind_rows(
-  parse_logger_dat("data_raw/2012/filmyDT2_LiCl.csv") %>% mutate(salt = "LiCl"),
-  parse_logger_dat("data_raw/2012/filmyDT2_MgNO3.csv") %>% mutate(salt = "MgNO3"),
-  parse_logger_dat("data_raw/2012/filmyDT2_NaCl.csv") %>% mutate(salt = "NaCl")
+  parse_logger_dat("data_raw/2012/track-it/filmyDT2_LiCl.csv") %>% mutate(salt = "LiCl"),
+  parse_logger_dat("data_raw/2012/track-it/filmyDT2_MgNO3.csv") %>% mutate(salt = "MgNO3"),
+  parse_logger_dat("data_raw/2012/track-it/filmyDT2_NaCl.csv") %>% mutate(salt = "NaCl")
 ) %>%
   mutate(generation = "sporophyte", year = 2012, species = "mixed") %>%
-  # It appears that data before 2012-07-31 18:10:00 UTC was prelminary (NaCl datalogger
-  # stabilizes to a different RH than 18%, 58%, or 80%). 
-  # Consider the period after this to be the correct data
+  # Data before 2012-07-31 18:10:00 UTC was prelminary (NaCl datalogger
+  # was actually placed in MgCl2, which wasn't used in final analysis). 
+  # Filter to the period after this.
   filter(date_time > "2012-07-31 18:10:00 UTC")
   
 # 2012 gametophytes
@@ -44,6 +44,7 @@ col_types = cols(
 hobo_chamber_data <-
   tibble(
     file = c(
+      list.files("data_raw/2012/hobo", pattern = "csv", full.names = TRUE),
       list.files("data_raw/2013/hobo", pattern = "csv", full.names = TRUE),
       list.files("data_raw/2014/hobo", pattern = "csv", full.names = TRUE)
     )
