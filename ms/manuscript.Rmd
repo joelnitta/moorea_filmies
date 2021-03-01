@@ -246,7 +246,7 @@ All experiments were initiated within 48 h of collection.
 Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitajima1975] was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM fluorometer (Walz Gmbh, Effeltrich, Germany).
 Any samples with pre-treatment F~v~/F~m~ < 0.4 were excluded from analysis, as typical values of F~v~/F~m~ in healthy plants tend to be \circa{ }0.8 [@Bjorkman1987].
 Samples were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100 % RH), and water withheld for either a short (2 d) or long (15 d) interval [@Testo2013].
-Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012 field season) or Hobo ProV2 dataloggers logging every 5 min (2013, 2014 field seasons).
+Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012 field season for species other than *Callistopteris apiifolia*) or Hobo ProV2 dataloggers logging every 5 min (2012 *Callistopteris apiifolia*, 2013, 2014 field seasons).
 The desiccation chambers were kept in an air-conditioned room. 
 Temperature inside the chambers was mean `mean(filmy_dt_chamber$temp) %>% round(1)` ± SD `r sd(filmy_dt_chamber$temp) %>% round(2)` °C (\figs `r s_figure_num("chamber")`).
 Salts used for desiccation and their corresponding mean water potentials and approximate relative humidity and VPD are as follows: LiCl (-282 MPa, 18 % RH, 2.45 kPa), Mg(NO~3~)~2~ (-86 MPa, 58 % RH, 1.25 kPa), and NaCl (-38 MPa, 80 % RH, 0.60 kPa).
@@ -286,7 +286,7 @@ Both measures test the hypothesis that the trait of interest is evolving accordi
 For *K*, values near one indicate evolution of traits following BM; *K* >1 indicates traits more conserved than expected under BM, and *K* <1 indicates that traits have less phylogenetic signal than expected under BM.
 We tested the significance of *K* by comparing the observed value against values from a null distribution of \num{1000} phylogenies with the traits randomly shuffled across the tips.
 We tested the significance of λ with a log-likelihood test comparing the likelihood of the observed value of λ vs. λ = 0.
-For all further analyses, we used methods that account for phylogenetic history for physiological traits that showed significant phylogenetic signal, and standard methods otherwise.
+For all further analyses, we used methods that account for phylogenetic history for physiological traits that showed significant phylogenetic signal in at least one of the two metrics, and standard methods otherwise.
 
 We used general linear mixed models (GLMMs) to investigate the effect of growth habit and life stage on DT (% recovery of F~v~/F~m~ after 48 h recovery from desiccation at -86 MPa for 2 d) and photosynthetic parameters (ETR~max~ and PPFD~95%~) using the \package{MCMCglmm} package [@Hadfield2010].
 For each of the three response variables (DT, ETR~max~, and PPFD~95%~), we constructed five models: a null model with no fixed effects, or models with either growth habit (high-elevation epiphyte, low-elevation epiphyte, terrestrial or saxicolous), generation (sporophyte vs. gametophyte), growth habit and generation, or growth habit, generation, and their interaction as fixed effects.
@@ -347,7 +347,7 @@ phylosig %>%
   verify(all(lambda_pval > 0.05), success_fun = success_logical, error_fun = error_stop)
 ```
 
-Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT (gametophytes *K* = `r gameto_recover_k`, *P* = `r gameto_recover_k_pval` and λ = `r gameto_recover_lambda`, *P* = `r gameto_recover_lambda_pval`; sporophytes *K* = `r sporo_recover_k`, *P* = `r sporo_recover_k_pval` and λ = `r sporo_recover_lambda`, *P* = `r sporo_recover_lambda_pval`), but no significant signal for PPFD~95%~ or ETR~max~ (`r table("physig")`).
+Results of the tests for phylogenetic signal (Blomberg's *K* and Pagel's λ*)* were mostly similar for sporophytes and gametophytes, revealing significant phylogenetic signal for DT when measured with *K* (gametophytes *K* = `r gameto_recover_k`, *P* = `r gameto_recover_k_pval`; sporophytes *K* = `r sporo_recover_k`, *P* = `r sporo_recover_k_pval`), but no significant signal in either metric for PPFD~95%~ or ETR~max~ (`r table("physig")`). Results for phylogenetic signal in DT as measured with λ differed slightly; although gametophytes showed significant signal (λ = `r gameto_recover_lambda`, *P* = `r gameto_recover_lambda_pval`) sporophytes did not (λ =`r sporo_recover_lambda`, *P* = `r sporo_recover_lambda_pval`).
 
 ### Desiccation tolerance
 
@@ -382,22 +382,22 @@ n_dt_species_both <- combined_species_means %>%
 # Extract effect of generation on DT from GLMM
 sporo_dt_effect_mean <-
 glmm_params %>% 
-  filter(response == "recovery", pMCMC < 0.05) %>%
-  verify(predictor == "generationsporophyte") %>%
+  filter(response == "recovery", predictor == "generationsporophyte") %>%
+  verify(pMCMC < 0.05) %>%
   pull(post.mean) %>%
   scales::percent(accuracy = 0.1)
 
 sporo_dt_effect_lower <-
 glmm_params %>% 
-  filter(response == "recovery", pMCMC < 0.05) %>%
-  verify(predictor == "generationsporophyte") %>%
+  filter(response == "recovery", predictor == "generationsporophyte") %>%
+  verify(pMCMC < 0.05) %>%
   pull(`l-95% CI`) %>%
   scales::percent(accuracy = 0.1)
 
 sporo_dt_effect_upper <-
 glmm_params %>% 
-  filter(response == "recovery", pMCMC < 0.05) %>%
-  verify(predictor == "generationsporophyte") %>%
+  filter(response == "recovery", predictor == "generationsporophyte") %>%
+  verify(pMCMC < 0.05) %>%
   pull(`u-95% CI`) %>%
   scales::percent(accuracy = 0.1)
 
@@ -439,7 +439,7 @@ Gametophytes of low elevation epiphytes had the highest DT (\circa{ }80% recover
 Relative humidity in the growth chambers was high when samples were first inserted, then gradually decreased to the target value maintained by each drying salt (\figs{ }`r s_figure_num("chamber")`).
 Brief fluctuations to higher humidities were observed when chambers were opened to insert or remove samples (`r s_figure("chamber-s")`).
 
-The GLMM including the effect of generation only was selected as the best-fitting model for DT (`r table("glmm")`). 
+The GLMM including the combined effects of generation plus growth habit and their interaction was selected as the best-fitting model for DT (`r table("glmm")`). 
 Sporophytes had `r sporo_dt_effect_mean` greater DT (95 % CI `r sporo_dt_effect_lower` to `r sporo_dt_effect_upper`) relative to gametophytes (`r table("glmm-pars")`).
 
 ### Photosynthetic optima

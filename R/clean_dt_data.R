@@ -96,7 +96,7 @@ dt_2012_all <-
       species == "C min" ~ "Crepidomanes_minutum2",
       species == "Cal api" ~ "Callistopteris_apiifolia",
       species == "H pol" ~ "Hymenophyllum_polyanthos",
-      species == "P end" ~ "Polyphlebium_borbonicum",
+      species == "P end" ~ "Polyphlebium_endlicherianum",
       TRUE ~ NA_character_
     )) %>%
   # Convert dry time to factor (control will be NA)

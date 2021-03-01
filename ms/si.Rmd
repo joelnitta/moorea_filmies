@@ -979,11 +979,12 @@ chamber_gameto_2013_temp_plot + chamber_gameto_2012_temp_plot +
 
 \newpage
 
-**`r s_figure("chamber")`**. Temperature, relative humidity (RH), and duration of desiccation treatment of filmy ferns from Moorea, French Polynesia. **a**--**c**, sporophytes; **d**, gametophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, **d**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH). Temperature and RH measured with Track-It RH/Temp dataloggers logging every 10 min (2012 species other than *Callistopteris apiifolia*) or Hobo ProV2 dataloggers logging every 5 min (2012 *Callistopteris apiifolia*, 2013, 2014). For NaCl (**c**), multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color; "missing" indicates correspondence between samples and data loggers (chambers) unknown. For bottom-most panels (duration of desiccation treatment), line indicates duration of treatment and point indicates removal of sample from chamber. Gametophytes were measured in batches; membership of individual gametophytes to each batch can be found in `r s_table("gameto-batches")` (Online Resource 2).
+**`r s_figure("chamber")`**. Temperature, relative humidity (RH), and duration of desiccation treatment of filmy ferns from Moorea, French Polynesia. **a**--**c**, sporophytes; **d**, gametophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, **d**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH). Temperature and RH measured with Track-It RH/Temp dataloggers logging every 10 min (2012 species other than *Callistopteris apiifolia*) or Hobo ProV2 dataloggers logging every 5 min (2012 *C. apiifolia*, 2013, 2014). For NaCl (**c**), multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color; "missing" indicates correspondence between samples and data loggers (chambers) unknown; *C. apiifolia* samples divided into two chambers. For bottom-most panels (duration of desiccation treatment), line indicates duration of treatment and point indicates removal of sample from chamber. Gametophytes were measured in batches; membership of individual gametophytes to each batch can be found in `r s_table("gameto-batches")` (Online Resource 2).
 
 \newpage
 
 ```{r change-theme-2}
+# Change theme back after DT chamber plots
 theme_set(previous_theme)
 ```
 
