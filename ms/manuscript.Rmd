@@ -57,6 +57,7 @@ tar_load(mean_vpd_sporo)
 tar_load(mean_vpd_gameto)
 tar_load(glmm_summary)
 tar_load(glmm_params)
+tar_load(env_range_dt_model)
 tar_load(env_range_dt_model_summary)
 tar_load(filmy_dt_chamber)
 ```
@@ -516,8 +517,7 @@ gameto_vpd_pval <- env_range_dt_model_summary %>% filter(model == "gameto_vpd_mo
   round_t(3)
 ```
 
-Desiccation tolerance tended to increase with VPD for sporophytes, but not gametophytes (`r figure("corr")`).
-This trend was marginally non-significant when analyzed using PGLS (*P* = `r sporo_vpd_pval`; `r table("pgls")`).
+Desiccation tolerance increased significantly with VPD for sporophytes, but not gametophytes (`r figure("corr")`; sporophytes *P* = `r sporo_vpd_pval`; `r table("pgls")`).
 
 No significant relationship was detected between range size of gametophytes beyond sporophytes and DT (`r figure("corr")`, `r table("pgls")`).
 
@@ -543,16 +543,16 @@ max_ter_vpd <- mean_vpd_sporo %>%
 
 We found a wide variation of DT in filmy fern sporophytes on Moorea, from no tolerance in terrestrial species to tolerance of water potentials well below -200 MPa (VPD > 2.45 kPa) in some epiphytes.
 Levels of similarly extreme DT have also been reported in other species of *Hymenophyllum* [@Proctor2003; @Proctor2012] and a general correlation of habitat with DT in filmy ferns has been previously established [@Shreve1911; @Proctor2003; @Proctor2012; @Parra2009; @Saldana2013], but no other studies to our knowledge have documented a similar range of DT values in filmy ferns from a single site.
-One may wonder then, what is the adaptive significance of being able to withstand drying at -282 MPa (\circa{ }2.45 kPa) vs. -86 MPa (\circa{ }1.25 kPa) when the ambient VPD is typically < (\circa{ }0.10 kPa) and only rarely exceeds > 0.50 kPa.
+One may wonder then, what is the adaptive significance of being able to withstand drying at -282 MPa (\circa{ }2.45 kPa) vs. -86 MPa (\circa{ }1.25 kPa) when the ambient VPD is typically < \circa{ }0.10 kPa and only rarely exceeds > 0.50 kPa.
 The recent finding of a constitutive mechanism for DT in filmy ferns [@GarcesCea2014] supports the need for a relatively wide "safety margin," and similar (or even more extreme) levels of constitutive DT are well known in bryophytes [@Oliver1993].
 The conservative behavior of fern stomata, which lack a response to the plant stress hormone ABA, is well documented [@Brodribb2011; @Mcadam2012; @Mcadam2013].
 It is possible that filmy ferns also behave conservatively with respect to water-stress.
 We suggest that the variation in DT observed here is relevant because it is correlated with habitat, and likely reflects overall physiological tolerance, not just artificial extremes.
-For example, sporophytes of some high elevation epiphytes that we surveyed (*C. minutum* var. 2, *H. digitatum*, *H. multifidum*, *H. polyanthos*) seem to be able to better withstand intense vs. moderate desiccation, with higher recovery values at -282 and -86 MPa vs. -38 MPa when dry for 15 d.
+For example, sporophytes of some high elevation epiphytes that we surveyed (*H. multifidum*, *H. polyanthos*) seem to be able to better withstand intense vs. moderate desiccation, with higher recovery values at -282 and -86 MPa vs. -38 MPa when dry for 15 d.
 This may be an adaptation to cloud forest conditions; although cloud forests are frequently moist due to constant fog, dry periods are intense during the times when there is no cloud cover.
 The complete lack of DT in terrestrial species is not surprising, considering they have much more direct access to water than epiphytes and therefore substantially less selective pressure to maintain DT.
 Since controls kept at 100% RH maintained F~v~/F~m~ values near pre-treatment levels in all sporophytes (`r s_figure("dt-control")`), it is unlikely that the lack of tolerance seen in terrestrial species is due solely to removal from the soil.
-Comparison of DT with the average daily maximum VPD of each species (`r figure("corr")`) indicates that sporophytes of non-tolerant terrestrial and saxicolous species may not be able to occur in habitats with VPD exceeding \circa{ }`r max_ter_vpd` kPa.
+The significant relationship between average daily maximum VPD and DT in sporophytes supports the specialization of sporophyte DT according to niche, and indicates that sporophytes of non-tolerant terrestrial and saxicolous species may not be able to occur in habitats with VPD exceeding \circa{ }`r max_ter_vpd` kPa (`r figure("corr")`).
 
 ### Filmy fern gametophytes are not more stress-tolerant than sporophytes
 
@@ -572,7 +572,7 @@ Sporophytes of this species are usually restricted to moist cloud forest sites f
 A similar distribution pattern has been reported in congeneric *Callistopteris baldwinii* (D. C. Eaton) Copel.
 from Hawaii [@Dassler1997].
 Since gametophytes of *C. apiifolia* are common on Moorea and have a unique morphology [@Nitta2017], we were able to collect enough material of this species for additional tests of DT at 100% RH for 2 d.
-However, it still failed to recover from even this gentle treatment (`r s_figure("capi-water")`.
+However, it still failed to recover from even this gentle treatment (`r s_figure("capi-water")`).
 This suggests that the widespread gametophytes of *C. apiifolia* do not rely on DT to attain their distribution, but instead must do so via some other mechanism.
 Although we measured terrestrial microhabitats by positioning sensors a few cm above the ground, these sensors are still outside of the boundary layer.
 It is likely that the gametophytes of *C. apiifolia* do not actually experience the conditions measured with our 'terrestrial' dataloggers, but instead grow within a much more consistently moist boundary layer.
@@ -597,7 +597,7 @@ It is possible that the actual light levels experienced by gametophytes growing 
 ### Influence of phylogeny on traits
 
 Previous studies of filmy fern ecophysiology also found a link between habitat and DT and/or photosynthetic rates [@Proctor2003; @Proctor2012; @Parra2009; @Saldana2013]; however, ours is the first to our knowledge to investigate this pattern while taking phylogeny into account.
-We detected significant phylogenetic signal in DT, suggesting that phylogeny should be considered when interpreting differences in DT between species (`r table("physig")`).
+We detected significant phylogenetic signal in DT with Blomberg's *K* (`r table("physig")`), suggesting that phylogeny should be considered when interpreting differences in DT between species.
 In contrast, the lack of phylogenetic signal in photosynthetic traits, coupled with the clear intergenerational differences we observed, suggest that sporophytes and gametophytes are adapted for different light levels regardless of clade or ecological niche.
 In a more densely sampled study of morphological evolution in the trichomanoid clade, @Dubuisson2013 identified several morphological changes including reduced stele and root systems associated with the evolution of epiphytic growth within the HE subclade (comprising the genera *Polyphlebium*, *Didymoglossum*, *Crepidomanes*, and *Vandenboschia*).
 It is possible that both reduced morphology and increased DT are parts of an integrated adaptive strategy for epiphytic growth within this subclade of filmy ferns, and have evolved together repeatedly.
@@ -903,8 +903,8 @@ Growth habit indicated by colored symbols (blue = low elevation epiphyte, green 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
 Asterisk indicates significant difference in means (*P* <0.05) between generations for a particular species (*t*-test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for *t*-test.
 Left bar plot shows recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). 
-Right bar plot shows maximum relative electron transport rate of photosystem II (ETR~max~). 
-The other photosynthetic parameter measured, photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~), was qualitatively very similar to ETR~max~ and not shown.
+Middle bar plot shows maximum relative electron transport rate of photosystem II (ETR~max~) (µmol e-·m^-2^·s^-1^). 
+Right bar plot shows photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~) (µmol quanta·m^-2^·s^-1^).
 Absence of a bar indicates measurements not available for gametophytes or sporophytes of that species.
 
 **`r figure("corr")`** Recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa plotted against environmental vapor pressure deficit (VPD; kPa) (**a**, **b**) or range of gametophytes beyond sporophytes (m) (**c**) for gametophytes (**a**, **c**) or sporophytes (**b**). 
@@ -913,7 +913,7 @@ Growth habit indicated by colored symbols (blue = low elevation epiphyte, green 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but were treated as epiphytes to distinguish them from exclusively saxicolous species.
 *Abrodictyum dentatum* sporophytes were desiccated at –38 MPa instead of –86 MPa.
 Range of gametophytes beyond sporophytes calculated as the total elevation that gametophytes exceeded sporophytes at either end of the elevational gradient.
-Relationships between recovery and VPD or range of gametophytes beyond sporophytes were analyzed with phylogenetic generalized least squares (PGLS); no significant relationships were detected.
+Relationships between recovery and VPD or range of gametophytes beyond sporophytes were analyzed with phylogenetic generalized least squares (PGLS); significant relationships (*P* < 0.05) shown with grey line.
 
 \newpage
 
@@ -1116,14 +1116,14 @@ habit <-
   
 # Part A (left): tree
 a <- ggtree(phy) %<+% habit +
-  geom_tippoint(aes(color = habit), position = position_nudge(x = 14, y = 0), size = 3.5) +
+  geom_tippoint(aes(color = habit), position = position_nudge(x = 14, y = 0), size = 3.0) +
   scale_color_manual(values = habit_colors, labels = pretty_text) +
   labs(color = "Growth habit") +
   # There is no way modify the text in geom_treescale (to add units), so make the
   # text disappear by setting fontsize = 0
-  geom_treescale(y = 12, x = 0, width = 40, fontsize = 0) +
+  geom_treescale(y = 12, x = 2, width = 40, fontsize = 0) +
   # Manually place custom label above scale bar
-  annotate("text", x = 20, y = 12, label = "40 my", size = 2.5, vjust = -1) +
+  annotate("text", x = 22, y = 12, label = "40 my", size = 2.5, vjust = -1) +
   scale_x_continuous(expand = expansion(mult = c(0.01, 0.04))) +
   theme_void(base_size = 10)
 
@@ -1167,12 +1167,12 @@ b <- ggplot(traits, aes(y = species)) +
     angle = -90,
     nudge_x = 0.01,
     color = "grey20",
-    size = 3,
+    size = 2.5,
     vjust = -0.5) +
   scale_x_continuous(
     labels = percent, 
     limits = c(0,1.2), 
-    expand = expansion(mult = c(0,0.025)), 
+    expand = expansion(mult = c(0,0.030)), 
     breaks=c(0,.25,.5,.75,1.0)) +
   scale_fill_manual(values = generation_colors, labels = pretty_text) +
   # theme_bw(base_size = 10) +
@@ -1188,7 +1188,7 @@ b <- ggplot(traits, aes(y = species)) +
 
 # Part C (right): light-levels
 
-# Make helper table of significant t-test results
+# Make helper table of significant t-test results: ETR
 etr_t_test_data <-
 t_test_results %>%
   filter(response == "etr") %>%
@@ -1201,9 +1201,28 @@ t_test_results %>%
   select(species, star) %>%
   left_join(select(traits, species, generation, etr_mean, etr_sd), by = "species") %>%
   rowwise %>%
+  # `etr_top` is the highest possible value of ETR in the plot (mean + sd),
+  # used for placing the asterisks
   mutate(etr_top = sum(etr_mean, etr_sd)) %>%
   group_by(species, star) %>%
   summarize(etr_top = max(etr_top), .groups = "drop")
+
+# Make helper table of significant t-test results: PAR
+par_t_test_data <-
+t_test_results %>%
+  filter(response == "par") %>%
+  mutate(star = case_when(
+    p_value < 0.001 ~ "***",
+    p_value < 0.01 ~ "**",
+    p_value < 0.05 ~ "*",
+    TRUE ~ "ns"
+    )) %>%
+  select(species, star) %>%
+  left_join(select(traits, species, generation, par_mean, par_sd), by = "species") %>%
+  rowwise %>%
+  mutate(par_top = sum(par_mean, par_sd)) %>%
+  group_by(species, star) %>%
+  summarize(par_top = max(par_top), .groups = "drop")
 
 c <- ggplot(traits, aes(y = species)) +
   geom_col(
@@ -1211,7 +1230,9 @@ c <- ggplot(traits, aes(y = species)) +
     position = pos,
     width = 0.5) +
   geom_errorbarh(
-    aes(x = etr_mean, xmax = etr_mean + etr_sd, xmin = etr_mean, fill = generation),
+    # need `fill = generation` for position to work correctly,
+    # even though it produces a warning 'Ignoring unknown aesthetics: fill '
+    aes(xmax = etr_mean + etr_sd, xmin = etr_mean, fill = generation),
     position = pos,
     height = 0,
     color = "grey20") +
@@ -1221,7 +1242,7 @@ c <- ggplot(traits, aes(y = species)) +
     angle = -90,
     nudge_x = 0.01,
     color = "grey20",
-    size = 3,
+    size = 2.5,
     vjust = -0.5) +
   scale_fill_manual(values = generation_colors, labels = pretty_text) +
   # theme_bw(base_size = 10) +
@@ -1236,13 +1257,51 @@ c <- ggplot(traits, aes(y = species)) +
     panel.grid.minor = element_blank(), 
     panel.grid.major.y = element_blank(),
     axis.title.y = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.x = element_markdown()
+  ) +
+  guides(fill = "none")
+
+
+d <- ggplot(traits, aes(y = species)) +
+  geom_col(
+    aes(x = par_mean, fill = generation),
+    position = pos,
+    width = 0.5) +
+  geom_errorbarh(
+    # need `fill = generation` for position to work correctly,
+    # even though it produces a warning 'Ignoring unknown aesthetics: fill '
+    aes(xmax = par_mean + par_sd, xmin = par_mean, fill = generation),
+    position = pos,
+    height = 0,
+    color = "grey20") +
+  geom_text(
+    data = par_t_test_data, 
+    aes(label = star, y = species, x = par_top),
+    angle = -90,
+    nudge_x = 0.01,
+    color = "grey20",
+    size = 2.5,
+    vjust = -0.5) +
+  scale_fill_manual(values = generation_colors, labels = pretty_text) +
+  scale_y_discrete(
+    position = "right",
+    labels = str_abbrev_sp_pretty
+    ) +
+  scale_x_continuous(expand = expansion(mult = c(0,0.025))) +
+  labs(x = "PPFD<sub>95%</sub>", fill = "Generation") +
+  theme(
+    panel.grid.minor = element_blank(), 
+    panel.grid.major.y = element_blank(),
+    axis.title.y = element_blank(),
     axis.text.y.right = element_markdown(), # NOT axis.text.y
     axis.title.x = element_markdown()
   ) +
   guides(fill = "none")
 
 # Combine plots
-a + b + c + plot_layout(nrow = 1, guides = "collect") &
+a + b + c + d + plot_layout(nrow = 1, guides = "collect") &
   theme(
     legend.position = "bottom",
     # Adjust invididual margins to remove whitespace between subplots
@@ -1270,7 +1329,29 @@ plot_data <-
 list(filmy_habit, recovery_mean_data, recovery_sd_data, mean_vpd_sporo, mean_vpd_gameto, range_comparison) %>%
   reduce(left_join, by = "species")
 
+# Verify that model fit is significant
+vpd_sporophyte_pval <- env_range_dt_model_summary %>% filter(model == "sporo_vpd_model") %>% pull(p_value) %>%
+  round_t(3)
+
+assertthat::assert_that(vpd_sporophyte_pval < 0.05)
+
+vpd_sporophyte_adj_r_squared <- env_range_dt_model_summary %>% filter(model == "sporo_vpd_model") %>% pull(adj_r_squared) %>%
+  round_t(3)
+
+# Extract fitted points from model
+vpd_sporophyte_fitted <-
+  # PGLS model has fitted points by species name, so join with VPD data
+  env_range_dt_model$sporo_vpd_model$fitted %>%
+  as.data.frame() %>%
+  rownames_to_column("species") %>%
+  as_tibble() %>%
+  rename(recovery_sporophyte_mean = V1) %>%
+  left_join(select(
+    plot_data, species, vpd_sporophyte_mean
+  ), by = "species")
+
 a <- ggplot(plot_data, aes(x = vpd_sporophyte_mean, y = recovery_sporophyte_mean, color = habit)) +
+  geom_line(data = vpd_sporophyte_fitted, color = "dark grey") +
   geom_linerange(aes(
     ymin = recovery_sporophyte_mean - recovery_sporophyte_sd,
     ymax = recovery_sporophyte_mean + recovery_sporophyte_sd),
@@ -1280,6 +1361,11 @@ a <- ggplot(plot_data, aes(x = vpd_sporophyte_mean, y = recovery_sporophyte_mean
     xmax = vpd_sporophyte_mean + vpd_sporophyte_sd),
     alpha = 0.3) +
   geom_point() +
+  annotate(
+    geom = "richtext", 
+    x = Inf, y = -Inf, 
+    label = glue("*P* = {vpd_sporophyte_pval}<br>*R*<sup>2</sup> = {vpd_sporophyte_adj_r_squared}"),
+    hjust = 1, vjust = 0, size = 3, label.colour = "transparent") +
   scale_y_continuous(
     labels = percent, 
     limits = c(0,1.25)) +
