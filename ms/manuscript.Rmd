@@ -60,6 +60,7 @@ tar_load(glmm_params)
 tar_load(env_range_dt_model)
 tar_load(env_range_dt_model_summary)
 tar_load(filmy_dt_chamber)
+tar_load(rel_water_species_means)
 ```
 
 <!-- to move to the next line without starting a new paragraph, 
@@ -418,6 +419,18 @@ t_test_results %>%
   pull(species) %>%
   map_chr(~ttest_pval(species_select = ., response_select = "recovery", data = t_test_results)) %>%
   knitr::combine_words()
+
+# Rel. water content
+rel_water_table <- 
+rel_water_species_means %>%
+  filter(!is.na(rel_water)) %>%
+  group_by(salt, dry_time, rec_time) %>% 
+  summarize(mean = mean(rel_water), sd = sd(rel_water), n = n(), .groups = "drop") %>%
+  arrange(mean) %>%
+  mutate(across(c(mean, sd), ~scales::percent(., suffix = " %", accuracy = 0.1))) %>%
+  mutate(sum_val = glue("{mean} ± {sd} (*n* = {n})"))
+
+rel_water_table %>% filter(salt == "LiCl", dry_time == "15") %>% pull(sum_val)
 ```
 
 Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases.
@@ -430,14 +443,15 @@ Most low elevation epiphytes could not tolerate long periods (15 d) of desiccati
 Most of the high elevation epiphytes could recover from 2 d treatments regardless of desiccation intensity (except for *H. pallidum* and *P. borbonicum*, which failed to recover from 2 d at --282 MPa), and many could withstand desiccation for 15 d.
 Interestingly, *C. minutum* var. 2, *Hymenophyllum multifidum* (G. Forst.) Sw., and *Hymenophyllum polyanthos* (Sw.) Sw. could recover from desiccation at --86 or --282 MPa for 15 d, but not --38 MPa.
 
-Control samples generally did not show any decrease in F~v~/F~m~ throughout the duration of the experiment (`r s_figure("dt-control")`). 
-Relative water content reached \circa{ }0 % in the desiccated state (`r s_figure("water-all")`), and returned to \circa{ }100 % upon re-wetting in all species sampled (`r s_figure("water-s")`).
+Control samples generally did not show any decrease in F~v~/F~m~ throughout the duration of the experiment (`r s_figure("dt-control")`) and maintained RWC near 100% (\figs{ }`r s_figure_num("water-all")`, `r s_figure_num("water-s")`). 
+
+Relative water content in the desiccated state ranged from `r rel_water_table %>% filter(salt == "LiCl", dry_time == "15", rec_time == "desiccated") %>% pull(sum_val)` (--282 MPa for 15 d) to `r rel_water_table %>% filter(salt == "NaCl", dry_time == "2", rec_time == "desiccated") %>% pull(sum_val)` (--38 MPa for 2 d), and returned to \circa{ }100 % upon re-wetting in all species sampled (`r s_figure("water-s")`).
 
 DT of gametophytes did not significantly exceed that of sporophytes for any species, and was significantly lower in `r dt_g_less_than_s` (`r figure("combined")`; *t*-test, *P* = `r dt_g_less_than_s_pvals`, respectively).
 
 Gametophytes of low elevation epiphytes had the highest DT (\circa{ }80% recovery), followed by high elevation epiphytes and saxicolous species (both with recovery from \circa{ }25% to 75%), with terrestrial species essentially non-tolerant (less than 20% recovery; `r figure("dt")`b).
 
-Relative humidity in the growth chambers was high when samples were first inserted, then gradually decreased to the target value maintained by each drying salt (\figs{ }`r s_figure_num("chamber")`).
+Relative humidity in the growth chambers was high when samples were first inserted, then gradually decreased to the target value maintained by each drying salt (`r s_figure("chamber")`).
 Brief fluctuations to higher humidities were observed when chambers were opened to insert or remove samples (`r s_figure("chamber-s")`).
 
 The GLMM including the combined effects of generation plus growth habit and their interaction was selected as the best-fitting model for DT (`r table("glmm")`). 

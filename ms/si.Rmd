@@ -553,7 +553,7 @@ licl_temp_plot_2012 + licl_temp_plot_2013 + licl_temp_plot_2014 +
   theme(plot.tag = element_text(face = "bold"))
 ```
 
-```{r sporophyte-dt-MgNO3, fig.height = 6.5, fig.width = 9, fig.cap = ""}
+```{r sporophyte-dt-MgNO3, fig.height = 6.6, fig.width = 9, fig.cap = ""}
 # Get mean times of each cluster of DT test samples for the selected drying salt
 mgno3_clusters_2013 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2013")), "MgNO3", 3)
 mgno3_clusters_2014 <- cluster_sporo_times(filter(sporo_times, str_detect(dataset, "2014")), "MgNO3", 1)
@@ -667,7 +667,7 @@ mgno3_temp_plot_2012 + mgno3_temp_plot_2013 + mgno3_temp_plot_2014 +
   theme(plot.tag = element_text(face = "bold"))
 ```
 
-```{r sporophyte-dt-NaCl, fig.height = 6.5, fig.width = 9, fig.cap = ""}
+```{r sporophyte-dt-NaCl, fig.height = 6.6, fig.width = 9, fig.cap = ""}
 # Subset desiccation duration data
 nacl_clusters_2012 <- filter(sporo_dt_times, salt == "NaCl") %>%
   mutate(
