@@ -382,26 +382,24 @@ n_dt_species_both <- combined_species_means %>%
 # Extract effect of generation on DT from GLMM
 sporo_dt_effect_mean <-
 glmm_params %>% 
-  filter(response == "recovery") %>%
+  filter(response == "recovery", pMCMC < 0.05) %>%
   verify(predictor == "generationsporophyte") %>%
   pull(post.mean) %>%
   scales::percent(accuracy = 0.1)
 
 sporo_dt_effect_lower <-
 glmm_params %>% 
-  filter(response == "recovery") %>%
+  filter(response == "recovery", pMCMC < 0.05) %>%
   verify(predictor == "generationsporophyte") %>%
   pull(`l-95% CI`) %>%
   scales::percent(accuracy = 0.1)
 
 sporo_dt_effect_upper <-
 glmm_params %>% 
-  filter(response == "recovery") %>%
+  filter(response == "recovery", pMCMC < 0.05) %>%
   verify(predictor == "generationsporophyte") %>%
   pull(`u-95% CI`) %>%
   scales::percent(accuracy = 0.1)
-
-t_test_results
 
 # Extract list of species with significant p-values for gameto DT less than sporo
 dt_g_less_than_s <-
@@ -535,7 +533,7 @@ Here, we present the first comparisons of physiological parameters between gener
 ```{r sporo-dt-disc-stats}
 # Calculate the avg daily maximum VPD tolerated by sax & terr sporophytes
 max_ter_vpd <- mean_vpd_sporo %>%
-  left_join(filmy_habit) %>%
+  left_join(filmy_habit, by = "species") %>%
   filter(habit %in% c("Saxicolous", "Terrestrial")) %>%
   slice_max(order_by = vpd_sporophyte_mean) %>%
   pull(vpd_sporophyte_mean) %>%

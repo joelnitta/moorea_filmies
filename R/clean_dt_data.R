@@ -35,19 +35,29 @@ minipam_2013_long <-
   arrange(date_time)
 
 # 2012 sporophyte DT data ----
+
+# Use the sheet "averages (new cmin)", which includes all raw data plus a single C minutum sample (2d treatment)
+# that was lacking in the "raw data" sheet, and extra columns for SD and mean (we won't use those though)
+
 ### Fix column names ###
 # In the original excel file, these are in two rows.
 moorea_filmy_dt_2012_raw_path <- "data_raw/2012/Moorea Filmy DT 2 8-26 (version 1).xlsx"
 
-headers_1 <- read_excel(moorea_filmy_dt_2012_raw_path) %>% colnames()
+headers_1 <- read_excel(
+  moorea_filmy_dt_2012_raw_path, sheet = "averages (new cmin)") %>% 
+  colnames()
 
-headers_2 <- read_excel(moorea_filmy_dt_2012_raw_path, skip = 1) %>% colnames()
+headers_2 <- read_excel(
+  moorea_filmy_dt_2012_raw_path, sheet = "averages (new cmin)", skip = 1) %>% 
+  colnames()
 
-dt_2012_head_1 <- read_excel(moorea_filmy_dt_2012_raw_path, skip = 2, col_names = headers_1) %>%
+dt_2012_head_1 <- read_excel(
+  moorea_filmy_dt_2012_raw_path, sheet = "averages (new cmin)", skip = 2, col_names = headers_1) %>%
   remove_empty(which = "cols", quiet = FALSE) %>% # delete empty columns
   clean_names()
 
-dt_2012_head_2 <- read_excel(moorea_filmy_dt_2012_raw_path, skip = 2, col_names = headers_2) %>%
+dt_2012_head_2 <- read_excel(
+  moorea_filmy_dt_2012_raw_path, sheet = "averages (new cmin)", skip = 2, col_names = headers_2) %>%
   remove_empty(which = "cols", quiet = FALSE) %>%
   clean_names()
 
@@ -57,12 +67,13 @@ headers <- tibble(
 )
 
 # Write out these column headers, then manually edit new column names
-# write.csv(headers, "moorea_filmy_dt_2012_headers.csv")
+# write.csv(headers, "moorea_filmy_dt_2012_headers_sheet-2.csv")
 
 # Read in file with new column names
-new_headers <- read_csv("data_raw/intermediates/moorea_filmy_dt_2012_headers.csv")
+new_headers <- read_csv("data_raw/intermediates/moorea_filmy_dt_2012_headers_sheet-2.csv")
 
-dt_2012_all_raw <- read_excel(moorea_filmy_dt_2012_raw_path, skip = 2, col_names = FALSE) %>%
+dt_2012_all_raw <- read_excel(
+  moorea_filmy_dt_2012_raw_path, skip = 2, sheet = "averages (new cmin)", col_names = FALSE) %>%
   remove_empty(which = "cols", quiet = FALSE) %>%
   set_names(new_headers$new_header)
 
@@ -81,7 +92,8 @@ dt_2012_all <-
     species = case_when(
       species == "C bip" ~ "Crepidomanes_bipunctatum",
       species == "C hum" ~ "Crepidomanes_humile",
-      species == "C min" ~ "Crepidomanes_minutum1",
+      # I have confirmed that this is C. minutum 2 (high el variety, not 1 = low el variety)
+      species == "C min" ~ "Crepidomanes_minutum2",
       species == "Cal api" ~ "Callistopteris_apiifolia",
       species == "H pol" ~ "Hymenophyllum_polyanthos",
       species == "P end" ~ "Polyphlebium_borbonicum",

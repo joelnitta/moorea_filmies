@@ -127,6 +127,93 @@ plot_sporo_chamber_time <- function (data, time_limits) {
     )
 }
 
+# NaCl plots need separate funcs because they involve color by serial number
+make_nacl_time_plot <- function (data, serial_no_cols, time_limits) {
+  ggplot(
+    data, 
+    aes(
+      x = species, ymin = pre, ymax = post, y = post, 
+      group = species_duration, color = serial_no)
+  ) +
+  geom_linerange(position = position_dodge(0.5)) +
+  geom_point(position = position_dodge(0.5)) +
+  scale_y_datetime(limits = time_limits, minor_breaks = "1 day") +
+  # Print all 'species' on the y-axis using `drop = false`
+  scale_x_discrete(labels = str_abbrev_sp_pretty, drop = FALSE) +
+  # Print all levels of 'serial no' in the legend using `drop = false`
+  scale_color_manual(values = serial_no_cols, drop = FALSE) +
+  labs(x = "Species", color = "Serial no.") +
+  coord_flip() +
+  theme(
+    axis.title = element_blank(),
+    axis.text.y = element_markdown()
+    )
+} 
+
+make_nacl_rh_plot <- function(data, serial_no_cols, time_range, rh_range, groups = FALSE) {
+  
+  # If groups is TRUE, plot separate lines for different groups of data
+  p <- if(groups == TRUE) {
+    ggplot(
+      data, 
+      aes(x = date_time, y = 0.01*rh, color = serial_no, group = interaction(group, serial_no))
+    ) 
+  } else {
+    ggplot(
+      data, 
+      aes(x = date_time, y = 0.01*rh, color = serial_no)
+    )
+  }
+  
+  p +
+  geom_line(size = 0.25) +
+  scale_color_manual(values = serial_no_cols) +
+  scale_x_datetime(limits = time_range, minor_breaks = "1 day") +
+  scale_y_continuous(
+    label = scales::label_percent(accuracy = 1), 
+    limits = rh_range) +
+  labs(
+    y = "Relative humidity",
+    color = "Serial no.") +
+  guides(color = "none") +
+  theme(axis.title.x = element_blank()) +
+  guides(color = "none")
+}
+
+make_nacl_temp_plot <- function(data, serial_no_cols, time_range, temp_range, title, groups = FALSE) {
+  
+  # If groups is TRUE, plot separate lines for different groups of data
+  p <- if(groups == TRUE) {
+    ggplot(
+      data, 
+      aes(x = date_time, y = temp, color = serial_no, group = interaction(group, serial_no))
+    ) 
+  } else {
+    ggplot(
+      data, 
+      aes(x = date_time, y = temp, color = serial_no)
+    )
+  }
+  
+  p +
+  geom_line(size = 0.25) +
+  scale_color_manual(values = serial_no_cols) +
+  scale_x_datetime(limits = time_range, minor_breaks = "1 day") +
+  scale_y_continuous(
+    label = label_number(suffix = "\u00b0C", accuracy = 1), 
+    limits = temp_range) +
+  labs(
+    y = "Temperature",
+    color = "Serial no.",
+    title = title) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 11),
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank()) +
+  guides(color = "none")
+}
+
 # Define function to plot facetted light curve
 make_facet_lc_plot <- function(light_data, lc_model_fitted_data, lc_model_params) {
   
@@ -582,22 +669,36 @@ mgno3_temp_plot_2012 + mgno3_temp_plot_2013 + mgno3_temp_plot_2014 +
 
 ```{r sporophyte-dt-NaCl, fig.height = 6.5, fig.width = 9, fig.cap = ""}
 # Subset desiccation duration data
+nacl_clusters_2012 <- filter(sporo_dt_times, salt == "NaCl") %>%
+  mutate(
+    serial_no = case_when(
+      species %in% c(
+        "Hymenophyllum_polyanthos", "Crepidomanes_humile", 
+        "Crepidomanes_bipunctatum", "Polyphlebium_endlicherianum", 
+        "Crepidomanes_minutum2") ~ "3200919",
+      species == "Callistopteris_apiifolia" ~ "10140667, 10140659",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  mutate(year = "2012", species_duration = paste(species, dry_time))
+
 # H_polyanthos shows n=1, but this is only because pre/post were available for only one sample
 # (actually had 8 samples total)
 nacl_clusters_2013 <- 
   sporo_times %>%
   filter(str_detect(dataset, "2013")) %>%
   cluster_sporo_times("NaCl", 4) %>%
+  # Exclude A. dentatum, which is lacking chamber datalogger data
+  filter(species != "Abrodictyum_dentatum") %>%
   mutate(
     serial_no = case_when(
       species %in% c("Didymoglossum_tahitense", "Crepidomanes_kurzii", "Callistopteris_apiifolia") & dry_time == "2" ~ "missing",
       species %in% c("Hymenophyllum_multifidum", "Hymenophyllum_digitatum") ~ "10140667",
       species %in% c("Hymenophyllum_polyanthos") ~ "10152774",
-      species %in% c("Abrodictyum_dentatum") & dry_time == "2" ~ "missing",
       TRUE ~ "missing"
-    ),
-    serial_no = as.factor(serial_no)
-  )
+    )
+  ) %>%
+  mutate(year = "2013")
 
 nacl_clusters_2014 <-
   sporo_times %>%
@@ -607,61 +708,39 @@ nacl_clusters_2014 <-
     serial_no = case_when(
       species %in% c("Vandenboschia_maxima") & dry_time == "2" ~ "10140661",
       TRUE ~ "10152773"
-    ),
-    serial_no = as.factor(serial_no)
-  )
-
-# make levels of `serial_no` and `species` the same across datasets
-nacl_all_sn <- filmy_dt_chamber %>% 
-  filter(salt == "NaCl") %>% 
-  pull(serial_no) %>% 
-  unique %>% 
-  sort %>%
-  c("missing")
-
-nacl_all_species <- sporo_times %>% 
-  filter(salt == "NaCl") %>% 
-  pull(species) %>% 
-  unique %>% 
-  sort
-
-nacl_clusters_2013 <- mutate(
-  nacl_clusters_2013, 
-  # sort SN in numeric order
-  serial_no = fct_expand(serial_no, nacl_all_sn) %>% fct_inseq,
-  # sort species in reverse-alphabetical order (so 'A' is on top in plot)
-  species = fct_expand(species, nacl_all_species) %>% fct_relevel(function (x) sort(x, decreasing = TRUE))
-)
-
-nacl_clusters_2014 <- mutate(
-  nacl_clusters_2014, 
-  serial_no = fct_expand(serial_no, nacl_all_sn) %>% fct_inseq,
-  species = fct_expand(species, nacl_all_species) %>% fct_relevel(function (x) sort(x, decreasing = TRUE))
-)
+    )
+  ) %>%
+  mutate(year = "2014")
 
 # Calculate time range for the clustered data
 # to standardize x-axis
+nacl_time_range_2012 <- c(min = min(nacl_clusters_2012$pre), max = max(nacl_clusters_2012$post))
 nacl_time_range_2013 <- c(min = min(nacl_clusters_2013$pre), max = max(nacl_clusters_2013$post))
 nacl_time_range_2014 <- c(min = min(nacl_clusters_2014$pre), max = max(nacl_clusters_2014$post))
 
-# Subset DT chamber data
-nacl_chamber_data_2012 <- 
-  filmy_dt_chamber %>% 
-  filter(salt == "NaCl", date_time > "2012-07-31 18:10:00 UTC", date_time < "2013-01-01 00:10:00 UTC")
-
-nacl_time_range_2012 <- c(min = min(nacl_chamber_data_2012$date_time), max = max(nacl_chamber_data_2012$date_time))
+nacl_chamber_data_2012 <-
+  filmy_dt_chamber %>%
+  mutate(year = as.character(year)) %>%
+  filter(
+    date_time >= nacl_time_range_2012[["min"]], 
+    date_time <= nacl_time_range_2012[["max"]], 
+    salt == "NaCl")
 
 nacl_chamber_data_2013 <-
-  filter(filmy_dt_chamber, 
-         date_time >= nacl_time_range_2013[["min"]], 
-         date_time <= nacl_time_range_2013[["max"]], 
-         salt == "NaCl")
+  filmy_dt_chamber %>%
+  mutate(year = as.character(year)) %>%
+  filter( 
+    date_time >= nacl_time_range_2013[["min"]], 
+    date_time <= nacl_time_range_2013[["max"]], 
+    salt == "NaCl")
 
 nacl_chamber_data_2014 <- 
-  filter(filmy_dt_chamber, 
-         date_time >= nacl_time_range_2014[["min"]], 
-         date_time <= nacl_time_range_2014[["max"]], 
-         salt == "NaCl") %>%
+  filmy_dt_chamber %>%
+  mutate(year = as.character(year)) %>%
+  filter( 
+    date_time >= nacl_time_range_2014[["min"]], 
+    date_time <= nacl_time_range_2014[["max"]], 
+    salt == "NaCl") %>%
   mutate(
     # There are two sets of times: 2014-06-17 to 2014-07-02, and 2014-07-06 to 2014-07-08
     # Add a group for these so ggplot doesn't connect lines betweeen them
@@ -669,203 +748,128 @@ nacl_chamber_data_2014 <-
     group = ifelse(day < 185, "a", "b")
   )
 
-# Get overall range of temperature and RH for NaCl
-# to standardize y-axis
-nacl_temp_range <- filter(filmy_dt_chamber, salt == "NaCl") %>%
-  summarize(min = min(temp), max = max(temp)) %>%
-  pivot_longer(everything()) %>%
-  arrange(value) %>%
-  pull(value)
-
-nacl_rh_range <- filter(filmy_dt_chamber, salt == "NaCl") %>%
-  mutate(rh = rh * 0.01) %>%
-  summarize(min = min(rh), max = max(rh)) %>%
-  pivot_longer(everything()) %>%
-  arrange(value) %>%
-  pull(value)
-
 # Set up color palette for serial numbers
 serial_no_cols <- c(
-  brewer_pal(palette = "Dark2")(5),
+  brewer_pal(palette = "Dark2")(8),
   "grey20") %>%
   set_names(
-    bind_rows(nacl_chamber_data_2013, nacl_chamber_data_2014) %>%
-      filter(serial_no != "missing") %>%
+    bind_rows(
+      nacl_clusters_2012, nacl_clusters_2013, nacl_clusters_2014, 
+      nacl_chamber_data_2012, nacl_chamber_data_2013, nacl_chamber_data_2014) %>%
+      filter(serial_no != "missing", !is.na(serial_no)) %>%
       pull(serial_no) %>%
       unique %>%
       sort %>%
       c("missing")
   )
 
-# Time plots
-nacl_time_plot_2013 <- 
-  ggplot(
-    nacl_clusters_2013, 
-    aes(
-      x = species, ymin = pre, ymax = post, y = post, 
-      group = species_duration, color = serial_no)
-  ) +
-  geom_linerange(position = position_dodge(0.5)) +
-  geom_point(position = position_dodge(0.5)) +
-  scale_y_datetime(limits = nacl_time_range_2013) +
-  # Print all 'species' on the y-axis using `drop = false`
-  scale_x_discrete(labels = str_abbrev_sp_pretty, drop = FALSE) +
-  # Print all levels of 'serial no' in the legend using `drop = false`
-  scale_color_manual(values = serial_no_cols, drop = FALSE) +
-  labs(x = "Species", color = "Serial no.") +
-  coord_flip() +
-  theme(
-    axis.title = element_blank(),
-    axis.text.y = element_blank())
+# Combine NaCl data so that factor levels are same across years
+nacl_chamber_data <- bind_rows(nacl_chamber_data_2012, nacl_chamber_data_2013, nacl_chamber_data_2014) %>%
+  mutate(
+    year = as.character(year),
+    serial_no = as.factor(serial_no) %>% 
+      fct_expand(names(serial_no_cols)) %>% 
+      fct_relevel(function (x) sort(x, decreasing = TRUE)) %>%
+      fct_relevel("10140667, 10140659", after = Inf) %>%
+      fct_relevel("missing", after = Inf))
 
-nacl_time_plot_2014 <- 
-  ggplot(
-    nacl_clusters_2014, 
-    aes(x = species, ymin = pre, ymax = post, y = post, 
-        group = species_duration, color = serial_no)
-  ) +
-  geom_linerange(position = position_dodge(0.5)) +
-  geom_point(position = position_dodge(0.5)) +
-  scale_y_datetime(limits = nacl_time_range_2014) +
-  scale_x_discrete(labels = str_abbrev_sp_pretty, drop = FALSE) +
-  scale_color_manual(values = serial_no_cols) +
-  coord_flip() +
-  labs(x = "Species", color = "Serial no.") +
-  theme(
-    axis.title = element_blank(),
-    axis.text.y = element_markdown()) +
+nacl_clusters <- bind_rows(nacl_clusters_2012, nacl_clusters_2013, nacl_clusters_2014) %>%
+  mutate(
+    species = as.factor(species) %>% fct_relevel(function (x) sort(x, decreasing = TRUE)),
+    serial_no = as.factor(serial_no) %>% 
+      fct_expand(names(serial_no_cols)) %>% 
+      fct_relevel(function (x) sort(x, decreasing = TRUE)) %>%
+      fct_relevel("10140667, 10140659", after = Inf) %>%
+      fct_relevel("missing", after = Inf))
+
+# Get overall range of temperature and RH for NaCl
+# to standardize y-axis
+nacl_temp_range <- nacl_chamber_data %>%
+  summarize(min = min(temp), max = max(temp)) %>%
+  pivot_longer(everything()) %>%
+  arrange(value) %>%
+  pull(value)
+
+nacl_rh_range <- nacl_chamber_data %>%
+  mutate(rh = rh * 0.01) %>%
+  summarize(min = min(rh), max = max(rh)) %>%
+  pivot_longer(everything()) %>%
+  arrange(value) %>%
+  pull(value)
+
+# Time plots
+nacl_time_plot_2012 <- make_nacl_time_plot(
+  nacl_clusters %>% filter(year == "2012"), serial_no_cols, nacl_time_range_2012)
+
+nacl_time_plot_2013 <- make_nacl_time_plot(
+  nacl_clusters %>% filter(year == "2013"), serial_no_cols, nacl_time_range_2013) +
+  blank_y_theme() +
+  guides(color = "none")
+
+nacl_time_plot_2014 <- make_nacl_time_plot(
+  nacl_clusters %>% filter(year == "2014"), serial_no_cols, nacl_time_range_2014) +
+  blank_y_theme() +
   guides(color = "none")
 
 # RH plots
-nacl_rh_plot_2012 <- 
-  ggplot(
-    nacl_chamber_data_2012, 
-    aes(x = date_time, y = 0.01*rh)
-  ) +
-  geom_line(size = 0.25) +
-  scale_x_datetime(limits = nacl_time_range_2012) +
-  scale_y_continuous(
-    label = scales::label_percent(accuracy = 1), 
-    limits = nacl_rh_range) +
-  labs(
-    y = "Relative humidity",
-    color = "Serial no.") +
-  guides(color = "none") +
-  theme(axis.title.x = element_blank()) +
-  blank_y_theme()
-
-nacl_rh_plot_2013 <- 
-  ggplot(
-    nacl_chamber_data_2013, 
-    aes(x = date_time, y = 0.01*rh, color = serial_no)
-  ) +
-  scale_color_manual(values = serial_no_cols) +
-  geom_line(size = 0.25) +
-  scale_x_datetime(limits = nacl_time_range_2013) +
-  scale_y_continuous(
-    label = scales::label_percent(accuracy = 1), 
-    limits = nacl_rh_range) +
-  labs(
-    y = "Relative humidity",
-    color = "Serial no.") +
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()) +
+nacl_rh_plot_2012 <- make_nacl_rh_plot(
+  nacl_chamber_data %>% filter(year == "2012"),
+  serial_no_cols,
+  nacl_time_range_2012, 
+  nacl_rh_range
+)
+  
+nacl_rh_plot_2013 <- make_nacl_rh_plot(
+  nacl_chamber_data %>% filter(year == "2013"),
+  serial_no_cols,
+  nacl_time_range_2013, 
+  nacl_rh_range
+) + 
   blank_y_theme() +
-  guides(color = "none")
+  blank_x_theme()
 
-nacl_rh_plot_2014 <- 
-  ggplot(
-    nacl_chamber_data_2014, 
-    aes(x = date_time, y = 0.01*rh, color = serial_no, group = interaction(group, serial_no))
-  ) +
-  scale_color_manual(values = serial_no_cols) +
-  geom_line(size = 0.25) +
-  scale_x_datetime(limits = nacl_time_range_2014) +
-  scale_y_continuous(
-    label = scales::label_percent(accuracy = 1), 
-    limits = nacl_rh_range) +
-  labs(
-    y = "Relative humidity",
-    color = "Serial no.") +
-  theme(
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()) +
-  guides(color = "none")
+nacl_rh_plot_2014 <- make_nacl_rh_plot(
+  nacl_chamber_data %>% filter(year == "2014"),
+  serial_no_cols,
+  nacl_time_range_2014, 
+  nacl_rh_range,
+  groups = TRUE
+) + 
+  blank_y_theme() +
+  blank_x_theme()
 
 # Temp plots
-nacl_temp_plot_2012 <- 
-  ggplot(
-    nacl_chamber_data_2012, 
-    aes(x = date_time, y = temp)
-  ) +
-  geom_line(size = 0.25) +
-  scale_x_datetime(limits = nacl_time_range_2012) +
-  scale_y_continuous(
-    label = label_number(suffix = "\u00b0C", accuracy = 1), 
-    limits = nacl_temp_range) +
-  labs(
-    y = "Temperature",
-    color = "Serial no.",
-    title = "2012") +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 11),
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()) +
+nacl_temp_plot_2012 <- make_nacl_temp_plot(
+  nacl_chamber_data %>% filter(year == "2012"),
+  serial_no_cols,
+  nacl_time_range_2012, 
+  nacl_temp_range,
+  title = "2012") +
+  guides(color = "none")
+
+nacl_temp_plot_2013 <- make_nacl_temp_plot(
+  nacl_chamber_data %>% filter(year == "2013"),
+  serial_no_cols,
+  nacl_time_range_2013, 
+  nacl_temp_range,
+  title = "2013") + 
   blank_y_theme() +
-  guides(color = "none")
+  blank_x_theme()
 
-nacl_temp_plot_2013 <- 
-  ggplot(
-    nacl_chamber_data_2013, 
-    aes(x = date_time, y = temp, color = serial_no)
-  ) +
-  geom_line(size = 0.25) +
-  scale_color_manual(values = serial_no_cols) +
-  scale_x_datetime(limits = nacl_time_range_2013) +
-  scale_y_continuous(
-    label = label_number(suffix = "\u00b0C", accuracy = 1), 
-    limits = nacl_temp_range) +
-  labs(
-    y = "Temperature",
-    color = "Serial no.",
-    title = "2013") +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 11),
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()) +
+nacl_temp_plot_2014 <- make_nacl_temp_plot(
+  nacl_chamber_data %>% filter(year == "2014"),
+  serial_no_cols,
+  nacl_time_range_2014, 
+  nacl_temp_range,
+  title = "2014",
+  groups = TRUE) + 
   blank_y_theme() +
-  guides(color = "none")
+  blank_x_theme()
 
-nacl_temp_plot_2014 <- 
-  ggplot(
-    nacl_chamber_data_2014, 
-    aes(x = date_time, y = temp, color = serial_no, group = interaction(group, serial_no))
-  ) +
-  scale_color_manual(values = serial_no_cols) +
-  geom_line(size = 0.25) +
-  scale_x_datetime(limits = nacl_time_range_2014) +
-  scale_y_continuous(
-    label = label_number(suffix = "\u00b0C", accuracy = 1), 
-    limits = nacl_temp_range) +
-  labs(
-    y = "Temperature",
-    color = "Serial no.",
-    title = "2014") +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 11),
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()) +
-  guides(color = "none")
-
-nacl_temp_plot_2014 + nacl_temp_plot_2013 + nacl_temp_plot_2012 +
-  nacl_rh_plot_2014 + nacl_rh_plot_2013 + nacl_rh_plot_2012 +
-  nacl_time_plot_2014 + nacl_time_plot_2013 + plot_spacer() +
+# Combine plots
+nacl_temp_plot_2012 + nacl_temp_plot_2013 + nacl_temp_plot_2014 +
+  nacl_rh_plot_2012 + nacl_rh_plot_2013 + nacl_rh_plot_2014 +
+  nacl_time_plot_2012 + nacl_time_plot_2013 + nacl_time_plot_2014 +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
   plot_annotation(title = "c") &
   theme(
@@ -975,7 +979,7 @@ chamber_gameto_2013_temp_plot + chamber_gameto_2012_temp_plot +
 
 \newpage
 
-**`r s_figure("chamber")`**. Temperature, relative humidity (RH), and duration of desiccation treatment of filmy ferns from Moorea, French Polynesia. **a**--**c**, sporophytes; **d**, gametophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, **d**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH). Temperature and RH measured with Track-It RH/Temp dataloggers logging every 10 min (2012) or Hobo ProV2 dataloggers logging every 5 min (2013, 2014). For **c**, multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color; "missing" indicates data were not collected on the correspondence between samples and data loggers (chambers). For bottom-most panels (duration of desiccation treatment), line indicates duration of treatment and point indicates removal of sample from chamber. Gametophytes were measured in batches; membership of individual gametophytes to each batch can be found in `r s_table("gameto-batches")` (Online Resource 2).
+**`r s_figure("chamber")`**. Temperature, relative humidity (RH), and duration of desiccation treatment of filmy ferns from Moorea, French Polynesia. **a**--**c**, sporophytes; **d**, gametophytes. Relative humidity was controlled by placing drying salts inside desiccation chambers: **a**, LiCl (-282 MPa, 18 % RH); **b**, **d**, Mg(NO~3~)~2~ (-86 MPa, 58 % RH); **c**, NaCl (-38 MPa, 80 % RH). Temperature and RH measured with Track-It RH/Temp dataloggers logging every 10 min (2012 species other than *Callistopteris apiifolia*) or Hobo ProV2 dataloggers logging every 5 min (2012 *Callistopteris apiifolia*, 2013, 2014). For NaCl (**c**), multiple chambers were set up and tracked with different data loggers; serial number of data logger indicated by color; "missing" indicates correspondence between samples and data loggers (chambers) unknown. For bottom-most panels (duration of desiccation treatment), line indicates duration of treatment and point indicates removal of sample from chamber. Gametophytes were measured in batches; membership of individual gametophytes to each batch can be found in `r s_table("gameto-batches")` (Online Resource 2).
 
 \newpage
 

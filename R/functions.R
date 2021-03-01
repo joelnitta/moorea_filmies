@@ -417,6 +417,7 @@ load_filmy_dt <- function (file) {
         species == "Callistopteris_apiifolia" & salt == "H2O" ~ "si",
         species == "Hymenophyllum_polyanthos" & dataset == "2013_4" ~ "si",
         species == "Polyphlebium_borbonicum" & dataset == "2013_2" ~ "si",
+        species == "Crepidomanes_minutum2" & dataset == "2014" ~ "si",
         salt == "Control" ~ "si",
         TRUE ~ "main"
       )

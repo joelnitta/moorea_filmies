@@ -6,9 +6,21 @@ source(here::here("R/packages.R"))
 # Load functions
 source("R/functions.R")
 
-# 2012 data were measured with Track-It RH/Temp dataloggers (no serial numbers) 
-# for most samples, and Hobo ProV2 dataloggers (with serial numbers) for
-# Callistopteris apiifolia only
+# Load metadata for data loggers
+logger_metadata <- read_csv(
+  "data_raw/intermediates/logger_metadata.csv", 
+  col_types = cols(
+    file = col_character(),
+    year = col_double(),
+    salt = col_character(),
+    use_status = col_character(),
+    generation = col_character(),
+    note = col_character(),
+    serial_no = col_character()
+  ))
+
+# 2012 data were measured with Track-It RH/Temp dataloggers for most samples,
+# and Hobo ProV2 dataloggers for Callistopteris apiifolia only
 # 2012 sporophytes
 sporo_2012_chamber <- bind_rows(
   parse_logger_dat("data_raw/2012/track-it/filmyDT2_LiCl.csv") %>% mutate(salt = "LiCl"),
@@ -19,26 +31,22 @@ sporo_2012_chamber <- bind_rows(
   # Data before 2012-07-31 18:10:00 UTC was prelminary (NaCl datalogger
   # was actually placed in MgCl2, which wasn't used in final analysis). 
   # Filter to the period after this.
-  filter(date_time > "2012-07-31 18:10:00 UTC")
+  filter(date_time > "2012-07-31 18:10:00 UTC") %>%
+  left_join(
+    select(logger_metadata, salt, generation, year, species, file, serial_no),
+    c("salt", "generation", "year", "species")
+  )
   
 # 2012 gametophytes
 gameto_2012_chamber <-
   bind_rows(
-    parse_logger_dat("data_raw/2012/gameto1_7-14.csv"),
-    parse_logger_dat("data_raw/2012/gameto2_7-24.csv")
-  ) %>% mutate(salt = "MgNO3", generation = "gametophyte", year = 2012, species = "mixed")
-
-# 2013 load metadata for hobo loggers
-hobo_metadata <- read_csv(
-"data_raw/intermediates/hobo_metadata.csv", 
-col_types = cols(
-  file = col_character(),
-  year = col_double(),
-  salt = col_character(),
-  use_status = col_character(),
-  generation = col_character(),
-  note = col_character()
-))
+    parse_logger_dat("data_raw/2012/track-it/gameto1_7-14.csv"),
+    parse_logger_dat("data_raw/2012/track-it/gameto2_7-24.csv")
+  ) %>% mutate(salt = "MgNO3", generation = "gametophyte", year = 2012, species = "mixed") %>%
+  left_join(
+    select(logger_metadata, salt, generation, year, species, file, serial_no),
+    c("salt", "generation", "year", "species")
+  )
 
 # Load all data measured with Hobo dataloggers (2013, 2014)
 hobo_chamber_data <-
@@ -50,9 +58,16 @@ hobo_chamber_data <-
     )
   ) %>%
   # Add metadata
-  left_join(select(hobo_metadata, -serial_no), by = "file") %>%
+  left_join(select(logger_metadata, -serial_no), by = "file") %>%
   mutate(data = map(file, read_hobo)) %>%
-  unnest(data) %>%
+  unnest(data) %>% 
+  # Exclude C. apiifolia NaCl 2012 after 2012-08-02 15:30:00 (end of DT test)
+  mutate(
+    use_status = case_when(
+      species == "Callistopteris_apiifolia" & salt == "NaCl" & year == 2012 & date_time > "2012-08-02 15:30:00" ~ "exclude",
+      TRUE ~ use_status
+    )
+  ) %>%
   # Exclude data not marked "keep" in metadata
   filter(use_status == "keep") %>%
   select(-use_status, -note) %>%
