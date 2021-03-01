@@ -1297,7 +1297,7 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
 
 \newpage
 
-```{r sporo-lab-light-curves, fig.height = 9.5, fig.width = 7, fig.cap = ""}
+```{r light-curves, fig.height = 9.5, fig.width = 7, fig.cap = ""}
 ### Make full sets of light curve plots ###
 # - sporos in lab
 lc_plots_sporo_lab <- make_facet_lc_plot(
@@ -1344,9 +1344,9 @@ for(i in 2:n_sporo_lab_lc_pages) {
   print(p)
 }
 
-### Print sporos in the field ###
+### Print the gametos ###
 # first with title "b"
-lc_plots_sporo_field +
+lc_plots_gameto +
   labs(title = "**b**") +
   facet_wrap_paginate(
     vars(str_abbrev_sp_pretty(species), light_id),
@@ -1355,30 +1355,9 @@ lc_plots_sporo_field +
 
 # print the rest
 # with title "b (cont.)"
-for(i in 2:n_sporo_field_lc_pages) {
-  p <- lc_plots_sporo_field +
-    labs(title = "**b** (cont.)") +
-    facet_wrap_paginate(
-      vars(str_abbrev_sp_pretty(species), light_id),
-      ncol = 4, nrow = 6, page = i,
-      scales = "free", labeller = label_value_2)
-  print(p)
-}
-
-### Print the gametos ###
-# first with title "c"
-lc_plots_gameto +
-  labs(title = "**c**") +
-  facet_wrap_paginate(
-    vars(str_abbrev_sp_pretty(species), light_id),
-    ncol = 4, nrow = 6, page = 1,
-    scales = "free", labeller = label_value_2)
-
-# print the rest
-# with title "c (cont.)"
 for(i in 2:n_gameto_lc_pages) {
   p <- lc_plots_gameto +
-    labs(title = "**c** (cont.)") +
+    labs(title = "**b** (cont.)") +
     facet_wrap_paginate(
       vars(str_abbrev_sp_pretty(species), light_id),
       ncol = 4, nrow = 6, page = i,
@@ -1387,7 +1366,7 @@ for(i in 2:n_gameto_lc_pages) {
 }
 ```
 
-**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes measured in the lab; **b**, sporophytes measured in the field; **c** gametophytes measured in the field (no gametophytes were measured in the lab). Title of each subplot indicates species followed by light curve ID number assigned to each sample. Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % saturation of ETR (PPFD~95%~).
+**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes; **b**, gametophytes. Title of each subplot indicates species followed by light curve ID number assigned to each sample. Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % saturation of ETR (PPFD~95%~).
 
 \newpage
 
