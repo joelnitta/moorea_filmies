@@ -120,9 +120,9 @@ tar_plan(
       mean_vpd_gameto,
       mean_vpd_sporo,
       range_comparison),
-    left_join,
+    full_join,
     by = "species"
-  ),
+  )  %>% assert(is_uniq, species),
   
   # - fit light curve models to data
   light_models = fit_lc_model(light_data),
