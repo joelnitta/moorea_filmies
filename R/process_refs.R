@@ -22,7 +22,7 @@ citations <-
 
 # Read in entire reference library exported from Zotero with BetterBibTex
 # (note: this can be a soft-link to ~/Dropbox/bibliography/main_library.bib)
-bib <- RefManageR::ReadBib("data_raw/main_library.bib", check = FALSE)
+bib <- RefManageR::ReadBib("main_library.bib", check = FALSE)
 
 # Convert reference library to dataframe
 bib_df <- as.data.frame(bib) %>% rownames_to_column("cite_key")
