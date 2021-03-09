@@ -289,7 +289,7 @@ filmy_lc_model_params_filtered <-
   filter(p.value < 0.05)  %>%
   abbrev_sp()
 
-# - Make plots
+# - Optional: make plots to visualize raw light curves
 filmy_all_lc_plot_filtered <-
   ggplot(abbrev_sp(filmy_lc_model_fitted_data_filtered), aes(x = par)) +
   geom_point(aes(y = etr)) +
@@ -298,7 +298,7 @@ filmy_all_lc_plot_filtered <-
   geom_vline(data = filmy_lc_model_params_filtered, aes(xintercept = par_critical), color = "red") +
   facet_wrap(vars(generation, species, id), scales = "free")
 
-ggsave(plot = filmy_all_lc_plot_filtered, file = "data_raw/intermediates/all_light_curves_filtered.pdf", height = 40, width = 40)
+ggsave(plot = filmy_all_lc_plot_filtered, file = "results/all_light_curves_filtered.pdf", height = 40, width = 40)
 
 # INTERACTIVE STEP:
 # To run, uncomment the lines below
