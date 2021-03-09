@@ -67,10 +67,10 @@ headers <- tibble(
 )
 
 # Write out these column headers, then manually edit new column names
-# write.csv(headers, "moorea_filmy_dt_2012_headers_sheet-2.csv")
+# write.csv(headers, "moorea_filmy_dt_2012_headers.csv")
 
 # Read in file with new column names
-new_headers <- read_csv("data_raw/intermediates/moorea_filmy_dt_2012_headers_sheet-2.csv")
+new_headers <- read_csv("data_raw/intermediates/moorea_filmy_dt_2012_headers.csv")
 
 dt_2012_all_raw <- read_excel(
   moorea_filmy_dt_2012_raw_path, skip = 2, sheet = "averages (new cmin)", col_names = FALSE) %>%
