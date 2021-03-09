@@ -245,7 +245,7 @@ Samples were collected in the field and stored in plastic bags with a small amou
 For sporophytes, 8 individuals (one individual = single whole frond including a \circa{ }2 cm section of rhizome) were used per treatment, and all individuals for each species came from a single population.
 We did not attempt to differentiate genotypes between fronds in species with long-creeping rhizomes, which often form clonal mats; hence, in some cases, individuals may be genetically identical ramets.
 All experiments were initiated within 48 h of collection.
-Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitajima1975] was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM fluorometer (Walz Gmbh, Effeltrich, Germany).
+Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitajima1975] was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM chlorophyll fluorometer (Walz Gmbh, Effeltrich, Germany).
 Any samples with pre-treatment F~v~/F~m~ < 0.4 were excluded from analysis, as typical values of F~v~/F~m~ in healthy plants tend to be \circa{ }0.8 [@Bjorkman1987].
 Samples were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100 % RH), and water withheld for either a short (2 d) or long (15 d) interval [@Testo2013].
 Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012 field season for species other than *Callistopteris apiifolia*) or Hobo ProV2 dataloggers logging every 5 min (2012 *Callistopteris apiifolia*, 2013, 2014 field seasons).
@@ -266,7 +266,7 @@ Relative water content was not calculated for gametophytes, as these were too sm
 
 ### Light responses
 
-Rapid light response curves were constructed for each species by measuring photosynthetic yield at gradually increasing levels of photosynthetically active actinic light (400 nm to 700 nm) with the Light Curve function of the mini-PAM portable chlorophyll fluorometer (Walz Gmbh, Effeltrich, Germany) as described by the manufacturer.
+Rapid light response curves were constructed for each species by measuring photosynthetic yield at gradually increasing levels of photosynthetically active actinic light (400 nm to 700 nm) with the Light Curve function of the mini-PAM portable chlorophyll fluorometer as described by the manufacturer.
 Briefly, the maximum yield (F~m~) was first measured in the absence of actinic light.
 Next, plants were equilibrated to the actinic light for 30 s, and photosynthetic yield (∆F/F~m~) measured with a 0.8 s saturating pulse.
 This was repeated for each photosynthetic photon flux density (PPFD) level, up to ca.
@@ -307,11 +307,13 @@ Since DT showed significant phylogenetic signal (see Results), we used phylogene
 To test whether gametophytes with wider ranges have higher DT, we calculated the extent of gametophyte range beyond sporophytes ("G beyond S") as the total elevational range (m) gametophytes were observed growing beyond sporophytes at either end of the elevational gradient. 
 We conducted PGLS with DT as the response variable and G beyond S as the explanatory variable with the \function{pgls} function in the \package{caper} [@Orme2018].
 
-Datasets used in this study are available on FigShare (\#\#\#\#\#\#). 
+Datasets used in this study are available on FigShare (https://doi.org/10.6084/m9.figshare.14184572). 
 Code used to analyze the data and generate figures and this manuscript are available on GitHub (https://github.com/joelnitta/moorea-filmies).
 A Docker image is available to run the code at https://hub.docker.com/r/joelnitta/moorea_filmies.
 The \package{targets} package [@Landau2021] was used to automate the workflow.
 The \package{ggplot2} [@Wickham2016], \package{ggtree}, [@Yu2017] and \package{patchwork} (https://github.com/thomasp85/patchwork) packages were used to generate the figures.
+
+\*\*\* NOTE TO REVIEWERS: The dataset and code will not be made public until the paper is accepted. While the paper is under review, these links can be used for the dataset (https://figshare.com/s/d6349abf01a3756a5aae) and code (https://www.dropbox.com/sh/h788g1h3sjcqj0j/AACwFWTmL6GxrbLkCfOrXZU9a?dl=0)  \*\*\*
 
 ## Results
 
