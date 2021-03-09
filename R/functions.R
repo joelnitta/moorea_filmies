@@ -1188,8 +1188,8 @@ prepare_gameto_dt_groups <- function(filmy_dt, gameto_time_summary_2012, filmy_s
     filter(n > 1) %>%
     select(-n) %>%
     pivot_wider(names_from = "condition", values_from = "date_time") %>%
-    # Cluster start times into groups (here, I know there are 10 groups)
-    add_clusters("pre", 10) %>%
+    # Cluster start times into groups (here, I know there are 9 groups)
+    add_clusters("pre", 9) %>%
     # Need to make space for two more clusters from 2012
     mutate(cluster = cluster + 2)
   

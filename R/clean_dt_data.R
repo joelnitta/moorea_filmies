@@ -820,6 +820,14 @@ filmy_dt_wide <-
   rename(time = date_time) %>%
   # Convert to wide format
   pivot_wider(names_from = "condition", values_from = c("yield", "time", "weight")) %>%
+  # Filter out gametophytes that were desiccated > 2 d
+  mutate(time_desiccated = time_30min - time_pre) %>%
+  mutate(remove = case_when(
+    generation == "gametophyte" & time_desiccated >= 3 ~ TRUE,
+    TRUE ~ FALSE
+  )) %>%
+  filter(remove == FALSE) %>%
+  select(-remove, -time_desiccated) %>%
   # Rearrange columns
   select(
     species:dataset,
@@ -838,7 +846,6 @@ filmy_dt_wide <-
     weight_72hr,
     weight_dry,
     time_pre,
-    time_desiccated,
     time_30min,
     time_24hr,
     time_48hr,
