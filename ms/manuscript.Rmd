@@ -994,6 +994,11 @@ dt_plot_data <-
     label = str_replace_all(species, "[a-z]+_", ". "),
     label = glue("*{label}* ({habit}{n_label})")
   ) %>%
+  # Add a line break only for C. bipunctatum
+  mutate(label = str_replace_all(
+    label, 
+    fixed("*C. bipunctatum* (LE, *n* = 10-12)"),
+    "*C. bipunctatum*<br>(LE, *n* = 10-12)")) %>%
   # - order by alphabetical species within growth habit
   arrange(habit, species) %>%
   mutate(
@@ -1076,12 +1081,7 @@ knitr::include_graphics(here::here("data/figure_1.png"))
 \newpage
 
 ```{r filmy-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = "", purl = FALSE}
-dt_plot_data %>%
-  mutate(label = str_replace_all(
-    label, 
-    fixed("*C. bipunctatum* (LE, *n* = 10-12)"),
-    "*C. bipunctatum*<br>(LE, *n* = 10-12)")) %>%
-make_dt_plot("sporophyte", "a")
+make_dt_plot(dt_plot_data, "sporophyte", "a")
 ggsave(here::here("results/ms/fig_1a_sporo_dt.pdf"), width = 6.85, height = 7.5)
 ```
 
