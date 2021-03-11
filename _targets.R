@@ -202,9 +202,25 @@ tar_plan(
   tar_file(refs_other, "ms/references_other.yaml"),
 
   # Render PDF
-  tar_render(manuscript_pdf, "ms/manuscript.Rmd", output_dir = here::here("results/ms")),
+  # - PDF for preprint
+  tar_render(
+    preprint_pdf, 
+    "ms/manuscript.Rmd", 
+    output_dir = here::here("results/ms"),
+    output_file = "moorea_filmies_preprint.pdf",
+    params = list(output_type = "preprint")),
+  
+  # - PDF for conversion to Word
+  tar_render(
+    manuscript_pdf, 
+    "ms/manuscript.Rmd", 
+    output_dir = here::here("results/ms")
+    ),
   
   # Render MS Word
+  # FIXME: 
+  # - change Florence to "in press" (in-line and refs)
+  # - remove extra space from bib entries
   ms_docx = latex2docx(
     latex = "results/ms/manuscript.tex",
     docx = "results/ms/manuscript.docx",
