@@ -896,7 +896,13 @@ gameto_time_limits_2013 <- c(min = min(gameto_times_2013$pre), max = max(gameto_
 gameto_time_limits_2012 <- c(min = min(gameto_times_2012$pre), max = max(gameto_times_2012$post))
 
 # Subset DT chamber data
-chamber_gameto_2013 <- filmy_dt_chamber %>% filter(generation == "gametophyte", year == "2013")
+# the datalogger in use changed part way through.
+# 10342564 was used in a combined chamber including both sporos and gametos
+chamber_gameto_2013_part_1 <- filmy_dt_chamber %>% filter(serial_no == "10342564", year == "2013")
+chamber_gameto_2013_part_2 <- filmy_dt_chamber %>% filter(serial_no == "10140659", year == "2013", generation == "gametophyte")
+
+# chamber_gameto_2013 <- filmy_dt_chamber %>% filter(generation == "gametophyte", year == "2013")
+chamber_gameto_2013 <- bind_rows(chamber_gameto_2013_part_1, chamber_gameto_2013_part_2)
 chamber_gameto_2012 <- filmy_dt_chamber %>% 
   filter(
     salt == "MgNO3", 
