@@ -57,8 +57,10 @@ bib_df %>%
   RefManageR::as.BibEntry() %>%
   RefManageR::WriteBib(file = "ms/references.bib")
 
-# Fix accents over vowels, which somehow got mangled by RefManageR
 read_lines("ms/references.bib") %>%
+  # Fix "Jr" in Eddie's name (eg, "Stoner, Jr, Winifred Sackville" is correct format in bibtex)
+  str_replace_all("James E \\{Watkins Jr\\.\\}", "Watkins, Jr, James E") %>%
+  # Fix accents over vowels, which somehow got mangled by RefManageR
   str_replace_all("\\{\\\\a'a\\}", "\\{\\\\'{a}}") %>%
   str_replace_all("\\{\\\\a'e\\}", "\\{\\\\'{e}}") %>%
   str_replace_all("\\{\\\\a'i\\}", "\\{\\\\'{i}}") %>%
