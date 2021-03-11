@@ -1384,7 +1384,7 @@ analyze_cont_phylosig <- function (selected_trait, traits, phy) {
   
   # Run phylosig() on selected trait
   # using Blomberg's K
-  k_model <- phytools::phylosig(phy_trim, trait_vec, method = "K", test = TRUE)
+  k_model <- phytools::phylosig(phy_trim, trait_vec, method = "K", test = TRUE, nsim=10000)
   # and Pagel's lambda
   lambda_model <- phytools::phylosig(phy_trim, trait_vec, method = "lambda", test = TRUE)
   
@@ -1498,8 +1498,8 @@ run_glmm <- function(combined_species_means, traits, phy) {
   
   # set number of iterations
   num <- 500000
-  n_burnin = 0.0002*num
-  n_thin = 0.0002*0.5*num
+  n_burnin = 1000
+  n_thin = 500
   
   # define prior list. Need one G for each random effect, one R for each fixed effect
   my_prior <- list(G=list(G1=list(V=1,nu=0.02)),
