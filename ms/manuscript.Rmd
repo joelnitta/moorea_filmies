@@ -70,9 +70,9 @@ add two spaces after last word, e.g., Atsushi Ebihara__ -->
 
 **Corresponding author**  
 Joel H. Nitta  
-Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo, 113-0032, Japan  
-Phone: +81-  
-Fax: +81-  
+Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan  
+Phone: +81-81-4-7136-3681  
+Fax: +81-4-7136-3680  
 email: joelnitta\@gmail.com
 
 **Membership of the Botanical Society of Japan**  
@@ -81,8 +81,11 @@ YES (Joel H. Nitta)
 **Subject area**  
 (1) Ecology/Ecophysiology/Environmental Biology
 
-**Number of tables, black-and-white figures, and color figures.**  
+**Number of tables, black-and-white figures, and color figures**  
 4 tables / 0 black-and-white figures / 4 color figures
+
+**Author contributions**  
+Joel H. Nitta conceived of and designed the study with input from James E. Watkins, N. Michele Holbrook, and Charles C. Davis. Data collection was performed by Joel H. Nitta and Tristan W. Wang. Data analysis was performed by Joel H. Nitta. The first draft of the manuscript was written by Joel H. Nitta, with subsequent comments and edits from the other authors. All authors read and approved the final manuscript.
 
 \newpage
 
@@ -94,9 +97,9 @@ Joel H. Nitta^1,4^, James E. Watkins, Jr.^2^, N. Michele Holbrook^1^, Tristan W.
 
 ^2^Department of Biology, Colgate University, 13 Oak Drive, Hamilton, New York 13346 USA
 
-^3^Current address: Section of Plant Pathology and Plant-Microbe Biology, Cornell University, Ithaca, New York 14853 USA
+^3^Current affiliation: Section of Plant Pathology and Plant-Microbe Biology, Cornell University, Ithaca, New York 14853 USA
 
-^4^Current address: Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo, 113-0032, Japan
+^4^Current affiliation: Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan  
 
 Author for correspondence: Joel Nitta (joelnitta\@gmail.com)
 
@@ -128,7 +131,7 @@ However, little is known about the transition from desiccation tolerant non-vasc
 Filmy ferns (Hymenophyllaceae) represent a useful system to investigate how water-stress strategies differ between non-vascular and vascular stages within a single organism because they have vascularized sporophytes and nonvascular gametophytes that are each capable of varying degrees of desiccation tolerance.
 To explore this, we surveyed sporophytes and gametophytes of `r n_filmy_sp` species (`r n_distinct(filmy_species)` taxa including varieties) of filmy ferns on Moorea (French Polynesia) and used chlorophyll fluorescence to measure desiccation tolerance and light responses.
 We conducted phylogenetically informed analyses to identify differences in physiology between life stages and growth habits.
-Gametophytes had similar or less desiccation tolerance and lower photosynthetic optima (maximum electron transport rate of photosystem II and light level at 95% of that rate) than sporophytes.
+Gametophytes had similar or less desiccation tolerance (ability to recover from 2 d desiccation at -86 MPa) and lower photosynthetic optima (maximum electron transport rate of photosystem II and light level at 95% of that rate) than sporophytes.
 Epiphytes were more tolerant of desiccation than terrestrial species in both generations.
 Despite their lack of greater physiological tolerances, gametophytes of several species occurred over a wider elevational range than conspecific sporophytes.
 Our results demonstrate that filmy fern gametophytes and sporophytes differ in their physiology and niche requirements, and point to the importance of microhabitat in shaping the evolution of water-use strategies in vascular plants.
@@ -256,7 +259,7 @@ All experiments were initiated within 48 h of collection.
 Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitajima1975] was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM chlorophyll fluorometer (Walz Gmbh, Effeltrich, Germany).
 Any samples with pre-treatment F~v~/F~m~ < 0.4 were excluded from analysis, as typical values of F~v~/F~m~ in healthy plants tend to be \circa{ }0.8 [@Bjorkman1987].
 Samples were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100 % RH), and water withheld for either a short (2 d) or long (15 d) interval [@Testo2013].
-Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012 field season for species other than *Callistopteris apiifolia* (C. Presl) Copel.) or Hobo ProV2 dataloggers logging every 5 min (2012 *C. apiifolia*, 2013, 2014 field seasons).
+Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012 field season for species other than *Callistopteris apiifolia* (Presl) Copel.) or Hobo ProV2 dataloggers logging every 5 min (2012 *C. apiifolia*, 2013, 2014 field seasons).
 The desiccation chambers were kept in an air-conditioned room. 
 Temperature inside the chambers was mean `r mean(filmy_dt_chamber$temp) %>% round(1)` ± SD `r sd(filmy_dt_chamber$temp) %>% round(2)` °C (`r s_figure("chamber")`) (hereafter, the value following '±' is standard deviation unless otherwise mentioned).
 Salts used for desiccation and their corresponding mean water potentials and approximate relative humidity and VPD are as follows: LiCl (-282 MPa, 18 % RH, 2.45 kPa), Mg(NO~3~)~2~ (-86 MPa, 58 % RH, 1.25 kPa), and NaCl (-38 MPa, 80 % RH, 0.60 kPa).
@@ -336,7 +339,7 @@ In several species, gametophytes exceeded the maximum or minimum elevational ran
 Iwats., and *Polyphlebium borbonicum* (Bosch) Ebihara & Dubuisson (`r s_figure("range")`).
 All of these have sporophytes that are normally restricted to cloud forest (\circa{ }500--1200 m), but gametophytes that are distributed to lower elevations.
 
-Sporophytes of two taxa, *C. minutum* var. 3 and *Hymenophyllum braithwaitei* (Ebihara & K. Iwats.), did not occur in the study plots, but each was observed from a single population on Mt. Tohiea, at \circa{ }1000 m and near the summit (1206 m), respectively.
+Sporophytes of two taxa, *C. minutum* var. 3 and *Hymenophyllum braithwaitei* Ebihara & K. Iwats., did not occur in the study plots, but each was observed from a single population on Mt. Tohiea, at \circa{ }1000 m and near the summit (1206 m), respectively.
 We include these observations for comparison of ranges between sporophytes and gametophytes.
 
 ### Phylogenetic signal
@@ -481,7 +484,7 @@ gameto_dt_ter_mean <- mean_gameto_dt_by_habit %>%
 Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases.
 
 A general correlation of DT with habitat was observed in sporophytes (`r figure("dt")`a).
-The two terrestrial species lacked DT, although *C. apiifolia* showed slightly greater ability to recover by 48 h compared to *Abrodictyum dentatum* (Bosch) Ebihara & K Iwats, which completely failed to recover from even the gentlest treatment of 2 d at --38 NaCl (more stringent tests were not conducted on *A. dentatum* after confirming its lack of DT at this level).
+The two terrestrial species lacked DT, although *C. apiifolia* showed slightly greater ability to recover by 48 h compared to *Abrodictyum dentatum* (Bosch) Ebihara & K. Iwats., which completely failed to recover from even the gentlest treatment of 2 d at --38 NaCl (more stringent tests were not conducted on *A. dentatum* after confirming its lack of DT at this level).
 Saxicolous species (*Crepidomanes kurzii* (Bedd.) Tagawa & K. Iwats., *Polyphlebium endlicherianum* (C. Presl) Ebihara & K. Iwats., and *Vandenboschia maxima* (Blume) Copel.) also had low DT; only *C. kurzii* was able to recover from desiccation up to --86 MPa for 2 d but not more.
 Nearly all epiphytic species were capable of recovering from desiccation of up to 2 d at --86 MPa.
 *Crepidomanes bipunctatum* (Poir.) Copel., a widespread low-elevation epiphyte, showed the greatest ability to recover from desiccation across all treatments.
@@ -634,7 +637,7 @@ The significant relationship between average daily maximum VPD and DT in sporoph
 Contrary to our hypotheses, gametophytes of filmy ferns are in general not more tolerant of the abiotic environment (light levels and water potential) than sporophytes.
 This differs from other fern groups with desiccation tolerant gametophytes but desiccation avoiding sporophytes [@WatkinsJr.2007c].
 In the filmy ferns we studied, DT levels of both sporophytes and gametophytes largely reflected habitat; in general, epiphytic species tended to have higher DT than terrestrial species, regardless of life stage (\figs{ }`r figure_num("combined")`, `r s_figure_num("traits-box")`).
-Interestingly, this echoes much earlier field observations (not experimental data) by @Holloway1930 on filmy fern gametophytes in New Zealand: he reported apparent DT in gametophytes of *Hymenophyllum rarum* R. Br. and *H. villosum* Colenso, both high elevation epiphytes with desiccation tolerant sporophytes, and lack of DT in terrestrial filamentous gametophytes of *Polyphlebium colensoi* (Hook.) Ebihara & K. Iwats., *Abrodictyum strictum* (Menzies ex Hook. & Grev.) Ebihara & K. Iwats., and *A. elongatum* (A. Cunn.) Ebihara & K. Iwats. occupying moist, protected sites on the forest floor.
+Interestingly, this echoes much earlier field observations (not experimental data) by @Holloway1930 on filmy fern gametophytes in New Zealand: he reported apparent DT in gametophytes of *Hymenophyllum rarum* R. Br. and *H. villosum* Colenso, both high elevation epiphytes with desiccation tolerant sporophytes, and lack of DT in terrestrial filamentous gametophytes of *Polyphlebium colensoi* (Hook. f.) Ebihara & K. Iwats., *Abrodictyum strictum* (Menzies ex Hook. & Grev.) Ebihara & K. Iwats., and *A. elongatum* (A. Cunn.) Ebihara & K. Iwats. occupying moist, protected sites on the forest floor.
 @WatkinsJr.2007c also found that DT of fern gametophytes tended to match habitat, with terrestrial species having lower DT than epiphytes.
 However, we found that gametophytes had lower DT than sporophytes regardless of growth habit (\figs{ }`r figure_num("combined")`, `r s_figure_num("traits-box")`).
 At high elevation sites (\ie, cloud forest), epiphytic ferns often occur in a dense matrix of bryophytes (`r figure("habit")`b).
@@ -939,7 +942,7 @@ S, sporophyte; G, gametophyte
 
 \newpage
 
-## Figure Captions
+## Figure legends
 <!-- JPR requirements: Figure captions begin with the term Fig. in bold type, followed by the figure number, also in boldtype. No punctuation is to be included after the number, nor is any punctuation to be placed at the end of the caption. -->
 
 **`r figure("habit")`** Examples of filmy ferns from French Polynesia.
@@ -1106,7 +1109,7 @@ make_dt_plot <- function (dt_plot_data, generation_select, plot_part) {
   ylab("Recovery (%)") +
   labs(
     x = "Recovery Time (hr)",
-    y = "Recovery (%)",
+    y = "Recovery",
     title = glue("**{plot_part}**")
   ) +
   theme(
@@ -1134,7 +1137,8 @@ knitr::include_graphics(here::here("data/figure_1.png"))
 
 ```{r filmy-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = "", purl = FALSE}
 make_dt_plot(dt_plot_data, "sporophyte", "a")
-ggsave(here::here("results/ms/fig_1a_sporo_dt.pdf"), width = 6.85, height = 7.5)
+figname <- figure("dt") %>% str_remove_all("[:punct:]| ") %>% paste0("a.pdf")
+ggsave(file = here::here("results/ms", figname), width = 6.85, height = 7.5)
 ```
 
 **`r figure("dt")`**
@@ -1143,7 +1147,8 @@ ggsave(here::here("results/ms/fig_1a_sporo_dt.pdf"), width = 6.85, height = 7.5)
 
 ```{r gameto-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = "", purl = FALSE}
 make_dt_plot(dt_plot_data, "gametophyte", "b")
-ggsave(here::here("results/ms/fig_1b_gameto_dt.pdf"), width = 6.85, height = 6.5)
+figname <- figure("dt") %>% str_remove_all("[:punct:]| ") %>% paste0("b.pdf")
+ggsave(here::here("results/ms", figname), width = 6.85, height = 6.5, device = "pdf")
 ```
 
 **`r figure("dt")`** (continued)
@@ -1313,7 +1318,6 @@ c <- ggplot(traits, aes(y = species)) +
     size = 2.5,
     vjust = -0.5) +
   scale_fill_manual(values = generation_colors, labels = pretty_text) +
-  # theme_bw(base_size = 10) +
   scale_y_discrete(
     position = "right",
     # Format species names by converting underscore to space and italicizing
@@ -1378,7 +1382,8 @@ a + b + c + d + plot_layout(nrow = 1, guides = "collect") &
     legend.box = "vertical", 
     legend.margin = margin())
 
-ggsave(here::here("results/ms/fig_combined.pdf"), width = 6.85, height = 5)
+figname <- figure("combined") %>% str_remove_all("[:punct:]| ") %>% paste0(".pdf")
+ggsave(here::here("results/ms", figname), width = 6.85, height = 5)
 ```
 
 **`r figure("combined")`**
@@ -1432,7 +1437,7 @@ a <- ggplot(plot_data, aes(x = vpd_sporophyte_mean, y = recovery_sporophyte_mean
   annotate(
     geom = "richtext", 
     x = Inf, y = -Inf, 
-    label = glue("*P* = {vpd_sporophyte_pval}<br>*R*<sup>2</sup> = {vpd_sporophyte_adj_r_squared}"),
+    label = glue("*P* = {vpd_sporophyte_pval}<br>adj. *R*<sup>2</sup> = {vpd_sporophyte_adj_r_squared}"),
     hjust = 1, vjust = 0, size = 3, label.colour = "transparent") +
   scale_y_continuous(
     labels = percent, 
@@ -1483,7 +1488,8 @@ a + b + c +
   plot_annotation(tag_levels = "a")  &
   theme(plot.tag = element_text(face = 'bold'))
 
-ggsave(here::here("results/ms/fig_corr.pdf"), width = 6.85, height = 5)
+figname <- figure("corr") %>% str_remove_all("[:punct:]| ") %>% paste0(".pdf")
+ggsave(here::here("results/ms", figname), width = 6.85, height = 5)
 ```
 
 **`r figure("corr")`**
