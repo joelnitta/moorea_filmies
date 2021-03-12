@@ -314,7 +314,7 @@ habit_colors <- c(
 
 **Title:** Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)
 
-**Authors:** Nitta JH; Watkins JE; Holbrook NM; Taputuarai R; Wang T; Davis CC
+**Authors:** Nitta JH; Watkins JE; Holbrook NM; Wang TW; Davis CC
 
 **Journal:** Journal of Plant Research 
 
@@ -1045,11 +1045,11 @@ ggplot(plot_data, aes(y = species)) +
     aes(x = gameto_max_el),
     shape = 23, fill = "grey10") +
   scale_color_manual(values = habit_colors, labels = pretty_text) +
-  scale_y_discrete(labels = pretty_text) +
+  scale_y_discrete(labels = str_abbrev_sp_pretty) +
   labs(x = "Elevation (m)", y = "Species", color = "Growth habit") +
   theme(
     legend.position = "bottom",
-    axis.text.y = element_text(face = "italic")
+    axis.text.y = element_markdown()
   )
 ```
 
@@ -1179,6 +1179,7 @@ ggplot(rel_water_species_means_desic, aes(x = rel_water, y = species, group = sa
     width = 0.2,
     position=position_dodge(width=0.5)) +
   geom_point(aes(fill = salt, shape = salt), size = 1.25, position=position_dodge(width=0.5)) +
+  scale_y_discrete(labels = str_abbrev_sp_pretty) +
   scale_x_continuous(label = scales::percent) +
   scale_shape_manual(name = "Desiccation Intensity",
                      values = salt_shapes,
@@ -1196,11 +1197,10 @@ ggplot(rel_water_species_means_desic, aes(x = rel_water, y = species, group = sa
   theme(
     panel.grid.minor.y = element_blank(),
     panel.grid.major.y = element_blank(),
+    axis.text.y = element_markdown(),
     legend.position = "bottom"
   ) +
   facet_grid(vars(dry_time), labeller = as_labeller(c(`2` = "2 days", `15` = "15 days")))
-
-# ggsave(here::here("results/S_fig_water_content_desic.pdf"))
 ```
 
 **`r s_figure("water-all")`**. Relative water content (RWC) of sporophytes after desiccation by duration of desiccation treatment (2 or 15 days). RWC was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not RWC of zero).
@@ -1217,7 +1217,11 @@ species_with_rec <-
 
 rel_water_species_means_with_rec <-
   rel_water_species_means %>%
-  filter(species %in% species_with_rec)
+  filter(species %in% species_with_rec) %>%
+  # Abbreviate species names to "G. species"
+  mutate(
+    species = str_replace_all(species, "[a-z]+_", ". "),
+    species = glue("*{species}*"))
 
 pd <- position_dodge(.5)
 
@@ -1255,12 +1259,11 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
   theme_bw() +
   theme(
     panel.grid.major.x = element_blank(),
+    strip.text = element_markdown(),
     legend.position = "bottom",
     legend.box="vertical", 
     legend.margin=margin()
   )
-
-# ggsave(here::here("results/S_fig_water_content_full.png"))
 ```
 
 **`r s_figure("water-s")`**. Relative water content (RWC) of sporophytes during desiccation tolerance test. RWC was not measured for all combinations of species and desiccation treatments; only species with complete data shown.
