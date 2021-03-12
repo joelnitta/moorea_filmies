@@ -184,7 +184,7 @@ They found that species occurring at greater heights in the trees tended to have
 A study using two species of *Hymenophyllum* demonstrated that DT in filmy ferns likely operates via a homoiochlorophyllous, constitutive mechanism, which is more similar to that of bryophytes than other drought-tolerant vascular plants, thus allowing filmy ferns to adjust to dry conditions extremely rapidly [@GarcesCea2014].
 This was further supported by evidence that induced biomechanical mechanisms likely do not play a role in DT of filmy ferns [@Fallard2018; but see @Mkhize2020].
 Recently, transcriptomics has been applied to elucidate the genes involved at each step of the desiccation-recovery cycle of filmy ferns [@Ostria-Gallardo2020; @Ostria-Gallardo2020a]. 
-In epiphytic *Hymenoglossum cruentum* Cav. from Chile, key genes and gene networks were identified related to intracellular mobility and photosynthetic metabolism in the desiccated state, and those related to detoxifying pathways and stabilization of photosystems during rehydration [@Ostria-Gallardo2020a].
+In epiphytic *Hymenoglossum cruentum* Cav., key genes and gene networks were identified related to intracellular mobility and photosynthetic metabolism in the desiccated state, and those related to detoxifying pathways and stabilization of photosystems during rehydration [@Ostria-Gallardo2020a].
 In a comparison of low-trunk and canopy epiphytes, @Ostria-Gallardo2020 identified multiple differentially expressed genes that may be specific to tolerating desiccation in these microhabitats.
 
 Despite this considerable interest in filmy fern ecophysiology, with the sole exception of @Johnson2000, no studies have compared physiology between gametophyte and sporophyte phases, and we are aware of none that have done so across multiple species.
@@ -228,6 +228,9 @@ For each marker, a reference library was constructed from sporophyte sequences u
 Field-collected gametophytes were identified by a local BLAST query against the reference library.
 Gametophytes matching > 99.5 % with a single reference sequence and no others were identified as that species; those that did not match any reference sequence or matched > 99.5 % with multiple reference sequences were not identified and excluded from further analysis.
 For this study, only gametophytes that could be identified as Hymenophyllaceae were used; others were excluded from analysis.
+
+Fieldwork was done under permits issued by the French Polynesian Government (Délégation à la Recherche) and the Haut-commissariat de la République en Polynésie Francaise (Protocole d’Accueil 2012–2014). 
+Voucher specimens were deposited at UC, with duplicates at GH and PAP (abbreviations follow @Thiers2021).
 
 ### Microclimate
 
@@ -324,7 +327,7 @@ A Docker image is available to run the code at https://hub.docker.com/r/joelnitt
 The \package{targets} package [@Landau2021] was used to automate the workflow.
 The \package{ggplot2} [@Wickham2016], \package{ggtree}, [@Yu2017] and \package{patchwork} (https://github.com/thomasp85/patchwork) packages were used to generate the figures.
 
-\*\*\* NOTE TO REVIEWERS: The dataset and code will not be made public until the paper is accepted. While the paper is under review, these links can be used for the dataset (https://figshare.com/s/d6349abf01a3756a5aae) and code (https://www.dropbox.com/sh/h788g1h3sjcqj0j/AACwFWTmL6GxrbLkCfOrXZU9a?dl=0)  \*\*\*
+\*\*\* NOTE TO REVIEWERS: The DOI for the dataset will not be active until the paper is accepted. Until then, this link can be used for the dataset https://figshare.com/s/d6349abf01a3756a5aae  \*\*\*
 
 ## Results
 
