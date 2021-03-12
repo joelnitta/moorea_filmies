@@ -79,7 +79,7 @@ tar_plan(
     # Only include samples that should be presented in the main MS
     filter(section == "main") %>%
     # Filter out individuals with low pre-treatment yields
-    filter(!is.na(yield_pre), yield_pre > 400) %>%
+    filter(!is.na(yield_pre), yield_pre > .4) %>%
     calculate_recovery(),
   
   # - calculate water content during DT test per individual

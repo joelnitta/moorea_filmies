@@ -1088,7 +1088,7 @@ dt_control_plot_data <-
   filmy_dt %>%
   filter(salt == "Control") %>%
   # Filter out individuals with low pre-treatment yields
-  filter(!is.na(yield_pre), yield_pre > 400) %>%
+  filter(!is.na(yield_pre), yield_pre > 0.4) %>%
   # Calculate recovery by individual
   verify(yield_pre > 0) %>%
   assert(not_na, yield_pre) %>%
@@ -1400,7 +1400,7 @@ cal_water_recovery <- filmy_dt %>%
   # Only include samples that should be presented in the main MS
   filter(salt == "H2O", species == "Callistopteris_apiifolia") %>%
   # Filter out individuals with low pre-treatment yields
-  filter(!is.na(yield_pre), yield_pre > 400) %>%
+  filter(!is.na(yield_pre), yield_pre > 0.4) %>%
   calculate_recovery() %>%
   calculate_mean_recovery() %>%
   rename(recovery = recovery_mean, sd = recovery_sd) %>%

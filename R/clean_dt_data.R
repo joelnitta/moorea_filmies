@@ -792,7 +792,8 @@ filmy_dt_wide <-
   # Remove rows with no yield or weight at all
   filter(!(is.na(yield_manual_entry) & is.na(yield_pam) & is.na(weight))) %>%
   filter(str_detect(note, "exclude", negate = TRUE)) %>%
-  # Convert yield to how it appears on the miniPAM (1000*actual yield)
+  # Convert yield to how it appears on the miniPAM (1000*actual yield) 
+  # to check against manual entries
   mutate(yield_pam = 1000*yield_pam) %>%
   # Check for problems in yield differences between 
   # manual entry and values matched from miniPAM
@@ -816,6 +817,8 @@ filmy_dt_wide <-
     # - use the miniPAM otherwise
     TRUE ~ yield_pam
   )) %>%
+  # Convert yield back to range between 0 and 1
+  mutate(yield = yield/1000) %>%
   select(-yield_manual_entry, -yield_pam, -memory, -note) %>%
   rename(time = date_time) %>%
   # Convert to wide format
