@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" default-locale="en-US" version="1.0" demote-non-dropping-particle="never">
   <!-- This style was edited with the Visual CSL Editor (https://editor.citationstyles.org/visualEditor/) -->
   <info>
@@ -19,7 +19,7 @@
     <category citation-format="author-date"/>
     <category field="generic-base"/>
     <summary>Springer Author Date Style for the disciplines Medicine, Biomedicine, Life Sciences, Chemistry, Geosciences, Computer Science, Engineering, Economics. This style is based on Harvard style and recommendations of the Council of Biology Editors.</summary>
-    <updated>2021-03-10T06:32:38+00:00</updated>
+    <updated>2021-03-12T05:36:56+00:00</updated>
     <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
   </info>
   <locale>
@@ -155,13 +155,13 @@
                     <text variable="page"/>
                   </group>
                 </group>
-                <text prefix="https://doi.org/" variable="DOI"/>
+                <text variable="DOI" prefix="doi: "/>
               </group>
             </if>
             <else>
               <group prefix=". " delimiter=". ">
                 <text variable="container-title" form="short" strip-periods="true"/>
-                <text prefix="https://doi.org/" variable="DOI"/>
+                <text variable="DOI" prefix="doi: "/>
               </group>
             </else>
           </choose>
