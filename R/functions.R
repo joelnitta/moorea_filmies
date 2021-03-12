@@ -1230,7 +1230,7 @@ write_gameto_times <- function(gameto_indiv_times, file_out) {
   gameto_indiv_times_lines <- c(
     "# Electronic supplementary materials: Online Resource 2",
     "# Title: Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)",
-    "# Authors: Nitta JH; Watkins JE; Holbrook NM; Taputuarai R; Wang T; Davis CC",
+    "# Authors: Nitta JH; Watkins JE; Holbrook NM; Wang TW; Davis CC",
     "# Journal: Journal of Plant Research",
     "# Corresponding author: Joel H. Nitta (joelnitta@gmail.com)",
     "# Contents: start and end times of desiccation tolerance test on gametophytes of filmy ferns from Moorea French Polynesia",
