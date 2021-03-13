@@ -14,7 +14,7 @@ unzip_nitta_2017(
 # https://datadryad.org/stash/dataset/doi:10.5061/dryad.fqz612jps, clicking on
 # "Download dataset", and saving to the "data" folder in this project.
 unzip(
-  zipfile = "data/doi_10.5061_dryad.fqz612jps__v4.zip", 
+  zipfile = "data/doi_10.5061_dryad.fqz612jps__v2.zip", 
   files = "moorea_climate.csv", 
   exdir = "data/nitta_2020/", 
   junkpaths = TRUE, 
