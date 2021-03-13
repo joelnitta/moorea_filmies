@@ -12,9 +12,9 @@ To run all analyses and generate the manuscript:
 
 ## Data
 
-For each of the links below, click on "Download Dataset", then place the zipped data file (it will have a similar name to the DOI) in the `data` folder of the 
-this repo. You can manually unzip the data archives if you want to see the contents, but the code needs the original zipped file in `data/` to run.
+For each of the links below, click on "Download Dataset" or "Download all", then place the zipped data file in the `data` folder of this repo. You can manually unzip the data archives if you want to see the contents, but the code needs the original zipped file in `data/` to run.
 
+- https://figshare.com/s/d6349abf01a3756a5aae
 - https://doi.org/10.5061/dryad.df59g
 - https://doi.org/10.5061/dryad.fqz612jps
 
@@ -31,7 +31,13 @@ cd /path/to/repo
 docker-compose up -d
 ```
 
-Run `targets::tar_make()` inside the container:
+Unzip the data (this only has to be done once):
+
+```
+docker exec moorea_filmies_analysis_1 Rscript R/unzip_data.R
+```
+
+Run `targets::tar_make()`:
 
 ```
 docker exec moorea_filmies_analysis_1 Rscript -e "targets::tar_make()"

@@ -19,3 +19,13 @@ unzip(
   exdir = "data/nitta_2020/", 
   junkpaths = TRUE, 
   overwrite = TRUE)
+
+# Unzip data from this paper
+# The dataset must be downloaded first by going to
+# https://figshare.com/s/d6349abf01a3756a5aae, clicking on
+# "Download all", and saving to the "data" folder in this project.
+unzip(
+  zipfile = "data/14184572.zip", 
+  exdir = "data/", 
+  junkpaths = TRUE, 
+  overwrite = TRUE)
