@@ -207,7 +207,7 @@ Here, we leverage a recently developed DNA barcoding system [@Nitta2017] to test
 We selected the island of Moorea, French Polynesia (17°32' S, 149°50' W) for our survey of filmy fern ecophysiology.
 Moorea is a small (135 km^2^; maximum elevation 1206 m) tropical oceanic island, located \circa{ }15 km NW of its larger sister island, Tahiti.
 Despite its small size, it hosts a range of habitats including coastal strand, low elevation rainforest, and high elevation cloud forest.
-A total of `r n_filmy_sp` filmy fern species are known from Moorea, including multiple terrestrial, saxicolous, and epiphytic species [@Florence; @Murdock2003; @Nitta2011b; @Nitta2017; @Ranker2005] (\figs{ }`r figure_num("habit")`, `r s_figure_num("tree")`; all supplemental figures available in Online Resource 1).
+A total of `r n_filmy_sp` filmy fern species are known from Moorea, including multiple terrestrial, saxicolous, and epiphytic species [@Florence in press; @Murdock2003; @Nitta2011b; @Nitta2017; @Ranker2005] (\figs{ }`r figure_num("habit")`, `r s_figure_num("tree")`; all supplemental figures available in Online Resource 1).
 The two major clades of filmy ferns, the hymenophylloid and trichomanoid lineages [@Pryer2001a], are represented on Moorea by `r n_hymeno_sp` and `r n_trich_sp` species, respectively.
 We follow the taxonomic system of @Ebihara2006 for Hymenophyllaceae.
 

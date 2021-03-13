@@ -230,7 +230,6 @@ tar_plan(
   
   # - docx for submission
   # FIXME: some fixes need to be made manually for MS submission
-  # - change Florence to "in press" (in-line and refs)
   # - remove extra space from bib entries
   # - add missing table header rows
   ms_docx = latex2docx(
