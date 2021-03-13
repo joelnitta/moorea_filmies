@@ -1,0 +1,456 @@
+---
+output: rtf_document
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE, cache = FALSE}
+# TO CONVERT TO PLAIN TEXT:
+# after rendering to rtf,
+# 1. Copy the contents of the rtf file, paste to txt.
+# 2. Replace all single line breaks with double line breaks
+# (in Atom search-replace with grep: \n for \n\n)
+# 3. Hard-wrap all text at 80 characters (in Atom with autoflow: cmd-alt-q)
+# (optional: add name after first line)
+# 4. Save as "README.txt"
+
+knitr::opts_chunk$set(
+  echo = FALSE, message = FALSE,
+  warning = FALSE, results = "hide", cache = FALSE)
+
+# Load objects from targets workflow (all paths to data files)
+tar_load(gameto_times_2012_file)
+tar_load(sporo_dt_times_file)
+tar_load(specimens_raw_file)
+tar_load(filmy_dt_file)
+tar_load(filmy_dt_chamber_file)
+tar_load(filmy_habit_file)
+tar_load(light_data_file)
+```
+
+This README.txt file was generated on `r format(Sys.time(), '%d %B, %Y')`
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\- GENERAL INFORMATION \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+Title of Dataset: Data from: Intergenerational niche differentiation in filmy
+ferns (Hymenophyllaceae)
+
+Author Information
+
+Principal Investigator: Joel H. Nitta
+
+Department of Integrated Biosciences, Graduate School of Frontier Sciences,
+The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan
+joelnitta@gmail.com
+
+Associate or Co-investigators: James E. Watkins, N. Michele Holbrook,
+Tristan W. Wang, Charles C. Davis
+
+Date of data collection: 2012--2014
+
+Geographic location of data collection: Moorea, French Polynesia
+
+Information about funding sources or sponsorship that supported the
+collection of the data: Funding provided in part by the National Science
+Foundation (Doctoral Dissertation Improvement Grant DEB-1311169 to JHN and
+CCD), Setup Funds from Harvard University to CCD, American Society of Plant
+Taxonomists (Research Grant for Graduate Students to JHN), Garden Club of
+America (Award in Tropical Botany to JHN), Harvard University Herbaria (Fernald
+Fieldwork Fellowship to JHN), Society of Systematic Biologists (Graduate Student
+Research Award to JHN), and Systematics Association (Systematics Research Fund
+to JHN).
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+SHARING/ACCESS INFORMATION
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+Licenses/restrictions placed on the data, or limitations of reuse: CC0 1.0
+Universal (CC0 1.0)
+
+Recommended citation for the data: Nitta JH, Watkins JE, Holbrook NM, Wang TW,
+Davis CC (2021) Data from: Intergenerational niche differentiation in filmy
+ferns (Hymenophyllaceae) https://doi.org/10.6084/m9.figshare.14184572
+
+Citation for and links to publications that cite or use the data: Nitta JH,
+Watkins JE, Holbrook NM, Wang TW, Davis CC (2021) Intergenerational niche
+differentiation in filmy ferns (Hymenophyllaceae) <<FIXME: ADD JOURNAL>>
+
+Code for analyzing the data is available on github:
+https://github.com/joelnitta/moorea_filmies
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+DATA & FILE OVERVIEW
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+File list (filenames, directory structure (for zipped files) and brief
+description of all data files):
+
+- 2012_gameto_dt_times.csv: Start and end times of desiccation tolerance (DT)
+  test on fern gametophytes during the 2012 field season.
+- 2012_sporo_dt_times.csv: Start and end times of desiccation tolerance (DT)
+  test on fern sporophytes during the 2012 field season.
+- data_raw.tar.gz: Zipped raw data files. For a description, see README.md in
+  the zipped archive.
+- fern_specimens.csv: Specimen data for ferns collected in French Polynesia
+  primarily by Joel H. Nitta.
+- filmy_dt.csv: Data from desiccation tolerance test on filmy ferns from
+  from Moorea, French Polynesia.
+- filmy_dt_chamber.csv: Temperature and humidity inside desiccation chambers during
+  desiccation tolerance test.
+- filmy_growth_habit.csv: Growth habit of filmy ferns from Moorea,
+  French Polynesia.
+- filmy_light_curves.csv: Light levels and chlorophyll fluorescence measured
+  in filmy ferns from Moorea, French Polynesia with a chlorophyll
+  fluorometer.
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+METHODOLOGICAL INFORMATION
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+Description of methods used for collection/generation of data:
+
+Desiccation tolerance (DT) and light responses were measured in sporophytes and
+gametophytes of filmy ferns (family Hymenophyllaceae) on the island of Moorea,
+French Polynesia.
+
+Samples were collected in the field and stored in plastic bags with a small
+amount of water to keep them fresh during transport to the lab.
+
+To measure DT, pre-treatment maximum photochemical yield of photosystem II was
+measured in fresh plants after a 10 min period of dark-adaptation using a
+portable mini-PAM fluorometer (Walz Gmbh, Effeltrich, Germany). Samples were
+then transferred to desiccation chambers containing saturated salts at three
+different desiccation intensities or a control treatment with moist tissues
+(100% RH), and water withheld for either a short (2 d) or long (15 d) interval.
+Conditions inside the desiccation chambers were monitored during the experiment
+using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging
+every 10 min or Hobo ProV2 dataloggers logging every 5 min. Salts used for
+desiccation and their corresponding mean water potentials and approximate
+relative humidity and VPD are as follows: LiCl (-282 MPa, 18% RH, 2.45 kPa),
+Mg(NO3)2 (-86 MPa, 58% RH, 1.25 kPa), and NaCl (-38 MPa, 80% RH, 0.60 kPa).
+Following the desiccation treatment, plants were rewetted and yield of
+photosystem II was again measured at 0.5 h, 24 h, and 48 h following rewetting.
+Eight individuals per treatment were used for sporophytes. No replication by
+species was possible for gametophytes due to their cryptic morphology. All
+gametophytes were subjected to the same treatment (2 d at -86 MPa). Gametophytes
+were later identified to species by DNA barcoding.
+
+Relative water content (RWC) was measured in a subset of samples by recording
+the mass of samples prior to the DT test (fresh mass), at each step of the DT
+test (turgid mass), then after drying them overnight in a drying oven at 65 °C
+following the DT test (dry mass). Relative water content was calculated as RWC =
+(TM - DM) / (FM - DM), where TM is turgid mass, DM is dry mass, and FM is fresh
+mass. Relative water content was not calculated for gametophytes, as these were
+too small to measure accurately with the balances available.
+
+To measure light responses, rapid light response curves were constructed for
+each species by measuring photosynthetic yield at gradually increasing levels of
+photosynthetically active actinic light (400 nm to 700 nm) with the Light Curve
+function of the mini-PAM portable chlorophyll fluorometer (Walz Gmbh,
+Effeltrich, Germany) as described by the manufacturer.
+
+Fieldwork was done under permits issued by the French Polynesian Government
+(Délégation à la Recherche) and the Haut-commissariat de la République en
+Polynésie Francaise (Protocole d’Accueil 2012–2014).
+
+fern_specimens.csv, filmy_dt.csv, filmy_dt_chamber.csv, and
+filmy_light_curves.csv were generated by processing the raw data files using
+scripts available at https://github.com/joelnitta/moorea_filmies (scripts
+beginning with "clean_" in the "R/" directory).
+
+For full methods, see Nitta JH, Watkins JE, Holbrook NM, Wang TW, Davis CC (2021) <<FIXME: ADD JOURNAL>>
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+DATA-SPECIFIC INFORMATION
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+```{r gameto-dt-times}
+gameto_dt_times <- read_csv(here::here(gameto_times_2012_file))
+```
+
+2012_gameto_dt_times.csv: Start and end times of desiccation tolerance (DT)
+experiment on fern gametophytes during the 2012 field season. All gametophytes
+were desiccated 2 d at -86 MPa. For other field seasons (2013, 2014), start and
+end times were recorded during each measurement, so are not included in this
+file.
+
+Number of variables: `r ncol(gameto_dt_times)`
+
+Number of cases/rows: `r nrow(gameto_dt_times)`
+
+Variable list:
+
+- date_time: Date and time, formatted YYYY-MM-DD HH-MM-SS.
+- event: Start or end of experiment.
+- group: Code corresponding to site and growth habit of samples.
+- cluster: Number assigned to each group of samples (gametophyte individuals)
+that were included together in a single experiment.
+
+Missing data codes: No missing data.
+
+Specialized formats or other abbreviations used: For 'group', 'ter' indicates
+terrestrial samples, 'epi' indicates epiphytic samples; number indicates site
+as follows: 1 = Three Pines 200m, 2 = Mt. Tohiea 400m, 3 = Mt. Tohiea 600m,  4 =
+Mt. Tohiea 800m, 5 = Mt. Tohiea 1000m, 6 = Mt. Tohiea 1170m. For a description
+of sites, see Nitta, Joel H.; Meyer, Jean-Yves; Taputuarai, Ravahere; Davis,
+Charles C. (2016), Data from: Life cycle matters: DNA barcoding reveals
+contrasting community structure between fern sporophytes and gametophytes,
+Dryad, Dataset, https://doi.org/10.5061/dryad.df59g
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+```{r sporo-dt-times}
+sporo_dt_times <- read_csv(here::here(sporo_dt_times_file))
+```
+
+2012_sporo_dt_times.csv: Start and end times of desiccation tolerance (DT) test
+on fern sporophytes during the 2012 field season. For other field seasons
+(2013, 2014), start and end times were recorded during each measurement, so are
+not included in this file.
+
+Number of variables: `r ncol(sporo_dt_times)`
+
+Number of cases/rows: `r nrow(sporo_dt_times)`
+
+Variable list:
+
+- date_time: Date and time, formatted YYYY-MM-DD HH-MM-SS
+- event: Start or end of experiment.
+- salt: Name of salt used to maintain constant humidity in the desiccation
+chamber (see methods above for corresponding relative humidity).
+- dry_time: Length (d) of desiccation.
+- species: Species included in experiment.
+
+Missing data codes: No missing data.
+
+Specialized formats or other abbreviations used: None.
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+data_raw.tar.gz: Zipped raw data files. For a description, see README.md in
+the zipped archive. These were used to generate the clean data files with code
+available at https://github.com/joelnitta/moorea_filmies (scripts starting with
+'clean_' in the 'R' folder).
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+```{r specimens}
+specimens <- read_csv(here::here(specimens_raw_file))
+```
+
+fern_specimens.csv: Specimen data for ferns collected in French Polynesia
+primarily by Joel H. Nitta.
+
+Number of variables: `r ncol(specimens)`
+
+Number of cases/rows: `r nrow(specimens)`
+
+Variable list:
+
+- specimen_id: Unique key assigned to each specimen.
+- specimen: Specimen voucher (collector name and number).
+- collector: Name of primary collector.
+- coll_num: Collection number.
+- family: Family.
+- genus: Genus.
+- specific_epithet: Specific epithet.
+- infraspecific_rank: Infraspecific rank.
+- infraspecific_name: Infraspecific name.
+- certainty: Taxonomic certainty.
+- species: Genus and specific epithet.
+- taxon: Genus, specific epithet, and any infraspecific names.
+- country: Country.
+- county: County (or approximate political division).
+- locality: General locality.
+- site: Name of collection site.
+- elevation: Elevation (m).
+- latitude: Latitude (decimal degrees).
+- longitude: Longitude (decimal degrees).
+- observations: Observations about the specimen.
+- generation: Gametophyte or sporophyte.
+- gameto_net_location: Location of gametophyte sampling grid.
+- gameto_square: Grid square where gametophyte was sampled.
+- gameto_habit: Gametophyte growth habit.
+- date_collected: Collection date.
+- other_collectors: Names of other collectors present.
+- herbaria: Herbarium code where specimen is deposited.
+
+Missing data codes: Missing data entered as 'NA'.
+
+Specialized formats or other abbreviations used: Herbarium codes follow Index
+Herbariorum (http://sweetgum.nybg.org/science/ih/)
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+```{r filmy-dt}
+filmy_dt <- read_csv(here::here(filmy_dt_file))
+```
+
+filmy_dt.csv: Data from desiccation tolerance test on filmy ferns from from
+Moorea, French Polynesia.
+
+Number of variables: `r ncol(filmy_dt)`
+
+Number of cases/rows: `r nrow(filmy_dt)`
+
+Variable list:
+
+- species: Species.
+- salt: Name of salt used to maintain constant humidity in the desiccation
+chamber (see methods above for corresponding relative humidity).
+- dry_time: Length (d) of desiccation.
+- individual: Individual code assigned to each sample per species per treatment.
+(sporophytes) or collection number (gametophytes).
+- generation: Gametophyte or sporophyte.
+- dataset: Name of corresponding raw dataset file (sporophytes only).
+- yield_pre: Maximum photochemical yield of photosystem II (Fv/Fm) prior to
+desiccation treatment.
+- yield_30min: Fv/Fm 30 m after rewetting following desiccation treatment.
+- yield_24hr: Fv/Fm 24 h after rewetting.
+- yield_48hr: Fv/Fm 48 h after rewetting.
+- yield_72hr: Fv/Fm 72 h after rewetting (gametophytes only).
+- yield_dry: Fv/Fm in the desiccated state.
+- weight_pre: Mass (g) prior to desiccation treatment.
+- weight_desiccated: Mass (g) in the desiccated state.
+- weight_30min: Mass (g) 30 m after rewetting.
+- weight_24hr: Mass (g) 24 h after rewetting.
+- weight_48hr: Mass (g) 48 h after rewetting.
+- weight_dry: Mass (g) after drying overnight at 60 C.
+- time_pre: Date and time just before starting desiccation treatment,
+formatted YYYY-MM-DD HH-MM-SS.
+- time_30min: Date and time 30 m after rewetting.
+- time_24hr: Date and time 24 h after rewetting.
+- time_48hr: Date and time 48 h after rewetting.
+- time_72hr: Date and time 72 h after rewetting (gametophytes only).
+- time_dry: Date and time when yield was measured in the desiccated state.
+
+Missing data codes: Missing data entered as 'NA'.
+
+Specialized formats or other abbreviations used: None.
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+```{r filmy-dt-chamber}
+filmy_dt_chamber <- read_csv(here::here(filmy_dt_chamber_file))
+```
+
+filmy_dt_chamber.csv: Temperature and humidity inside desiccation chambers during
+desiccation tolerance test, measured using Track-It RH/Temp dataloggers
+(Monarch Instrument, Amherst, NH) logging every 10 min or Hobo ProV2 dataloggers
+logging every 5 min.
+
+Number of variables: `r ncol(filmy_dt_chamber)`
+
+Number of cases/rows: `r nrow(filmy_dt_chamber)`
+
+Variable list:
+
+- date_time: Date and time, formatted YYYY-MM-DD HH-MM-SS.
+- temp: Temperature (degrees Celsius)
+- rh: Relative humidity (%)
+- salt: Name of salt used to maintain constant humidity in the desiccation
+chamber (see methods above for corresponding relative humidity).
+- generation: Gametophyte or sporophyte, or "mixed" if samples of both generations
+were present in the growth chamber.
+- year: Year.
+- species: Species.
+- file: Name of file containing raw data.
+- serial_no: Serial number of datalogger.
+
+Missing data codes: Missing data entered as 'NA'.
+
+Specialized formats or other abbreviations used: None.
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+```{r filmy-habit}
+filmy_growth_habit <- read_csv(here::here(filmy_habit_file))
+```
+
+filmy_growth_habit.csv: Growth habit of filmy ferns from Moorea, French
+Polynesia. Growth habit determined by field observation. Species were
+categorized into one of four growth habits: terrestrial (growing in soil, with
+true roots), saxicolous  (growing on rocks), low-elevation epiphyte (mostly
+occurring outside of cloud  forest, i.e., below ca. 500 m), and high-elevation
+epiphyte (mostly occurring  within cloud forest, i.e., above ca. 500 m).
+Crepidomanes bipunctatum and Crepidomanes  humile were observed growing as both
+epiphytes and saxicoles, but are coded as  epiphytes to distinguish them from
+exclusively saxicolous species.
+
+Number of variables: `r ncol(filmy_growth_habit)`
+
+Number of cases/rows: `r nrow(filmy_growth_habit)`
+
+Variable list:
+
+- species: Species.
+- habit: Growth habit.
+
+Missing data codes: None.
+
+Specialized formats or other abbreviations used: None.
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+```{r filmy-light-curves}
+filmy_light_curves <- read_csv(here::here(light_data_file))
+```
+
+filmy_light_curves.csv: Light levels and chlorophyll fluorescence measured in
+filmy ferns from Moorea, French Polynesia with a chlorophyll fluorometer.
+Chlorophyll  fluorescence measured with "light curve" function of mini-PAM
+chlorophyll fluorometer.
+
+Number of variables: `r ncol(filmy_light_curves)`
+
+Number of cases/rows: `r nrow(filmy_light_curves)`
+
+Variable list:
+
+- type: Type of fluorescence measurement, from mini-PAM raw data.
+- no: Number of fluorescence measurement, from mini-PAM raw data (not unique, 
+because this file includes measurements from multiple mini-PAM raw data files).
+- f: Momentary fluorescence level before application of saturation pulse.
+- fm: Maximum fluorescence level of the illuminated sample.
+- par: Level of photosynthetically active radiation during fluorescence 
+measurement.
+- yield: Effective photochemical quantum yield of photosystem II.
+- etr: Relative electron transport rate.
+- date_time: Date and time of measurement, formatted YYYY-MM-DD HH-MM-SS.
+- species: Species.
+- individual: Individual code assigned to each sample per species per treatment.
+- generation: Gametophyte or sporophyte.
+- coll_num: J.H. Nitta collection number
+- sporo_site: Name of site where sporophyte sample was collected.
+- condition: Condition under which measurements were taken (lab or field).
+- date: Date of measurement, formatted YYYY-MM-DD.
+- outlier: "TRUE" or "FALSE", indicating whether measurement should be excluded 
+from light curve analysis.
+- light_id: Unique ID number corresponding to light curve measured from a single 
+sample.
+
+Missing data codes: Missing data entered as 'NA'.
+
+Specialized formats or other abbreviations used: For a description of sporophyte
+sites, see Nitta, Joel H.; Meyer, Jean-Yves; Taputuarai, Ravahere; Davis,
+Charles C. (2016), Data from: Life cycle matters: DNA barcoding reveals
+contrasting community structure between fern sporophytes and gametophytes,
+Dryad, Dataset, https://doi.org/10.5061/dryad.df59g
+
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+
+CHANGE LOG
+
+\-\-\-
+
+2021-03-14
+
+Generate this README file.

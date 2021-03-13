@@ -15,6 +15,7 @@ tar_plan(
   moorea_sites = read_csv(
     moorea_sites_file,
     col_types = "cnnn") %>%
+    # remove sites on Tahiti (Mt. Aorai)
     filter(str_detect(site, "Aorai", negate = TRUE)),
   
   # - growth habit
@@ -27,11 +28,13 @@ tar_plan(
   # - phylogenetic tree (time tree, lacks BS values at nodes)
   tar_file(filmy_phy_file, "data/nitta_2017/treepl_Moorea_Tahiti.tre"),
   filmy_phy_no_bs = ape::read.tree(filmy_phy_file) %>%
+    # trim to only filmy ferns
     ape::keep.tip(filmy_species),
   
   # - phylogenetic tree (ML tree with BS values at nodes)
   tar_file(filmy_phy_bs_file, "data/nitta_2017/RAxML_bipartitions.all_broad.reduced"),
   filmy_phy_bs = ape::read.tree(filmy_phy_bs_file) %>%
+    # trim to only filmy ferns
     ape::keep.tip(filmy_phy_no_bs$tip.label),
   
   # - transfer bootstrap values from ML tree to time tree
@@ -59,11 +62,11 @@ tar_plan(
   tar_file(specimens_raw_file, "data/fern_specimens.csv"),
   specimens_raw = read_csv(specimens_raw_file),
   
-  # - gametophyte DT groups
+  # - gametophyte DT times entered manually (2012 only)
   tar_file(gameto_times_2012_file, "data/2012_gameto_dt_times.csv"),
   gameto_time_summary_2012 = load_gameto_time_summary_2012(gameto_times_2012_file),
   
-  # - sporophyte DT times entered manually
+  # - sporophyte DT times entered manually (2012 only)
   tar_file(sporo_dt_times_file, "data/2012_sporo_dt_times.csv"),
   sporo_dt_times = load_sporo_dt_times(sporo_dt_times_file),
   
@@ -131,7 +134,7 @@ tar_plan(
   filmy_lc_model_fitted_data = extract_fitted_lc_data(light_models),
   
   # - extract model parameters: 
-  # critical PAR, and ETR at 95% of estimated max value
+  #  ETR at 95% of estimated max value and PAR at that value
   filmy_lc_model_params = extract_lc_model_params(light_models),
   
   # - calculate mean light curve parameters by species and generation
@@ -143,7 +146,7 @@ tar_plan(
   # - calculate relative water content by species (sporophytes only)
   rel_water_species_means = calculate_mean_water(rel_water_indiv),
   
-  # - combine the species means into a single df
+  # - combine the species means into a single dataframe
   combined_species_means = combine_mean_phys_traits(
     recovery_species_means = recovery_species_means,
     light_species_means = light_species_means
@@ -183,7 +186,7 @@ tar_plan(
   # PGLS ----
   # (Phylogenetic Generalized Least Squares)
   
-  # Run PGLS for VPD and gametophyte range breadth vs. desiccation tolerance
+  # Run PGLS for VPD and range of gameto beyond sporo vs. desiccation tolerance
   env_range_recover_data = combine_env_env_range_recover(
     combined_species_means = combined_species_means,
     env_range_data = env_range_data
@@ -200,9 +203,16 @@ tar_plan(
   # Track bibliography files
   tar_file(refs, "ms/references.bib"),
   tar_file(refs_other, "ms/references_other.yaml"),
+  
+  # Render data README
+  tar_render(
+    data_readme,
+    "ms/data_readme.Rmd",
+    output_dir = here::here("results/data_readme")
+  ),
 
-  # Render PDF
-  # - PDF for preprint
+  # Render MS:
+  # - pdf for preprint
   tar_render(
     preprint_pdf, 
     "ms/manuscript.Rmd", 
@@ -210,14 +220,14 @@ tar_plan(
     output_file = "moorea_filmies_preprint.pdf",
     params = list(output_type = "preprint")),
   
-  # - PDF for conversion to Word
+  # - pdf for conversion to docx
   tar_render(
     manuscript_pdf, 
     "ms/manuscript.Rmd", 
     output_dir = here::here("results/ms")
     ),
   
-  # Render MS Word
+  # - docx for submission
   # FIXME: some fixes need to be made manually for MS submission
   # - change Florence to "in press" (in-line and refs)
   # - remove extra space from bib entries
@@ -231,10 +241,15 @@ tar_plan(
     depends = manuscript_pdf
   ),
   
-  # SI: figures (ESM 1)
-  tar_render(si_pdf, "ms/si.Rmd", output_file = "ESM_1.pdf", output_dir = here::here("results/si")),
+  # Render SI: figures (ESM 1)
+  tar_render(
+    si_pdf, 
+    "ms/si.Rmd", 
+    output_file = "ESM_1.pdf", 
+    output_dir = here::here("results/si")
+    ),
   
-  # SI: tables (ESM 2)
+  # Render SI: tables (ESM 2)
   tar_file(
     gameto_indiv_times_table,
     write_gameto_times(gameto_indiv_times, "results/si/ESM_2.csv"))
