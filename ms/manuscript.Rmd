@@ -219,6 +219,7 @@ For the gametophyte plots, each 50 cm x 50 cm plot was subdivided into 25 5 x 5 
 Epiphytes were sampled to a maximum height of \circa{ }2 m on their host plants.
 For additional details on sampling procedure, see @Nitta2017.
 The growth habit of each species was scored based on field observations as terrestrial, saxicolous, low elevation epiphyte (mostly occurring outside of cloud forest, \ie, below \circa{ }500 m), or high elevation epiphyte (mostly occurring in cloud forest, \ie, above \circa{ }500 m).
+*Crepidomanes bipunctatum* (Poir.) Copel. and *C. humile* (G. Forst.) Bosch were observed growing as both epiphytes and saxicoles, but were treated as epiphytes to distinguish them from exclusively saxicolous species.
 
 Unlike sporophytes, fern gametophytes are cryptic and cannot be identified to species based on morphology alone. 
 Therefore, we used DNA barcoding to identify filmy fern gametophytes to species following @Nitta2017.
@@ -490,7 +491,7 @@ A general correlation of DT with habitat was observed in sporophytes (`r figure(
 The two terrestrial species lacked DT, although *C. apiifolia* showed slightly greater ability to recover by 48 h compared to *Abrodictyum dentatum* (Bosch) Ebihara & K. Iwats., which completely failed to recover from even the gentlest treatment of 2 d at --38 NaCl (more stringent tests were not conducted on *A. dentatum* after confirming its lack of DT at this level).
 Saxicolous species (*Crepidomanes kurzii* (Bedd.) Tagawa & K. Iwats., *Polyphlebium endlicherianum* (C. Presl) Ebihara & K. Iwats., and *Vandenboschia maxima* (Blume) Copel.) also had low DT; only *C. kurzii* was able to recover from desiccation up to --86 MPa for 2 d but not more.
 Nearly all epiphytic species were capable of recovering from desiccation of up to 2 d at --86 MPa.
-*Crepidomanes bipunctatum* (Poir.) Copel., a widespread low-elevation epiphyte, showed the greatest ability to recover from desiccation across all treatments.
+*Crepidomanes bipunctatum*, a widespread low-elevation epiphyte, showed the greatest ability to recover from desiccation across all treatments.
 Interestingly, high-elevation epiphytes *Hymenophyllum multifidum* (G. Forst.) Sw. and *Hymenophyllum polyanthos* (Sw.) Sw. could recover from desiccation at --86 or --282 MPa for 15 d, but not --38 MPa.
 
 Gametophytes of terrestrial species could not tolerate desiccation (mean 48 h recovery `r gameto_dt_ter_mean`). Levels of DT were in general higher for saxicolous and epiphytic gametophytes, but otherwise did not show a clear pattern (`r figure("dt")`b).
