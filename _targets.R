@@ -204,6 +204,9 @@ tar_plan(
   tar_file(refs, "ms/references.bib"),
   tar_file(refs_other, "ms/references_other.yaml"),
   
+  # Track docx style
+  tar_file(word_style, "ms/journal-of-plant-research.docx"),
+  
   # Render data README
   tar_render(
     data_readme,
@@ -235,7 +238,7 @@ tar_plan(
   ms_docx = latex2docx(
     latex = "results/ms/manuscript.tex",
     docx = "results/ms/manuscript.docx",
-    template = "ms/journal-of-plant-research.docx",
+    template = word_style,
     lua_filter = "ms/pagebreak.lua",
     wd = here::here("results"),
     depends = manuscript_pdf
