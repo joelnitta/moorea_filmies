@@ -11,7 +11,7 @@ mainfontoptions:
   - BoldItalicFont=Roboto-BoldItalic.ttf
 output: 
   bookdown::pdf_document2:
-    citation_package: none # Use pandoc default, otherwise csl can't be used for reference formatting
+    citation_package: default # Use pandoc default, otherwise csl can't be used for reference formatting
     toc: no
     number_sections: no
     fig_caption: yes
@@ -27,6 +27,8 @@ header-includes:
   \usepackage{pdflscape}
   \newcommand{\blandscape}{\begin{landscape}}
   \newcommand{\elandscape}{\end{landscape}}
+params:
+  output_type: "ms"
 editor_options: 
   markdown: 
     wrap: sentence
@@ -314,15 +316,20 @@ habit_colors <- c(
 
 **Title:** Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)
 
+```{r paper-info, results = "asis", eval = params$output_type == "ms", purl = FALSE}
+# Only print journal name in SI for submission
+cat("
 **Authors:** Nitta JH; Watkins JE; Holbrook NM; Wang TW; Davis CC
 
 **Journal:** Journal of Plant Research 
 
 **Corresponding author:** Joel H. Nitta  
-Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo, 113-0032, Japan  
-Phone: +81-  
-Fax: +81-  
-email: joelnitta\@gmail.com
+Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan  
+Phone: +81-4-7136-3681  
+Fax: +81-4-7136-3680  
+email: joelnitta\\@gmail.com
+")
+```
 
 **Content:** \figs `r s_figure_num("tree")`--`r s_figure_num("capi-water")`
 
@@ -411,8 +418,8 @@ ggtree(phy) %<+% filmy_habit %<+% bs_tibble +
 ```
 
 **`r s_figure("tree")`**. Maximum likelihood ultrametric phylogenetic tree including all filmy fern species from Moorea, French Polynesia.
-Tree obtained by extracting Hymenophyllaceae from the tree of Nitta et al. (2016) with the extract.clade function of the ape package in R (Paradis et al., 2004).
-Bootstrap support values >50% shown at nodes.
+Tree obtained by extracting Hymenophyllaceae from the tree of Nitta et al. (2017) with the ‘extract.clade’ function of the ‘ape’ package (Paradis et al. 2004).
+Bootstrap support values > 50 % shown at nodes.
 Growth habit indicated by colored dots. 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
 
@@ -1158,7 +1165,7 @@ dt_control_plot_data %>%
   )
 ```
 
-**`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation treatment (see Methods). Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%).
+**`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation treatment (see Methods). Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%). All error bars shown are standard deviation unless otherwise mentioned.
 
 \newpage
 
@@ -1272,21 +1279,31 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
 
 ```{r light-curves, fig.height = 9.5, fig.width = 7, fig.cap = ""}
 ### Make full sets of light curve plots ###
+
+# Remove one sample that had only outlier points and no good measurements
+light_data_all_mod <-
+light_data_all %>%
+  group_by(light_id) %>%
+  mutate(all_outliers = all(outlier)) %>%
+  ungroup() %>%
+  filter(!all_outliers) %>%
+  select(-all_outliers)
+
 # - sporos in lab
 lc_plots_sporo_lab <- make_facet_lc_plot(
-  light_data = light_data_all %>% filter(generation == "sporophyte", condition == "lab"),
+  light_data = light_data_all_mod %>% filter(generation == "sporophyte", condition == "lab"),
   lc_model_fitted_data = filmy_lc_model_fitted_data %>% filter(generation == "sporophyte", condition == "lab"),
   lc_model_params = filmy_lc_model_params %>% filter(generation == "sporophyte", condition == "lab")
 )
 # - sporos in field
 lc_plots_sporo_field <- make_facet_lc_plot(
-  light_data = light_data_all %>% filter(generation == "sporophyte", condition == "field"),
+  light_data = light_data_all_mod %>% filter(generation == "sporophyte", condition == "field"),
   lc_model_fitted_data = filmy_lc_model_fitted_data %>% filter(generation == "sporophyte", condition == "field"),
   lc_model_params = filmy_lc_model_params %>% filter(generation == "sporophyte", condition == "field")
 )
 # - gametos
 lc_plots_gameto <- make_facet_lc_plot(
-  light_data = light_data_all %>% filter(generation == "gametophyte"),
+  light_data = light_data_all_mod %>% filter(generation == "gametophyte"),
   lc_model_fitted_data = filmy_lc_model_fitted_data %>% filter(generation == "gametophyte"),
   lc_model_params = filmy_lc_model_params %>% filter(generation == "gametophyte")
 )
@@ -1339,7 +1356,7 @@ for(i in 2:n_gameto_lc_pages) {
 }
 ```
 
-**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes; **b**, gametophytes. Title of each subplot indicates species followed by light curve ID number assigned to each sample. Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % saturation of ETR (PPFD~95%~).
+**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes; **b**, gametophytes. Title of each subplot indicates species followed by light curve ID number assigned to each sample (light curve IDs match those in filmy_light_curves.csv data file). Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % saturation of ETR (PPFD~95%~).
 
 \newpage
 
@@ -1387,7 +1404,10 @@ b <- plot_sp_mean(combined_species_means_habit, par_mean, "PPFD<sub>95%<sub>") +
 c <- plot_sp_mean(combined_species_means_habit, recovery_mean, "Recovery") +
   scale_y_continuous(labels = percent)
 
-a + b + c + guide_area() + plot_layout(ncol = 2, guides = 'collect') + plot_annotation(tag_levels = "a")
+a + b + c + guide_area() + 
+  plot_layout(ncol = 2, guides = 'collect') + 
+  plot_annotation(tag_levels = "a") &
+  theme(plot.tag = element_text(face = 'bold'))
 ```
 
 **`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species.

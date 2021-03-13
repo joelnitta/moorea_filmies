@@ -241,7 +241,7 @@ tar_plan(
     depends = manuscript_pdf
   ),
   
-  # Render SI: figures (ESM 1)
+  # Render SI: figures (ESM 1) for submission
   tar_render(
     si_pdf, 
     "ms/si.Rmd", 
@@ -249,9 +249,23 @@ tar_plan(
     output_dir = here::here("results/si")
     ),
   
-  # Render SI: tables (ESM 2)
+  # Render SI: figures (ESM 1) for pre-print
+  tar_render(
+    si_pdf_bioarxiv, 
+    "ms/si.Rmd", 
+    output_file = "ESM_1_preprint.pdf", 
+    params = list(output_type = "preprint"),
+    output_dir = here::here("results/si")
+  ),
+  
+  # Render SI: tables (ESM 2) for sumbission
   tar_file(
-    gameto_indiv_times_table,
-    write_gameto_times(gameto_indiv_times, "results/si/ESM_2.csv"))
+    gameto_indiv_times_table_ms,
+    write_gameto_times(gameto_indiv_times, ms_type = "ms", "results/si/ESM_2.csv")),
+  
+  # Render SI: tables (ESM 2) for pre-print
+  tar_file(
+    gameto_indiv_times_table_preprint,
+    write_gameto_times(gameto_indiv_times, ms_type = "preprint", "results/si/ESM_2_preprint.csv"))
   
 )

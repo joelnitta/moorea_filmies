@@ -1211,11 +1211,12 @@ prepare_gameto_dt_groups <- function(filmy_dt, gameto_time_summary_2012, filmy_s
 #' Data written out as CSV with metadata in comments
 #'
 #' @param gameto_indiv_times Data with gametophyte DT data to include membership in treatment batches
+#' @param ms_type Type of manuscript: preprint or MS for submission to journal
 #' @param file_out Path to write file
 #'
 #' @return Path to output file
 #' 
-write_gameto_times <- function(gameto_indiv_times, file_out) {
+write_gameto_times <- function(gameto_indiv_times, ms_type = "ms", file_out) {
   
   # In order to include metadata as commented lines above CSV, first
   # write out to plain temporary CSV file,
@@ -1226,7 +1227,8 @@ write_gameto_times <- function(gameto_indiv_times, file_out) {
   fs::file_delete(temp_file)
   
   # Add metadata
-  gameto_indiv_times_lines <- c(
+  if(ms_type == "ms") {
+    gameto_indiv_times_lines <- c(
     "# Electronic supplementary materials: Online Resource 2",
     "# Title: Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)",
     "# Authors: Nitta JH; Watkins JE; Holbrook NM; Wang TW; Davis CC",
@@ -1242,6 +1244,25 @@ write_gameto_times <- function(gameto_indiv_times, file_out) {
     "# --- END COLUMN METADATA ---",
     gameto_indiv_times_lines
   )
+  } else if(ms_type == "preprint") {
+   gameto_indiv_times_lines <- c(
+    "# Electronic supplementary materials: Online Resource 2",
+    "# Title: Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)",
+    "# Authors: Nitta JH; Watkins JE; Holbrook NM; Wang TW; Davis CC",
+    "# Corresponding author: Joel H. Nitta (joelnitta@gmail.com)",
+    "# Contents: start and end times of desiccation tolerance test on gametophytes of filmy ferns from Moorea French Polynesia",
+    "# --- BEGIN COLUMN METADATA ---",
+    "# species: Species name",
+    "# individual: J.H. Nitta specimen collection number of gametophyte individual",
+    "# pre: start time of desiccation",
+    "# post: end time of desiccation",
+    "# cluster: number indicating membership in treatment cluster. Individuals in the same cluster were subjected to desiccation test together",
+    "# --- END COLUMN METADATA ---",
+    gameto_indiv_times_lines
+  )
+  } else {
+    stop("Need to choose 'ms' or 'preprint' for 'ms_type'")
+  }
   
   write_lines(gameto_indiv_times_lines, file_out)
   
