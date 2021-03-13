@@ -224,7 +224,8 @@ tar_plan(
   tar_render(
     manuscript_pdf, 
     "ms/manuscript.Rmd", 
-    output_dir = here::here("results/ms")
+    output_dir = here::here("results/ms"),
+    params = list(output_type = "ms")
     ),
   
   # - docx for submission

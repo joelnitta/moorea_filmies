@@ -15,16 +15,18 @@ output:
     toc: no
     number_sections: no
     fig_caption: yes
-    keep_tex: yes
+    keep_tex: yes # for converting tex to doc
     latex_engine: xelatex
     pandoc_args: [ "--csl", "journal-of-plant-research.csl"]
     includes:
       in_header: journal-of-plant-research.sty
+# Prevent figures from moving around, suppress automatic "Figure #:" in captions
 header-includes: 
   \usepackage{float}
   \makeatletter\renewcommand*{\fps@figure}{H}\makeatother
+  \renewcommand{\caption}{}
 params:
-  output_type: ms_for_word
+  output_type: "ms"
 editor_options: 
   markdown: 
     wrap: sentence
@@ -66,7 +68,7 @@ tar_load(rel_water_species_means)
 ```
 
 <!-- to move to the next line without starting a new paragraph, 
-add two spaces after last word, e.g., Atsushi Ebihara__ -->
+add two spaces after last word, e.g., Joel Nita__ -->
 
 **Corresponding author**  
 Joel H. Nitta  
@@ -947,6 +949,7 @@ S, sporophyte; G, gametophyte
 \newpage
 
 ## Figure legends
+
 <!-- JPR requirements: Figure captions begin with the term Fig. in bold type, followed by the figure number, also in boldtype. No punctuation is to be included after the number, nor is any punctuation to be placed at the end of the caption. -->
 
 **`r figure("habit")`** Examples of filmy ferns from French Polynesia.
@@ -989,8 +992,6 @@ Growth habit indicated by colored symbols (blue = low elevation epiphyte, green 
 *Abrodictyum dentatum* sporophytes were desiccated at –38 MPa instead of –86 MPa.
 Range of gametophytes beyond sporophytes calculated as the total elevation that gametophytes exceeded sporophytes at either end of the elevational gradient.
 Relationships between recovery and VPD or range of gametophytes beyond sporophytes were analyzed with phylogenetic generalized least squares (PGLS); significant relationships (*P* < 0.05) shown with grey line.
-
-\newpage
 
 ```{r plot-setup, purl = FALSE}
 # JPR requirements:
@@ -1131,35 +1132,48 @@ make_dt_plot <- function (dt_plot_data, generation_select, plot_part) {
 }
 ```
 
-```{r filmies-fig, fig.width = 6.85, results = "asis", purl = FALSE}
+<!-- From here, use params$output_type to output plots directly for preprint PDF, or save to file for journal submission -->
+
+```{r filmies-print, fig.width = 6.85, results = "asis", fig.cap = figure("habit"), eval = params$output_type == "preprint", purl = FALSE}
+# Print plot if knitting MS to preprint
 knitr::include_graphics(here::here("images/figure_1.png"))
 ```
 
-**`r figure("habit")`**
-
-\newpage
-
-```{r filmy-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = "", purl = FALSE}
-make_dt_plot(dt_plot_data, "sporophyte", "a")
-figname <- figure("dt") %>% str_remove_all("[:punct:]| ") %>% paste0("a.pdf")
-ggsave(file = here::here("results/ms", figname), width = 6.85, height = 7.5)
+```{r filmy-dt-plot-make, purl = FALSE}
+# Make plot
+filmy_dt_plot <- make_dt_plot(dt_plot_data, "sporophyte", "a")
 ```
 
-**`r figure("dt")`**
-
-\newpage
-
-```{r gameto-dt-plot, fig.width = 6.85, fig.height = 7.5, fig.cap = "", purl = FALSE}
-make_dt_plot(dt_plot_data, "gametophyte", "b")
-figname <- figure("dt") %>% str_remove_all("[:punct:]| ") %>% paste0("b.pdf")
-ggsave(here::here("results/ms", figname), width = 6.85, height = 6.5, device = "pdf")
+```{r filmy-dt-plot-save, eval = params$output_type == "ms", purl = FALSE}
+# Save plot to file if knitting MS for submission
+filmy_dt_plot_name <- figure("dt") %>% str_remove_all("[:punct:]| ") %>% paste0("a.pdf")
+ggsave(plot = filmy_dt_plot, file = here::here("results/ms", filmy_dt_plot_name), width = 6.85, height = 7.5)
 ```
 
-**`r figure("dt")`** (continued)
+```{r filmy-dt-plot-print, fig.width = 6.85, fig.height = 7.5, fig.cap = figure("dt"), eval = params$output_type == "preprint", purl = FALSE}
+# Print plot if knitting MS to preprint
+filmy_dt_plot
+```
 
-\newpage
+```{r gameto-dt-plot-make, purl = FALSE}
+# Make plot
+gameto_dt_plot <- make_dt_plot(dt_plot_data, "gametophyte", "b")
+```
 
-```{r combined-plot, fig.width = 6.85, fig.height = 5, fig.cap = "", purl = FALSE}
+```{r gameto-dt-plot-save, eval = params$output_type == "ms", purl = FALSE}
+# Save plot to file if knitting MS for submission
+gameto_dt_plot_name <- figure("dt") %>% str_remove_all("[:punct:]| ") %>% paste0("b.pdf")
+ggsave(plot = gameto_dt_plot, file = here::here("results/ms", gameto_dt_plot_name), width = 6.85, height = 6.5, device = "pdf")
+```
+
+```{r gameo-dt-plot-print, fig.width = 6.85, fig.height = 7.5, fig.cap = paste(figure("dt"), "(continued)"), eval = params$output_type == "preprint", purl = FALSE}
+# Print plot if knitting MS to preprint
+gameto_dt_plot
+```
+
+```{r combined-plot-make, purl = FALSE}
+# Make plot
+
 # Copy data so they can be manipulated for this plot
 phy <- filmy_phy
 traits <- combined_species_means
@@ -1376,8 +1390,8 @@ d <- ggplot(traits, aes(y = species)) +
   ) +
   guides(fill = "none")
 
-# Combine plots
-a + b + c + d + plot_layout(nrow = 1, guides = "collect") &
+# Make combined plot
+combined_plot <- a + b + c + d + plot_layout(nrow = 1, guides = "collect") &
   theme(
     legend.position = "bottom",
     # Adjust invididual margins to remove whitespace between subplots
@@ -1385,14 +1399,22 @@ a + b + c + d + plot_layout(nrow = 1, guides = "collect") &
     # Wrap legend parts into multiple lines
     legend.box = "vertical", 
     legend.margin = margin())
-
-figname <- figure("combined") %>% str_remove_all("[:punct:]| ") %>% paste0(".pdf")
-ggsave(here::here("results/ms", figname), width = 6.85, height = 5)
 ```
 
-**`r figure("combined")`**
+```{r combined-plot-save, eval = params$output_type == "ms", purl = FALSE}
+# Save plot to file if knitting MS for submission
+combined_plot_name <- figure("combined") %>% str_remove_all("[:punct:]| ") %>% paste0(".pdf")
+ggsave(plot = combined_plot, file = here::here("results/ms", combined_plot_name), width = 6.85, height = 5)
+```
 
-```{r corr-plot, fig.width = 6.85, fig.height = 5, fig.cap = "", purl = FALSE}
+```{r combined-plot-print, fig.width = 6.85, fig.height = 5, fig.cap = figure("combined"), eval = params$output_type == "preprint", purl = FALSE}
+# Print plot if knitting MS to preprint
+combined_plot
+```
+
+```{r corr-plot-make, fig.width = 6.85, fig.height = 5, fig.cap = "", purl = FALSE}
+# Make plot
+
 # Combine recovery, VPD, and growth habit into a single dataframe (wide format)
 recovery_mean_data <- select(combined_species_means, species, generation, recovery_mean) %>%
   pivot_wider(values_from = recovery_mean, names_from = generation) %>%
@@ -1486,14 +1508,20 @@ c <- ggplot(plot_data, aes(x = gameto_beyond_sporo, y = recovery_gametophyte_mea
     color = "Growth habit") +
   guides(color = "none")
 
-a + b + c + 
+corr_plot <- a + b + c + 
   guide_area() + 
   plot_layout(guides = "collect") +
   plot_annotation(tag_levels = "a")  &
   theme(plot.tag = element_text(face = 'bold'))
-
-figname <- figure("corr") %>% str_remove_all("[:punct:]| ") %>% paste0(".pdf")
-ggsave(here::here("results/ms", figname), width = 6.85, height = 5)
 ```
 
-**`r figure("corr")`**
+```{r corr-plot-save, eval = params$output_type == "ms", purl = FALSE}
+# Save plot to file if knitting MS for submission
+corr_plot_name <- figure("corr") %>% str_remove_all("[:punct:]| ") %>% paste0(".pdf")
+ggsave(plot = corr_plot, file = here::here("results/ms", corr_plot_name), width = 6.85, height = 5)
+```
+
+```{r corr-plot-print, fig.width = 6.85, fig.height = 5, fig.cap = figure("corr"), eval = params$output_type == "preprint", purl = FALSE}
+# Print plot if knitting MS to preprint
+corr_plot
+```

@@ -265,8 +265,6 @@ parse_pam <- function (file, exclude_lines = NULL, ret_type = "lc", recalc_yield
 
 #' Parse datalogger data for a desiccation chamber
 #'
-#' FIXME: find the name of this type of datalogger
-#'
 #' @param file Path to datalogger data in CSV format
 #'
 #' @return Dataframe
@@ -983,7 +981,8 @@ calculate_mean_vpd_sporo <- function (community_matrix_raw, filmy_species, moore
     select(-generation) %>%
     left_join(select(traits, species, habit), by = "species") %>%
     assert(not_na, habit) %>%
-    # For sporophytes, treat "saxicolous" as "terrestrial"
+    # For sporophytes, treat "saxicolous" as "terrestrial", since they were collected
+    # on the ground (not a vertical rock surface)
     mutate(habit = case_when(
       str_detect(habit, regex("terr|saxi", ignore_case = TRUE)) ~ "terrestrial",
       str_detect(habit, regex("epi", ignore_case = TRUE)) ~ "epiphytic",
