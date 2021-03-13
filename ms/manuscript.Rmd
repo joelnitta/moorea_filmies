@@ -1132,7 +1132,7 @@ make_dt_plot <- function (dt_plot_data, generation_select, plot_part) {
 ```
 
 ```{r filmies-fig, fig.width = 6.85, results = "asis", purl = FALSE}
-knitr::include_graphics(here::here("data/figure_1.png"))
+knitr::include_graphics(here::here("images/figure_1.png"))
 ```
 
 **`r figure("habit")`**
