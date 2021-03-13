@@ -11,7 +11,7 @@ mainfontoptions:
   - BoldItalicFont=Roboto-BoldItalic.ttf
 output: 
   bookdown::pdf_document2:
-    citation_package: none # Use pandoc default, otherwise csl can't be used for reference formatting
+    citation_package: default # Use pandoc default, otherwise csl can't be used for reference formatting
     toc: no
     number_sections: no
     fig_caption: yes
@@ -70,12 +70,14 @@ tar_load(rel_water_species_means)
 <!-- to move to the next line without starting a new paragraph, 
 add two spaces after last word, e.g., Joel Nita__ -->
 
+```{r first-page, results = "asis", eval = params$output_type == "ms", purl = FALSE}
+cat("
 **Corresponding author**  
 Joel H. Nitta  
 Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan  
-Phone: +81-81-4-7136-3681  
+Phone: +81-4-7136-3681  
 Fax: +81-4-7136-3680  
-email: joelnitta\@gmail.com
+email: joelnitta\\@gmail.com
 
 **Membership of the Botanical Society of Japan**  
 YES (Joel H. Nitta)
@@ -89,7 +91,9 @@ YES (Joel H. Nitta)
 **Author contributions**  
 Joel H. Nitta conceived of and designed the study with input from James E. Watkins, N. Michele Holbrook, and Charles C. Davis. Data collection was performed by Joel H. Nitta and Tristan W. Wang. Data analysis was performed by Joel H. Nitta. The first draft of the manuscript was written by Joel H. Nitta, with subsequent comments and edits from the other authors. All authors read and approved the final manuscript.
 
-\newpage
+\\newpage
+")
+```
 
 # Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)
 
@@ -330,7 +334,7 @@ A Docker image is available to run the code at https://hub.docker.com/r/joelnitt
 The \package{targets} package [@Landau2021] was used to automate the workflow.
 The \package{ggplot2} [@Wickham2016], \package{ggtree}, [@Yu2017] and \package{patchwork} (https://github.com/thomasp85/patchwork) packages were used to generate the figures.
 
-\*\*\* NOTE TO REVIEWERS: The DOI for the dataset will not be active until the paper is accepted. Until then, this link can be used for the dataset https://figshare.com/s/d6349abf01a3756a5aae  \*\*\*
+\*\*\* NOTE TO READER: The DOI for the dataset will not be active until the paper is accepted. Until then, this link can be used for the dataset https://figshare.com/s/d6349abf01a3756a5aae  \*\*\*
 
 ## Results
 
@@ -506,7 +510,7 @@ Relative water content in the desiccated state ranged from `r rel_water_table %>
 
 Relative humidity in the growth chambers was high when samples were first inserted, then gradually decreased to the target value maintained by each drying salt (`r s_figure("chamber")`).
 In a few cases (particularly species with larger fronds, \eg, *C. apiifolia*), the NaCl chamber did not reach equilibrium humidity before 2 d (`r s_figure("chamber")`).
-Brief fluctuations in humidity were observed when chambers were opened to insert or remove samples (`r s_figure("chamber-s")`).
+Brief fluctuations in humidity were observed when chambers were opened to insert or remove samples (`r s_figure("chamber")`).
 
 The GLMM including the combined effects of generation plus growth habit and their interaction was selected as the best-fitting model for DT (`r table("glmm")`). 
 Sporophytes had `r sporo_dt_effect_mean` greater DT (95 % CI `r sporo_dt_effect_lower` to `r sporo_dt_effect_upper`) relative to gametophytes (`r table("glmm-pars")`).
@@ -1511,7 +1515,7 @@ c <- ggplot(plot_data, aes(x = gameto_beyond_sporo, y = recovery_gametophyte_mea
 corr_plot <- a + b + c + 
   guide_area() + 
   plot_layout(guides = "collect") +
-  plot_annotation(tag_levels = "a")  &
+  plot_annotation(tag_levels = "a") &
   theme(plot.tag = element_text(face = 'bold'))
 ```
 
