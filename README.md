@@ -24,7 +24,7 @@ The analysis code requires various packages to be installed, and may not work pr
 [Docker image is provided](https://hub.docker.com/r/joelnitta/moorea_filmies) to run the code reproducibly. You can 
 [install docker from here](https://docs.docker.com/install/).
 
-First, navigate to the cloned repository (where `/path/to/repo` is the path on your machine).
+Navigate to the cloned repository (where `/path/to/repo` is the path on your machine).
 
 ```
 cd /path/to/repo
