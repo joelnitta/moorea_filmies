@@ -44,6 +44,22 @@ docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.1 Rscr
 
 You will see the targets being built by `targets`. The final manuscript should be compiled at the end as `manuscript.docx` (MS for journal submission) and `moorea_filmies_preprint.pdf` (preprint PDF) in the `results/ms` folder. Other figure and table files will also be compiled. Supplemental information will be written to the `results/si` folder.
 
+## Interacting with the code
+
+If you want to interact with the code in the Docker container, you can launch the container in the background using `docker-compose`:
+
+```
+docker-compose up -d
+```
+
+Navigate to http://localhost:8787/ in your browser of choice (firefox or google chrome recommended). There, you should be able to access an instance of the [RStudio](https://rstudio.com/) IDE, which can be used to inspect and manipulate objects in R.
+
+When you're done, take down the container:
+
+```
+docker-compose down
+```
+
 ## Licenses
 
 - All code in this repository is licensed under the [MIT license](LICENSE)
