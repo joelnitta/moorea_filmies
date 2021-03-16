@@ -238,7 +238,7 @@ make_facet_lc_plot <- function(light_data, lc_model_fitted_data, lc_model_params
       aes(xintercept = par), color = cbPalette[["red"]]) +
     scale_alpha_manual(values = c("TRUE" = 0.2, "FALSE" = 1.0)) +
     labs(
-      y = "ETR<sub>max</sub> (µmol m<sup>-2</sup>·s<sup>-1</sup>)", 
+      y = "ETR (µmol m<sup>-2</sup>·s<sup>-1</sup>)", 
       x = "PPFD (µmol m<sup>-2</sup>·s<sup>-1</sup>)", 
       alpha = "Outlier") +
     theme(
@@ -339,7 +339,7 @@ email: joelnitta\\@gmail.com
 
 **`r s_figure("range")`**. Elevational range (m) of sporophytes and gametophytes of filmy ferns on Moorea, French Polynesia.
 
-**`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy ferns from Moorea, French Polynesia. 
+**`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) during desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. 
 
 **`r s_figure("water-all")`**. Relative water content (RWC) of sporophytes after desiccation by duration of desiccation treatment (2 or 15 days).
 
@@ -390,7 +390,7 @@ bs_tibble <- tibble(
 
 # Join growth habit and BS data to ggtree object
 ggtree(phy) %<+% filmy_habit %<+% bs_tibble +
-  geom_text(aes(label=bootstrap), hjust=-.25, size = 3, color = "grey30") +
+  geom_text(aes(label=bootstrap), hjust=-.25, size = 2, color = "grey10") +
   geom_tippoint(aes(color = habit), position = position_nudge(x = 0, y = 0), size = 4) +
   # Add species labels
   geom_tiplab(
@@ -412,7 +412,7 @@ ggtree(phy) %<+% filmy_habit %<+% bs_tibble +
   # Need to remove clip so that species names print properly
   coord_cartesian(clip = "off") +
   theme(
-    plot.margin = margin(t = 0, r = 2.2, b = 0, l = 0, unit = "in"),
+    plot.margin = margin(t = 0.1, r = 2.2, b = 0.1, l = 0.5, unit = "in"),
     legend.position = "bottom"
   )
 ```
@@ -518,7 +518,7 @@ licl_temp_plot_2013 <- plot_chamber_temp(licl_chamber_data_2013, licl_time_range
   blank_x_theme()
 
 licl_temp_plot_2012 <- plot_chamber_temp(licl_chamber_data_2012, licl_time_range_2012) +
-  scale_y_continuous(limits = licl_temp_range) +
+  scale_y_continuous(limits = licl_temp_range, label = label_number(suffix = "\u00b0C", accuracy = 1)) +
   labs(title = "2012") +
   theme(plot.title = element_text(hjust = 0.5, size = 11)) +
   blank_x_theme()
@@ -556,8 +556,8 @@ licl_temp_plot_2012 + licl_temp_plot_2013 + licl_temp_plot_2014 +
   licl_rh_plot_2012 + licl_rh_plot_2013 + licl_rh_plot_2014 +
   licl_time_plot_2012 + licl_time_plot_2013 + licl_time_plot_2014 +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
-  plot_annotation(title = "a") &
-  theme(plot.tag = element_text(face = "bold"))
+  plot_annotation(title = "**a**") &
+  theme(plot.title = element_markdown())
 ```
 
 ```{r sporophyte-dt-MgNO3, fig.height = 6.6, fig.width = 9, fig.cap = ""}
@@ -632,7 +632,7 @@ mgno3_temp_plot_2013 <- plot_chamber_temp(mgno3_chamber_data_2013, mgno3_time_ra
   blank_x_theme()
 
 mgno3_temp_plot_2012 <- plot_chamber_temp(mgno3_chamber_data_2012, mgno3_time_range_2012) +
-  scale_y_continuous(limits = mgno3_temp_range) +
+  scale_y_continuous(limits = mgno3_temp_range, label = label_number(suffix = "\u00b0C", accuracy = 1)) +
   labs(title = "2012") +
   theme(plot.title = element_text(hjust = 0.5, size = 11)) +
   blank_x_theme()
@@ -670,8 +670,8 @@ mgno3_temp_plot_2012 + mgno3_temp_plot_2013 + mgno3_temp_plot_2014 +
   mgno3_rh_plot_2012 + mgno3_rh_plot_2013 + mgno3_rh_plot_2014 +
   mgno3_time_plot_2012 + mgno3_time_plot_2013 + mgno3_time_plot_2014 +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
-  plot_annotation(title = "b") &
-  theme(plot.tag = element_text(face = "bold"))
+  plot_annotation(title = "**b**") &
+  theme(plot.title = element_markdown())
 ```
 
 ```{r sporophyte-dt-NaCl, fig.height = 6.6, fig.width = 9, fig.cap = ""}
@@ -878,9 +878,9 @@ nacl_temp_plot_2012 + nacl_temp_plot_2013 + nacl_temp_plot_2014 +
   nacl_rh_plot_2012 + nacl_rh_plot_2013 + nacl_rh_plot_2014 +
   nacl_time_plot_2012 + nacl_time_plot_2013 + nacl_time_plot_2014 +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
-  plot_annotation(title = "c") &
+  plot_annotation(title = "**c**") &
   theme(
-    plot.tag = element_text(face = "bold"),
+    plot.title = element_markdown(),
     legend.position = "bottom")
 ```
 
@@ -931,7 +931,8 @@ dt_times_gameto_2013_plot <- ggplot(
   labs(x = "Batch") +
   theme(
     axis.title.x = element_blank()
-  )
+  ) +
+  blank_y_theme()
 
 dt_times_gameto_2012_plot <- ggplot(
   gameto_mean_times, 
@@ -943,12 +944,12 @@ dt_times_gameto_2012_plot <- ggplot(
   labs(x = "Batch") +
   theme(
     axis.title.x = element_blank()
-  ) +
-  blank_y_theme()
+  )
 
 # RH plot
 chamber_gameto_2013_rh_plot <-
-  plot_chamber_rh(chamber_gameto_2013, gameto_time_limits_2013)
+  plot_chamber_rh(chamber_gameto_2013, gameto_time_limits_2013) +
+  blank_y_theme()
 
 chamber_gameto_2012_rh_plot <-
   ggplot(chamber_gameto_2012, aes(x = date_time, y = 0.01*rh, group = group)) +
@@ -958,14 +959,14 @@ chamber_gameto_2012_rh_plot <-
   labs(y = "Relative humidity") +
   theme(
     legend.position = "none",
-    axis.title.x = element_blank()) +
-  blank_y_theme()
+    axis.title.x = element_blank())
 
 # Temp plot
 chamber_gameto_2013_temp_plot <-
   plot_chamber_temp(chamber_gameto_2013, gameto_time_limits_2013) +
   labs(title = "2013") +
-  theme(plot.title = element_text(hjust = 0.5, size = 11))
+  theme(plot.title = element_text(hjust = 0.5, size = 11)) +
+  blank_y_theme()
 
 chamber_gameto_2012_temp_plot <-
   ggplot(chamber_gameto_2012, aes(x = date_time, y = temp, group = group)) +
@@ -978,16 +979,15 @@ chamber_gameto_2012_temp_plot <-
   theme(
     legend.position = "none",
     plot.title = element_text(hjust = 0.5, size = 11),
-    axis.title.x = element_blank()) +
-  blank_y_theme()
+    axis.title.x = element_blank())
 
 # Combine into final plot
-chamber_gameto_2013_temp_plot + chamber_gameto_2012_temp_plot +
-  chamber_gameto_2013_rh_plot + chamber_gameto_2012_rh_plot + 
-  dt_times_gameto_2013_plot + dt_times_gameto_2012_plot + 
+chamber_gameto_2012_temp_plot + chamber_gameto_2013_temp_plot +
+  chamber_gameto_2012_rh_plot + chamber_gameto_2013_rh_plot + 
+  dt_times_gameto_2012_plot + dt_times_gameto_2013_plot + 
   plot_layout(ncol = 2, nrow = 3) +
-  plot_annotation(title = "d") &
-  theme(plot.tag = element_text(face = "bold"))
+  plot_annotation(title = "**d**") &
+  theme(plot.title = element_markdown())
 ```
 
 \newpage
@@ -1145,7 +1145,7 @@ dt_control_plot_data %>%
     colour = "grey50", width = 0, 
     position = pd) +
   facet_wrap(vars(habit, species)) +
-  scale_shape_manual(name = "Desiccation Time",
+  scale_shape_manual(name = "Desiccation time",
                      values = c(24, 21),
                      breaks = c("15", "2"),
                      labels = c("15 days", "2 days")) +
@@ -1153,19 +1153,18 @@ dt_control_plot_data %>%
   scale_x_discrete(limits = c("30min","24hr","48hr"),
                    labels = c("0.5", "24", "48")) +
   xlab("Recovery Time (hr)") +
-  ylab("Recovery (%)") +
+  ylab("Recovery") +
   theme_bw() +
   legend_theme +
   theme(
     legend.position = "bottom",
     panel.grid.minor = element_blank(), 
     panel.grid.major.x = element_blank(),
-    strip.text = element_markdown(),
-    axis.title.x = element_blank()
+    strip.text = element_markdown()
   )
 ```
 
-**`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) for desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation treatment (see Methods). Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%). All error bars shown are standard deviation unless otherwise mentioned.
+**`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) during desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. Recovery was measured by comparing maximum photochemical yield of photosystem II before desiccation treatment with values at 30 min, 24 hr, and 48 hr following desiccation treatment (see Methods). Recovery was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not recovery of 0%). All error bars shown are standard deviation unless otherwise mentioned.
 
 \newpage
 
@@ -1188,16 +1187,16 @@ ggplot(rel_water_species_means_desic, aes(x = rel_water, y = species, group = sa
   geom_point(aes(fill = salt, shape = salt), size = 1.25, position=position_dodge(width=0.5)) +
   scale_y_discrete(labels = str_abbrev_sp_pretty) +
   scale_x_continuous(label = scales::percent) +
-  scale_shape_manual(name = "Desiccation Intensity",
+  scale_shape_manual(name = "Desiccation intensity",
                      values = salt_shapes,
                      breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
                      labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) + 
-  scale_fill_manual(name = "Desiccation Intensity",
+  scale_fill_manual(name = "Desiccation intensity",
                     values = salt_cols, 
                     breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
                     labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) +
   labs(
-    x = "Relative Water Content",
+    x = "Relative water content",
     y = "Species",
     color = "Desiccation\nintensity") +
   theme_bw() +
@@ -1247,15 +1246,15 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
     position = pd) +
   geom_line(position = pd, aes(linetype = dry_time), color = "grey30") +
   geom_point(aes(shape = salt, fill = salt), position = pd) +
-  scale_linetype_manual(name = "Desiccation Time",
+  scale_linetype_manual(name = "Desiccation time",
                         values = c("solid", "dashed"),
                         breaks = c("15", "2"),
                         labels = c("15 days", "2 days")) +
-  scale_shape_manual(name = "Desiccation Intensity",
+  scale_shape_manual(name = "Desiccation intensity",
                      values = salt_shapes,
                      breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
                      labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) + 
-  scale_fill_manual(name = "Desiccation Intensity",
+  scale_fill_manual(name = "Desiccation intensity",
                     values = salt_cols, 
                     breaks = c("NaCl", "MgNO3",  "LiCl", "Control"),
                     labels = c("-38 MPa", "-86 MPa", "-282 Mpa", "Control")) +
@@ -1273,7 +1272,7 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
   )
 ```
 
-**`r s_figure("water-s")`**. Relative water content (RWC) of sporophytes during desiccation tolerance test. RWC was not measured for all combinations of species and desiccation treatments; only species with complete data shown.
+**`r s_figure("water-s")`**. Relative water content (RWC) of sporophytes during desiccation tolerance (DT) test. RWC was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not RWC of zero). x-axis indicates condition of sample during DT test; times refer to amount of elapsed time since re-wetting.
 
 \newpage
 
@@ -1356,7 +1355,7 @@ for(i in 2:n_gameto_lc_pages) {
 }
 ```
 
-**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes; **b**, gametophytes. Title of each subplot indicates species followed by light curve ID number assigned to each sample (light curve IDs match those in filmy_light_curves.csv data file). Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % saturation of ETR (PPFD~95%~).
+**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes; **b**, gametophytes. Title of each subplot indicates species followed by light curve ID number assigned to each sample (light curve IDs match those in filmy_light_curves.csv data file). Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % of ETR~max~ (PPFD~95%~).
 
 \newpage
 
@@ -1410,7 +1409,7 @@ a + b + c + guide_area() +
   theme(plot.tag = element_text(face = 'bold'))
 ```
 
-**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species.
+**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species. Growth habit abbreviations: HE, high elevation epiphyte; LE, low elevation epiphyte; S, saxicolous; T, terrestrial.
 
 \newpage
 
