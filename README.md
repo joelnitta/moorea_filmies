@@ -24,28 +24,37 @@ The analysis code requires various packages to be installed, and may not work pr
 [Docker image is provided](https://hub.docker.com/r/joelnitta/moorea_filmies) to run the code reproducibly. You can 
 [install docker from here](https://docs.docker.com/install/).
 
-Navigate to the cloned repository (where `/path/to/repo` is the path on your machine), and launch the container:
+Navigate to the cloned repository (where `/path/to/repo` is the path on your machine):
 
 ```
 cd /path/to/repo
-docker-compose up -d
 ```
 
-Unzip the data (this only has to be done once):
+Unzip the data:
 
 ```
-docker exec moorea_filmies_analysis_1 Rscript R/unzip_data.R
+docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.1 Rscript R/unzip_data.R
 ```
 
 Run `targets::tar_make()`:
 
 ```
-docker exec moorea_filmies_analysis_1 Rscript -e "targets::tar_make()"
+docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.1 Rscript -e 'targets::tar_make()'
 ```
 
-You will see the targets being built by `targets`, and the final manuscript should be compiled at the end as `manuscript.pdf` and `manuscript.docx` in the `results/ms` folder. Other figure and table files will also be compiled.
+You will see the targets being built by `targets`. The final manuscript should be compiled at the end as `manuscript.docx` (MS for journal submission) and `moorea_filmies_preprint.pdf` (preprint PDF) in the `results/ms` folder. Other figure and table files will also be compiled. Supplemental information will be written to the `results/si` folder.
 
-When it's finished, take down the container:
+## Interacting with the code
+
+If you want to interact with the code in the Docker container, you can launch the container in the background using `docker-compose`:
+
+```
+docker-compose up -d
+```
+
+Navigate to http://localhost:8787/ in your browser of choice (firefox or google chrome recommended). There, you should be able to access an instance of the [RStudio](https://rstudio.com/) IDE, which can be used to inspect and manipulate objects in R.
+
+When you're done, take down the container:
 
 ```
 docker-compose down
