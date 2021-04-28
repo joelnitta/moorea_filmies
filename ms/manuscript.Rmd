@@ -95,7 +95,7 @@ Joel H. Nitta conceived of and designed the study with input from James E. Watki
 ")
 ```
 
-# Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)
+# Ecophysiological differentiation between life stages in filmy ferns (Hymenophyllaceae)
 
 Joel H. Nitta^1,4^, James E. Watkins, Jr.^2^, N. Michele Holbrook^1^, Tristan W. Wang^1,3^, and Charles C. Davis^1^
 
