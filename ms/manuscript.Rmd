@@ -74,7 +74,7 @@ add two spaces after last word, e.g., Joel Nita__ -->
 cat("
 **Corresponding author**  
 Joel H. Nitta  
-Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan  
+Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo 113-0032, Japan  
 Phone: +81-4-7136-3681  
 Fax: +81-4-7136-3680  
 email: joelnitta\\@gmail.com
