@@ -256,7 +256,7 @@ During the study period, some dataloggers malfunctioned, presumably due to prolo
 Any days during which one or more dataloggers failed are excluded from the dataset.
 One terrestrial datalogger (Mt. Tohiea 393 m site) was lacking data for more than half of the survey period, but had data available for the same period from a preliminary survey conducted during the previous year (2012--2013), so the previous year's data for this site was used instead.
 The dataset includes `r climate_n_days` days of data from `r climate_n_sites` sites (`r climate_n_loggers` dataloggers).
-Mean daily temperature on Moorea is strongly correlated with elevation, dropping \circa{ }6 °C from the lowest surveyed site (201 m) to the highest (1206 m); temperature does not differ significantly between epiphytic and terrestrial habitats [@Nitta2020].
+Mean daily temperature on Moorea is strongly correlated with elevation, dropping \circa{ }6 °C from the lowest surveyed site (201 m) to the highest (1206 m) (*R*^2^ = 0.87; \pval{ }< 0.001; linear model); temperature does not differ significantly between epiphytic and terrestrial habitats [@Nitta2020].
 Epiphytic habitats tend to have lower daily mean RH, and greater daily variation in RH, than terrestrial ones.
 This difference is greatest at low elevations, and smallest at high elevations [@Nitta2020].
 
