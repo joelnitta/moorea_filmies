@@ -138,7 +138,7 @@ Filmy ferns (Hymenophyllaceae) represent a useful system to investigate how wate
 To explore this, we surveyed sporophytes and gametophytes of `r n_filmy_sp` species (`r n_distinct(filmy_species)` taxa including varieties) of filmy ferns on Moorea (French Polynesia) and used chlorophyll fluorescence to measure desiccation tolerance and light responses.
 We conducted phylogenetically informed analyses to identify differences in physiology between life stages and growth habits.
 Gametophytes had similar or less desiccation tolerance (ability to recover from 2 d desiccation at -86 MPa) and lower photosynthetic optima (maximum electron transport rate of photosystem II and light level at 95% of that rate) than sporophytes.
-Epiphytes were more tolerant of desiccation than terrestrial species in both generations.
+Epiphytes were more tolerant of desiccation than terrestrial species in both life stages.
 Despite their lack of greater physiological tolerances, gametophytes of several species occurred over a wider elevational range than conspecific sporophytes.
 Our results demonstrate that filmy fern gametophytes and sporophytes differ in their physiology and niche requirements, and point to the importance of microhabitat in shaping the evolution of water-use strategies in vascular plants.
 
@@ -165,7 +165,7 @@ Ferns represent an important, understudied group of tracheophytes for investigat
 Ferns are the only major lineage among land plants with sporophytes and gametophytes that are capable of growing independently from each other.
 These two life stages differ drastically in their morphology and physiology---fern sporophytes have true vascular tissue and are homoiohydric (\ie, they regulate their internal water content), whereas fern gametophytes are much smaller (often < 1 cm), lack vascular tissue, and are poikilohydric.
 Recent studies indicate that the gametophytes of many fern species are desiccation tolerant, while sporophytes of the same species are thought to lack DT [@Pittermann2013; @WatkinsJr.2007c].
-Thus, ferns present a unique opportunity to observe the transition from desiccation tolerance to desiccation avoidance across independently growing life phases within a single organism.
+Thus, ferns present a unique opportunity to observe the transition from desiccation tolerance to desiccation avoidance across independently growing life stages within a single organism.
 
 Filmy ferns (Hymenophyllaceae) represent a particularly interesting case for studying the ecological and evolutionary significance of vegetative DT across life stages in ferns.
 Filmy ferns are a large family [\circa{ }430 spp.; @PteridophytePhylogenyGroupI2016] of primarily tropical, leptosporangiate ferns named for their remarkably thin leaf laminae, which are usually only a single cell layer in thickness and lack cuticle or stomata (`r figure("habit")`a--d).
@@ -179,10 +179,10 @@ As would be expected from their poikilohydric nature, DT of varying degrees has 
 Filmy fern gametophytes are similarly diverse, with morphotypes including filamentous, ribbon, and a combination of these two types (`r figure("habit")`e--h).
 While there are no quantitative data about DT in filmy fern gametophytes available, DT has been reported in gametophytes from several other fern lineages [@Pittermann2013; @WatkinsJr.2007a; @WatkinsJr.2012], and may be expected to occur in filmy ferns as well.
 The possibility for varying degrees of vegetative DT in both stages of the life cycle of filmy ferns makes them a potentially useful system to compare how DT is utilized between haploid, non-vascular and diploid, vascular life stages.
-Furthermore, the diversity of growth forms and habitats in filmy ferns makes them an ideal group for a comparative study of water-stress strategies (\ie, desiccation tolerance vs. desiccation avoidance) and the correlation of these strategies with ecological niche.
+Furthermore, the diversity of growth forms and habitats in filmy ferns makes them an ideal group for a comparative study of water-stress strategies (\ie, desiccation tolerance vs. desiccation avoidance) and their association with different ecological niches (\ie, along gradients of temperature and relative humidity).
 
 The degree of DT in filmy fern sporophytes occupying different niches has been relatively well studied.
-In a series of elegant experiments on Jamaican filmy ferns, @Shreve1911 demonstrated that water-use strategies differ between species occupying contrasting habitats (\ie, terrestrial, low elevation epiphyte, and high elevation epiphyte).
+In a series of elegant experiments on Jamaican filmy ferns, @Shreve1911 demonstrated that water-use strategies differ between species with contrasting growth habits including terrestrial, low elevation epiphyte, and high elevation epiphyte.
 Proctor [-@Proctor2003; -@Proctor2012] investigated water relations and the ability to recover from desiccation in sporophytes of several filmy ferns, and found a general correlation between high DT and adaptation for high light levels in widespread species vs. low DT and adaptation to low light levels in species occupying more sheltered habitats.
 In the only study to our knowledge including in situ physiological observations of hymenophyllaceous gametophytes, @Johnson2000 found that gametophytes of *Vandenboschia speciosa* (Willd.) G. Kunkel (= *Trichomanes speciosum* Willd.) are adapted for extremely low light environments, and operate at lower light levels than conspecific sporophytes.
 @Parra2009 and @Saldana2013 investigated the relationship between physiology (photosynthetic rates and water relations) and vertical stratification in several epiphytic filmy fern species (primarily genus *Hymenophyllum*) along tree trunks in Chile.
@@ -193,7 +193,7 @@ Recently, transcriptomics has been applied to elucidate the genes involved at ea
 In epiphytic *Hymenoglossum cruentum* Cav., key genes and gene networks were identified related to intracellular mobility and photosynthetic metabolism in the desiccated state, and those related to detoxifying pathways and stabilization of photosystems during rehydration [@Ostria-Gallardo2020a].
 In a comparison of low-trunk and canopy epiphytes, @Ostria-Gallardo2020 identified multiple differentially expressed genes that may be specific to tolerating desiccation in these microhabitats.
 
-Despite this considerable interest in filmy fern ecophysiology, with the sole exception of @Johnson2000, no studies have compared physiology between gametophyte and sporophyte phases, and we are aware of none that have done so across multiple species.
+Despite this considerable interest in filmy fern ecophysiology, with the sole exception of @Johnson2000, no studies have compared physiology between gametophyte and sporophyte stages, and we are aware of none that have done so across multiple species.
 Furthermore, to our knowledge, no physiological studies of filmy ferns have accounted for their phylogenetic relationships, and we lack an understanding of how physiological strategies have evolved in this clade.
 In addition to DT, photosynthetic optima (adaptation to different light levels) are likely to be important in determining the niches of life stages and species of filmy ferns [@Flores-Bavestrello2016; @Parra2015; @Proctor2003].
 Terrestrial and epiphytic species experience different levels of photosynthetic radiation and desiccation, and light intensity varies with height along the host plant in epiphytes [@Benzing1990; @WatkinsJr.2009].
@@ -312,7 +312,7 @@ We tested the significance of λ with a log-likelihood test comparing the likeli
 For all further analyses, we used methods that account for phylogenetic history for physiological traits that showed evidence of phylogenetic signal in at least one of the two metrics, and standard methods otherwise.
 
 We used general linear mixed models (GLMMs) to investigate the effect of growth habit and life stage on DT (% recovery of F~v~/F~m~ after 48 h recovery from desiccation at -86 MPa for 2 d) and photosynthetic parameters (ETR~max~ and PPFD~95%~) using the \package{MCMCglmm} package [@Hadfield2010].
-For each of the three response variables (species mean DT, ETR~max~, and PPFD~95%~), we constructed five models: a null model with no fixed effects, or models with either growth habit (high-elevation epiphyte, low-elevation epiphyte, terrestrial or saxicolous), generation (sporophyte vs. gametophyte), growth habit and generation, or growth habit, generation, and their interaction as fixed effects.
+For each of the three response variables (species mean DT, ETR~max~, and PPFD~95%~), we constructed five models: a null model with no fixed effects, or models with either growth habit (high-elevation epiphyte, low-elevation epiphyte, terrestrial or saxicolous), life stage (sporophyte vs. gametophyte), growth habit and life stage, or growth habit, life stage, and their interaction as fixed effects.
 We included species as a random effect in all models, and included a phylogenetic variance-covariance matrix if the response variable showed evidence of phylogenetic signal [@Hadfield2010].
 We used an inverse-Gamma distribution for all priors, and ran analyses for 500,000 iterations, with burnin after 1,000 iterations and thinning every 500 iterations.
 We compared models using the Deviance Information Criterion (DIC) [@Spiegelhalter2002] and selected the best-fitting model as the one with the lowest DIC.
@@ -372,7 +372,7 @@ phylosig %>%
   verify(all(lambda_pval > 0.05), success_fun = success_logical, error_fun = error_stop)
 ```
 
-For DT, *K* was near 1 with *P* < 0.1 in both generations (gametophytes *K* = `r gameto_recover_k`, *P* = `r gameto_recover_k_pval`; sporophytes *K* = `r sporo_recover_k`, *P* = `r sporo_recover_k_pval`); λ was near 1 for both generations, but not significant for sporophytes (gametophytes λ = `r gameto_recover_lambda`, *P* = `r gameto_recover_lambda_pval`; sporophytes λ = `r sporo_recover_lambda`, *P* = `r sporo_recover_lambda_pval`). There was no evidence of significant phylogenetic signal in photosynthetic parameters (PPFD~95%~ and ETR~max~) in either generation (*P* >> 0.05, `r table("physig")`). Therefore, phylogenetic methods were used for analyses involving DT, but not photosynthetic parameters.
+For DT, *K* was near 1 with *P* < 0.1 in both life stages (gametophytes *K* = `r gameto_recover_k`, *P* = `r gameto_recover_k_pval`; sporophytes *K* = `r sporo_recover_k`, *P* = `r sporo_recover_k_pval`); λ was near 1 for both life stages, but not significant for sporophytes (gametophytes λ = `r gameto_recover_lambda`, *P* = `r gameto_recover_lambda_pval`; sporophytes λ = `r sporo_recover_lambda`, *P* = `r sporo_recover_lambda_pval`). There was no evidence of significant phylogenetic signal in photosynthetic parameters (PPFD~95%~ and ETR~max~) in either life stage (*P* >> 0.05, `r table("physig")`). Therefore, phylogenetic methods were used for analyses involving DT, but not photosynthetic parameters.
 
 ### Desiccation tolerance
 
@@ -491,7 +491,7 @@ gameto_dt_ter_mean <- mean_gameto_dt_by_habit %>%
   pull(sum_val)
 ```
 
-Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life phases.
+Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life stages.
 
 A general correlation of DT with habitat was observed in sporophytes (`r figure("dt")`a).
 The two terrestrial species lacked DT, although *C. apiifolia* showed slightly greater ability to recover by 48 h compared to *Abrodictyum dentatum* (Bosch) Ebihara & K. Iwats., which completely failed to recover from even the gentlest treatment of 2 d at --38 NaCl (more stringent tests were not conducted on *A. dentatum* after confirming its lack of DT at this level).
@@ -512,7 +512,7 @@ Relative humidity in the growth chambers was high when samples were first insert
 In a few cases (particularly species with larger fronds, \eg, *C. apiifolia*), the NaCl chamber did not reach equilibrium humidity before 2 d (`r s_figure("chamber")`).
 Brief fluctuations in humidity were observed when chambers were opened to insert or remove samples (`r s_figure("chamber")`).
 
-The GLMM including the combined effects of generation plus growth habit and their interaction was selected as the best-fitting model for DT (`r table("glmm")`). 
+The GLMM including the combined effects of life stage plus growth habit and their interaction was selected as the best-fitting model for DT (`r table("glmm")`). 
 Sporophytes had `r sporo_dt_effect_mean` greater DT (95 % CI `r sporo_dt_effect_lower` to `r sporo_dt_effect_upper`) relative to gametophytes (`r table("glmm-pars")`).
 
 ### Photosynthetic optima
@@ -588,14 +588,14 @@ mean_etr_sporo_n <- etr_means %>% filter(generation == "sporophyte") %>% pull(n)
 mean_etr_gameto_n <- etr_means %>% filter(generation == "gametophyte") %>% pull(n)
 ```
 
-Light responses were measured in sporophytes of `r n_light_species_sporo` species and gametophytes of `r n_light_species_gameto` species, including `r n_light_species_both` species with both life phases.
+Light responses were measured in sporophytes of `r n_light_species_sporo` species and gametophytes of `r n_light_species_gameto` species, including `r n_light_species_both` species with both life stages.
 
-Photosynthetic optima showed clear differences across generations: sporophytes were adapted for higher light levels, whereas gametophytes were adapted for lower light levels (\figs{ }`r figure_num("combined")`, `r s_figure_num("light-curves")`, `r s_figure_num("traits-box")`).
+Photosynthetic optima showed clear differences across life stages: sporophytes were adapted for higher light levels, whereas gametophytes were adapted for lower light levels (\figs{ }`r figure_num("combined")`, `r s_figure_num("light-curves")`, `r s_figure_num("traits-box")`).
 Sporophytes reached their maximum photosynthetic rate (PPFD~95%~) at light levels ca.
 `r mean_par_sporo` µmol·m^--2^ ·s^--1^ (*n* = `r mean_par_sporo_n` species), whereas gametophytes did so at `r mean_par_gameto` µmol·m^--2^ ·s^--1^ (*n* = `r mean_par_gameto_n` species).
 Similarly, sporophytes attained higher rates of electron transport (ETR~max~) (`r mean_etr_sporo` µmol·m^--2^ ·s^--1^, *n* = `r mean_etr_sporo_n` species) than gametophytes (`r mean_etr_gameto` µmol·m^--2^ ·s^--1^, *n* = `r mean_etr_gameto_n` species).
 
-The GLMM including the effect of generation only was selected as the best-fitting model for ETR~max~, and the combined effect of growth habit plus generation and their interaction was selected for PPFD~95%~ (`r table("glmm")`).
+The GLMM including the effect of life stage only was selected as the best-fitting model for ETR~max~, and the combined effect of growth habit plus life stage and their interaction was selected for PPFD~95%~ (`r table("glmm")`).
 
 ### Relationships of vapor pressure deficit and range size with DT
 
@@ -613,9 +613,9 @@ No significant relationship was detected between range size of gametophytes beyo
 ## Discussion
 
 Vegetative DT was a key innovation linked to the rise of early land plants, but is largely limited to non-vascular groups such as bryophytes and algae among extant plants.
-Filmy ferns have received considerable attention for their remarkable reversion to vegetative DT in the sporophyte phase [\eg, @GarcesCea2014; @Ostria-Gallardo2020; @Proctor2003; @Shreve1911].
+Filmy ferns have received considerable attention for their remarkable reversion to vegetative DT in the sporophyte stage [\eg, @GarcesCea2014; @Ostria-Gallardo2020; @Proctor2003; @Shreve1911].
 Yet, no previous study to our knowledge has evaluated parallel physiology of sporophytes and gametophytes of filmy ferns in relation to DT.
-Here, we present the first comparisons of physiological parameters between generations within filmy ferns in a phylogenetic comparative framework.
+Here, we present the first comparisons of physiological parameters between life stages within filmy ferns in a phylogenetic comparative framework.
 
 ### Filmy fern sporophytes have a wide range of DT
 
@@ -674,19 +674,19 @@ Growth rates of tolerant versus non-tolerant gametophytes, including quantificat
 
 ### Gametophytes are adapted for lower light levels than sporophytes
 
-We observed a clear intergenerational difference in photosynthetic optima, with gametophytes consistently adapted for lower light levels than sporophytes (`r figure("combined")`, `r table("glmm")`).
+We observed a clear difference between life stages in photosynthetic optima, with gametophytes consistently adapted for lower light levels than sporophytes (`r figure("combined")`, `r table("glmm")`).
 In the only other study to our knowledge that compared photosynthetic rates between gametophytes and sporophytes of a filmy fern, @Johnson2000 also found that gametophytes of *V. speciosa* reached maximum ETR at lower levels than sporophytes: in gametophytes of this species, photosynthesis became saturated at a PPFD of 4--5 µmol·m^-2^·s^-1^ in the field or 30--50 µmol·m^-2^·s^-1^ in the lab vs. 30--50 µmol·m^-2^ ·s^-1^ for sporophytes (lab measurement only).
 Although we found similar differences in direction between gametophytes and sporophytes, the measurements of @Johnson2000 are considerably lower than what we observed in the field for both Moorean filmy fern gametophytes (PPFD~95%~ \circa{ }40--60 µmol·m^-2^·s^-1^) and sporophytes (PPFD~95%~ \circa{ }130--160 µmol·m^-2^·s^-1^).
 This makes sense in light of the fact that *V. speciosa* is an extremely deep-shade plant, with gametophytes occupying protected rock crevices that receive less than 1 µmol·m^-2^·s^-1^ PPFD for most of the day [@Johnson2000]; many of the gametophytes sampled in our study occur in more exposed conditions.
 It is surprising, however, that we did not observe any consistent differences between species in different habitats, given that light levels should vary between tree trunks and the forest floor, at least on a \circa{ }1 m scale.
-Although the GLMM showed an interaction effect between generation and growth habit for PPFD~95%~, the model including only generation was selected for ETR~max~ (`r table("glmm")`).
+Although the GLMM showed an interaction effect between life stage and growth habit for PPFD~95%~, the model including only life stage was selected for ETR~max~ (`r table("glmm")`).
 It is possible that the actual light levels experienced by gametophytes growing in these habitats may not vary significantly if they occupy protected microsites such as bryophyte mats or crevices in rock or bark.
 
 ### Influence of phylogeny on traits
 
 Previous studies of filmy fern ecophysiology also found a link between habitat and DT and/or photosynthetic rates [@Parra2009; @Proctor2003; @Proctor2012; @Saldana2013]; however, ours is the first to our knowledge to investigate this pattern while taking phylogeny into account.
 We detected phylogenetic signal in DT (`r table("physig")`), suggesting that phylogeny should be considered when interpreting differences in DT between species.
-In contrast, the lack of phylogenetic signal in photosynthetic traits, coupled with the clear intergenerational differences we observed, suggest that sporophytes and gametophytes are adapted for different light levels regardless of clade or growth habit.
+In contrast, the lack of phylogenetic signal in photosynthetic traits, coupled with the clear differences in traits between life stages, suggest that sporophytes and gametophytes are adapted for different light levels regardless of clade or growth habit.
 In a more densely sampled study of morphological evolution in the trichomanoid clade, @Dubuisson2013 identified several morphological changes including reduced stele and root systems associated with the evolution of epiphytic growth within the HE subclade (comprising the genera *Polyphlebium*, *Didymoglossum*, *Crepidomanes*, and *Vandenboschia*).
 It is possible that both reduced morphology and increased DT are parts of an integrated adaptive strategy for epiphytic growth within this subclade of filmy ferns, and have evolved together repeatedly.
 However, @Dubuisson2013 were unable to determine if these morphological changes had occurred independently, or if there was a single origin at the base of the HE clade followed by multiple losses.
@@ -694,9 +694,9 @@ Increased sampling of both morphological and physiological traits of additional 
 
 ### Concluding remarks and future directions
 
-In filmy ferns, both sporophyte and gametophyte generations are poikilohydric; however, this does not necessarily mean they share similar physiological optima.
+In filmy ferns, both sporophyte and gametophyte life stages are poikilohydric; however, this does not necessarily mean they share similar physiological optima.
 Although filmy fern sporophytes are often of small stature, elevating a leaf even a few cm above the substrate surface means escape from the boundary layer and exposure to substantially greater evapotranspiration.
-It is likely that even in this clade, wherein the physiological divide between sporophyte and gametophyte is probably the smallest amongst ferns, the two generations experience substantially different selective pressures.
+It is likely that even in this clade, wherein the physiological divide between sporophyte and gametophyte is probably the smallest amongst ferns, the two life stages experience substantially different selective pressures.
 Fossils indicate that some of the earliest vascular plants may have had sporophytes and gametophytes that were both branched and small [@Kenrick1997a], but it is unclear at what point selective pressures began to diverge to favor large, complex sporophytes and small, simple gametophytes.
 The relevance of plant size to water relations is supported by a study showing increased DT in smaller size classes of the epiphytic fern *Asplenium auritum* Sw. [@Testo2012].
 Future studies of DT in filmy ferns should include juvenile stages of the sporophyte, which are expected to experience similar microhabitats as gametophytes, to better determine the role of microhabitat vs. life stage (and plant size) on DT.
@@ -728,7 +728,7 @@ The online version of this article (DOI) contains supplementary material, which 
 options(knitr.table.format = "latex")
 ```
 
-**`r table("physig")`** Results of tests for phylogenetic signal (Blomberg’s *K* and Pagel’s λ) in desiccation tolerance (DT) and photosynthetic parameters of filmy ferns from Moorea, French Polynesia by generation
+**`r table("physig")`** Results of tests for phylogenetic signal (Blomberg’s *K* and Pagel’s λ) in desiccation tolerance (DT) and photosynthetic parameters of filmy ferns from Moorea, French Polynesia by life stage
 
 ```{r physig-table, results = "asis", purl = FALSE}
 # Format phylogenetic signal results as a pretty table with kableExtra
@@ -771,7 +771,7 @@ Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa; ETR~
 
 \newpage
 
-**`r table("glmm")`** Deviance information criterion (DIC) and delta DIC for general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to generation and growth habit in filmy ferns from Moorea, French Polynesia
+**`r table("glmm")`** Deviance information criterion (DIC) and delta DIC for general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to life stage and growth habit in filmy ferns from Moorea, French Polynesia
 
 ```{r glmm-table, results = "asis", purl = FALSE}
 # Make helper table for formatting by groups
@@ -796,8 +796,8 @@ glmm_summary_cols <-
 glmm_summary %>%
   mutate(
     fixed_effects = case_when(
-      fixed_effects == "both" ~ "Generation + habit",
-      fixed_effects == "intersect" ~ "Generation + habit + Generation:habit",
+      fixed_effects == "both" ~ "Life stage + habit",
+      fixed_effects == "intersect" ~ "Life stage + habit + Life stage:habit",
       TRUE ~ str_to_sentence(fixed_effects)
     ),
     DIC = round_t(DIC, 2),
@@ -829,7 +829,7 @@ Best model (that with the lowest DIC) for each response variable in bold
 
 \newpage
 
-**`r table("glmm-pars")`** Predictor effects, lower and upper 95% confidence interval (CI), effective sample size, and significance of model parameters for the best general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to generation and growth habit in filmy ferns from Moorea, French Polynesia
+**`r table("glmm-pars")`** Predictor effects, lower and upper 95% confidence interval (CI), effective sample size, and significance of model parameters for the best general linear mixed models (GLMMs) of photosynthetic parameters and desiccation tolerance in response to life stage and growth habit in filmy ferns from Moorea, French Polynesia
 
 ```{r glmm-params, results = "asis", purl = FALSE}
 # Make helper table for formatting by groups
@@ -860,8 +860,8 @@ glmm_params_table <-
 glmm_params %>%
   mutate(
     fixed_effects = case_when(
-      fixed_effects == "both" ~ "Generation + habit",
-      fixed_effects == "intersect" ~ "Generation + habit + Generation:habit",
+      fixed_effects == "both" ~ "Life stage + habit",
+      fixed_effects == "intersect" ~ "Life stage + habit + Life stage:habit",
       TRUE ~ str_to_sentence(fixed_effects)
     ),
     predictor = str_replace_all(predictor, "generationsporophyte", "Sporophyte") %>%
@@ -902,7 +902,7 @@ if(params$output_type == "preprint") glmm_params_table <- kable_styling(glmm_par
 
 ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
 
-Effect of generation is relative to gametophytes; effect of growth habit is relative to high elevation epiphytes
+Effect of life stage is relative to gametophytes; effect of growth habit is relative to high elevation epiphytes
 
 Significant predictors in bold
 
@@ -983,7 +983,7 @@ Bootstrap support >50% from 100 ML bootstraps indicated at nodes.
 Bold letters indicate major clades (H = hymenophylloid clade, T = trichomanoid clade).
 Growth habit indicated by colored symbols (blue = low elevation epiphyte, green = high elevation epiphyte, yellow = saxicolous, red = terrestrial).
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
-Asterisk indicates significant difference in means (*P* <0.05) between generations for a particular species (*t*-test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for *t*-test.
+Asterisk indicates significant difference in means (*P* <0.05) between life stages for a particular species (*t*-test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for *t*-test.
 Left bar plot shows recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). 
 Middle bar plot shows maximum relative electron transport rate of photosystem II (ETR~max~) (µmol e-·m^-2^·s^-1^). 
 Right bar plot shows photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~) (µmol quanta·m^-2^·s^-1^).
@@ -1271,7 +1271,7 @@ b <- ggplot(traits, aes(y = species)) +
     breaks=c(0,.25,.5,.75,1.0)) +
   scale_fill_manual(values = generation_colors, labels = pretty_text) +
   # theme_bw(base_size = 10) +
-  labs(x = "Recovery", fill = "Generation") +
+  labs(x = "Recovery", fill = "Life stage") +
   theme(
     panel.grid.minor = element_blank(), 
     panel.grid.major.y = element_blank(),
@@ -1346,7 +1346,7 @@ c <- ggplot(traits, aes(y = species)) +
     labels = function(x) str_replace_all(x, "_", " ") %>% paste0("*", ., "*")
     ) +
   scale_x_continuous(expand = expansion(mult = c(0,0.025))) +
-  labs(x = "ETR<sub>max</sub>", fill = "Generation") +
+  labs(x = "ETR<sub>max</sub>", fill = "Life stage") +
   theme(
     panel.grid.minor = element_blank(), 
     panel.grid.major.y = element_blank(),
@@ -1384,7 +1384,7 @@ d <- ggplot(traits, aes(y = species)) +
     labels = str_abbrev_sp_pretty
     ) +
   scale_x_continuous(expand = expansion(mult = c(0,0.025))) +
-  labs(x = "PPFD<sub>95%</sub>", fill = "Generation") +
+  labs(x = "PPFD<sub>95%</sub>", fill = "Life stage") +
   theme(
     panel.grid.minor = element_blank(), 
     panel.grid.major.y = element_blank(),
