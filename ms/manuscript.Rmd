@@ -708,6 +708,7 @@ Future studies that apply such methods to gametophytes as well as sporophytes ac
 Members of the Davis Lab and Jonathan Losos provided helpful discussion and comments on drafts.
 Saad Amer, Ravahere Taputuarai, Tohei Theophilus, and Suzanne Vinnette assisted with fieldwork and experiments.
 Weston Testo provided advice on settings for the DT test.
+Two anonymous reviewers provided feedback that improved the manuscript.
 Staff at the University of California Berkeley's Richard B. Gump South Pacific Research Station, Moorea, French Polynesia, in particular Valentine Brotherson, Neil Davies, Hinano Teavai-Murphy, and Frank Murphy, provided logistical support for fieldwork.
 Funding provided in part by the National Science Foundation (Doctoral Dissertation Improvement Grant DEB-1311169 to JHN and CCD), Setup Funds from Harvard University to CCD, American Society of Plant Taxonomists (Research Grant for Graduate Students to JHN), Garden Club of America (Award in Tropical Botany to JHN), Harvard University Herbaria (Fernald Fieldwork Fellowship to JHN), Society of Systematic Biologists (Graduate Student Research Award to JHN), and Systematics Association (Systematics Research Fund to JHN).
 
