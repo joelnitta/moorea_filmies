@@ -1,7 +1,10 @@
 # Clean specimen collection data
 
 # Load packages
-source("R/packages.R")
+library(readxl)
+library(tidyverse)
+library(janitor)
+library(glue)
 
 # Load functions
 source("R/functions.R")
