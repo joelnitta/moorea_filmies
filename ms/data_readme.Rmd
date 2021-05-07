@@ -32,15 +32,14 @@ This README.txt file was generated on `r format(Sys.time(), '%d %B, %Y')`
 
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\- GENERAL INFORMATION \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
-Title of Dataset: Data from: Intergenerational niche differentiation in filmy
-ferns (Hymenophyllaceae)
+Title of Dataset: Data from: Ecophysiological differentiation between life stages in filmy ferns (Hymenophyllaceae)
 
 Author Information
 
 Principal Investigator: Joel H. Nitta
 
-Department of Integrated Biosciences, Graduate School of Frontier Sciences,
-The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan
+Department of Biological Sciences, Graduate School of Science, The University 
+of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo 113-0032, Japan 
 joelnitta@gmail.com
 
 Associate or Co-investigators: James E. Watkins, N. Michele Holbrook,
@@ -70,12 +69,12 @@ Licenses/restrictions placed on the data, or limitations of reuse: CC0 1.0
 Universal (CC0 1.0)
 
 Recommended citation for the data: Nitta JH, Watkins JE, Holbrook NM, Wang TW,
-Davis CC (2021) Data from: Intergenerational niche differentiation in filmy
-ferns (Hymenophyllaceae) https://doi.org/10.6084/m9.figshare.14184572
+Davis CC (2021) Data from: Ecophysiological differentiation between life stages 
+in filmy ferns (Hymenophyllaceae) https://doi.org/10.6084/m9.figshare.14184572
 
 Citation for and links to publications that cite or use the data: Nitta JH,
-Watkins JE, Holbrook NM, Wang TW, Davis CC (2021) Intergenerational niche
-differentiation in filmy ferns (Hymenophyllaceae) <<FIXME: ADD JOURNAL>>
+Watkins JE, Holbrook NM, Wang TW, Davis CC (2021) Ecophysiological differentiation 
+between life stages in filmy ferns (Hymenophyllaceae) (Hymenophyllaceae) <<FIXME: ADD JOURNAL>>
 
 Code for analyzing the data is available on github:
 https://github.com/joelnitta/moorea_filmies
@@ -106,6 +105,8 @@ description of all data files):
 - filmy_light_curves.csv: Light levels and chlorophyll fluorescence measured
   in filmy ferns from Moorea, French Polynesia with a chlorophyll
   fluorometer.
+  
+Checksums are 32-byte MD5 hashes generated with tools::md5sum() in R.
 
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
@@ -205,6 +206,8 @@ Charles C. (2016), Data from: Life cycle matters: DNA barcoding reveals
 contrasting community structure between fern sporophytes and gametophytes,
 Dryad, Dataset, https://doi.org/10.5061/dryad.df59g
 
+MD5 checksum: `r tools::md5sum(here::here(gameto_times_2012_file))`
+
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
 ```{r sporo-dt-times}
@@ -233,12 +236,16 @@ Missing data codes: No missing data.
 
 Specialized formats or other abbreviations used: None.
 
+MD5 checksum: `r tools::md5sum(here::here(sporo_dt_times_file))`
+
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
 data_raw.tar.gz: Zipped raw data files. For a description, see README.md in
 the zipped archive. These were used to generate the clean data files with code
 available at https://github.com/joelnitta/moorea_filmies (scripts starting with
 'clean_' in the 'R' folder).
+
+MD5 checksum: `r tools::md5sum(here::here("data/data_raw.tar.gz"))`
 
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
@@ -288,6 +295,8 @@ Missing data codes: Missing data entered as 'NA'.
 Specialized formats or other abbreviations used: Herbarium codes follow Index
 Herbariorum (http://sweetgum.nybg.org/science/ih/)
 
+MD5 checksum: `r tools::md5sum(here::here(specimens_raw_file))`
+
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
 ```{r filmy-dt}
@@ -336,6 +345,8 @@ Missing data codes: Missing data entered as 'NA'.
 
 Specialized formats or other abbreviations used: None.
 
+MD5 checksum: `r tools::md5sum(here::here(filmy_dt_file))`
+
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
 ```{r filmy-dt-chamber}
@@ -358,7 +369,7 @@ Variable list:
 - rh: Relative humidity (%)
 - salt: Name of salt used to maintain constant humidity in the desiccation
 chamber (see methods above for corresponding relative humidity).
-- generation: Gametophyte or sporophyte, or "mixed" if samples of both generations
+- generation: Gametophyte or sporophyte, or "mixed" if samples of both life stages
 were present in the growth chamber.
 - year: Year.
 - species: Species.
@@ -368,6 +379,8 @@ were present in the growth chamber.
 Missing data codes: Missing data entered as 'NA'.
 
 Specialized formats or other abbreviations used: None.
+
+MD5 checksum: `r tools::md5sum(here::here(filmy_dt_chamber_file))`
 
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
@@ -397,6 +410,8 @@ Variable list:
 Missing data codes: None.
 
 Specialized formats or other abbreviations used: None.
+
+MD5 checksum: `r tools::md5sum(here::here(filmy_habit_file))`
 
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
@@ -445,9 +460,26 @@ Charles C. (2016), Data from: Life cycle matters: DNA barcoding reveals
 contrasting community structure between fern sporophytes and gametophytes,
 Dryad, Dataset, https://doi.org/10.5061/dryad.df59g
 
+MD5 checksum: `r tools::md5sum(here::here(light_data_file))`
+
 \-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 
 CHANGE LOG
+
+2021-05-07
+
+- Update specimens.csv in raw data.
+
+\-\-\-
+
+2021-05-06
+
+- Add MD5 checksums.
+- Correct missing values in 'date_collected' column of fern_specimens.csv from 'NA-NA-NA'
+to 'NA'.
+- Change title of paper.
+- Change address of first author.
+- Change description of "generation" to "life stage".
 
 \-\-\-
 
