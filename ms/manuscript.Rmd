@@ -105,7 +105,7 @@ Joel H. Nitta^1,4^, James E. Watkins, Jr.^2^, N. Michele Holbrook^1^, Tristan W.
 
 ^3^Current affiliation: Section of Plant Pathology and Plant-Microbe Biology, Cornell University, Ithaca, New York 14853 USA
 
-^4^Current affiliation: Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan  
+^4^Current affiliation: Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo 113-0032, Japan
 
 Author for correspondence: Joel Nitta (joelnitta\@gmail.com)
 
@@ -334,7 +334,7 @@ A Docker image is available to run the code at https://hub.docker.com/r/joelnitt
 The \package{targets} package [@Landau2021] was used to automate the workflow.
 The \package{ggplot2} [@Wickham2016], \package{ggtree}, [@Yu2017] and \package{patchwork} (https://github.com/thomasp85/patchwork) packages were used to generate the figures.
 
-\*\*\* NOTE TO READER: The DOI for the dataset will not be active until the paper is accepted. Until then, this link can be used for the dataset https://figshare.com/s/d6349abf01a3756a5aae  \*\*\*
+\*\*\* NOTE TO `r ifelse(params$output_type == "ms", "EDITOR AND REVIEWERS", "READER")`: The DOI for the dataset will not be active until the paper is accepted. Until then, this link can be used for the dataset https://figshare.com/s/d6349abf01a3756a5aae  \*\*\*
 
 ## Results
 
@@ -712,9 +712,14 @@ Two anonymous reviewers provided feedback that improved the manuscript.
 Staff at the University of California Berkeley's Richard B. Gump South Pacific Research Station, Moorea, French Polynesia, in particular Valentine Brotherson, Neil Davies, Hinano Teavai-Murphy, and Frank Murphy, provided logistical support for fieldwork.
 Funding provided in part by the National Science Foundation (Doctoral Dissertation Improvement Grant DEB-1311169 to JHN and CCD), Setup Funds from Harvard University to CCD, American Society of Plant Taxonomists (Research Grant for Graduate Students to JHN), Garden Club of America (Award in Tropical Botany to JHN), Harvard University Herbaria (Fernald Fieldwork Fellowship to JHN), Society of Systematic Biologists (Graduate Student Research Award to JHN), and Systematics Association (Systematics Research Fund to JHN).
 
+```{r esm-statement, results = "asis", eval = params$output_type == "ms", purl = FALSE}
+# FIXME: add DOI when available
+cat("
 **Electronic supplementary material**
 
 The online version of this article (DOI) contains supplementary material, which is available to authorized users.
+")
+```
 
 ## References
 
@@ -797,6 +802,7 @@ glmm_summary_cols <-
 glmm_summary %>%
   mutate(
     fixed_effects = case_when(
+      fixed_effects == "generation" ~ "Life stage",
       fixed_effects == "both" ~ "Life stage + habit",
       fixed_effects == "intersect" ~ "Life stage + habit + Life stage:habit",
       TRUE ~ str_to_sentence(fixed_effects)
@@ -861,6 +867,7 @@ glmm_params_table <-
 glmm_params %>%
   mutate(
     fixed_effects = case_when(
+      fixed_effects == "generation" ~ "Life stage",
       fixed_effects == "both" ~ "Life stage + habit",
       fixed_effects == "intersect" ~ "Life stage + habit + Life stage:habit",
       TRUE ~ str_to_sentence(fixed_effects)
@@ -917,7 +924,7 @@ Significant predictors in bold
 # right side is original name
 pgls_cols <-
   c(
-    "Generation" = "generation", 
+    "Life stage" = "generation", 
     "Predictor" = "predictor",
     "df" = "df",
     "\\textit{F}" = "f_value",
@@ -964,10 +971,10 @@ S, sporophyte; G, gametophyte
 (GH). 
 (**c**) *Polyphlebium endlicherianum*, a saxicolous species found at low to middle elevations. *Nitta 629* (GH). 
 (**d**) *Callistopteris apiifolia*, a terrestrial species with sporophytes occurring only in humid cloud forests. *Nitta 3990* (GH).
-(**e**) *C. apiifolia* (ribbon morphotype). Arrow indicates gemmae (asexual propagules) at tip of lobe. *Nitta 2565* (GH). 
+(**e**) *Callistopteris apiifolia* (ribbon morphotype). Arrow indicates gemmae (asexual propagules) at tip of lobe. *Nitta 2565* (GH). 
 (**f**) *Hymenophyllum polyanthos* (ribbon morphotype). *Nitta 3862* (GH).
 (**g**) Filamentous gametophytes of an unidentified species of Hymenophyllaceae. *Nitta 4036* (GH). 
-(**h**) *C. apiifolia*, showing detail of gemmifers (attachment points of gemmae, example indicated by arrow) and branched gemmae. *Nitta 3887* (GH). 
+(**h**) *Callistopteris apiifolia*, showing detail of gemmifers (attachment points of gemmae, example indicated by arrow) and branched gemmae. *Nitta 3887* (GH). 
 Scalebars: (**a**–**c**) 1.0 cm; (**d**) 5.0 cm; (**e**) 5.0 mm; (**f**) 2.0 mm; (**g**, **h**) 1.0 mm. 
 Photographs by J. H. Nitta.
 
