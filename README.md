@@ -1,8 +1,8 @@
 # moorea_filmies
 
-Code repostitory to run analyses and generate figures and manuscript for Nitta et al. "Intergenerational Niche Differentiation in Filmy Ferns (Hymenophyllaceae)".
+Code repostitory to run analyses and generate figures and manuscript for Nitta et al. "Ecophysiological differentiation between life stages in filmy ferns (Hymenophyllaceae)". ([preprint](https://doi.org/10.1101/2021.03.12.435213))
 
-All code is in [R](https://cran.r-project.org/). The [targets package](https://wlandau.github.io/targets/index.html) is used to manage the workflow. 
+All code is in [R](https://cran.r-project.org/). The [targets package](https://wlandau.github.io/targets/index.html) is used to manage the workflow.
 
 To run all analyses and generate the manuscript:
 
@@ -20,8 +20,8 @@ For each of the links below, click on "Download Dataset" or "Download all", then
 
 ## Reproducible analysis with Docker
 
-The analysis code requires various packages to be installed, and may not work properly if package versions have changed. Therefore, a 
-[Docker image is provided](https://hub.docker.com/r/joelnitta/moorea_filmies) to run the code reproducibly. You can 
+The analysis code requires various packages to be installed, and may not work properly if package versions have changed. Therefore, a
+[Docker image is provided](https://hub.docker.com/r/joelnitta/moorea_filmies) to run the code reproducibly. You can
 [install docker from here](https://docs.docker.com/install/).
 
 Navigate to the cloned repository (where `/path/to/repo` is the path on your machine):
@@ -33,13 +33,13 @@ cd /path/to/repo
 Unzip the data:
 
 ```
-docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.1 Rscript R/unzip_data.R
+docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.2 Rscript R/unzip_data.R
 ```
 
 Run `targets::tar_make()`:
 
 ```
-docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.1 Rscript -e 'targets::tar_make()'
+docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.2 Rscript -e 'targets::tar_make()'
 ```
 
 You will see the targets being built by `targets`. The final manuscript should be compiled at the end as `manuscript.docx` (MS for journal submission) and `moorea_filmies_preprint.pdf` (preprint PDF) in the `results/ms` folder. Other figure and table files will also be compiled. Supplemental information will be written to the `results/si` folder.
@@ -52,7 +52,7 @@ If you want to interact with the code in the Docker container, you can launch th
 docker-compose up -d
 ```
 
-Navigate to http://localhost:8787/ in your browser of choice (firefox or google chrome recommended). There, you should be able to access an instance of the [RStudio](https://rstudio.com/) IDE, which can be used to inspect and manipulate objects in R.
+Navigate to http://localhost:8787/ in your browser of choice (firefox or google chrome recommended). There, you should be able to access an instance of the [RStudio](https://rstudio.com/) IDE, which can be used to inspect and manipulate objects in R. You can click on "Build All" in the "Build" tab to run the workflow. 
 
 When you're done, take down the container:
 
