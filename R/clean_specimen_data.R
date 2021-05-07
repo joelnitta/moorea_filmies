@@ -1,10 +1,7 @@
 # Clean specimen collection data
 
 # Load packages
-library(readxl)
-library(tidyverse)
-library(janitor)
-library(glue)
+source(here::here("R/packages.R"))
 
 # Load functions
 source("R/functions.R")
@@ -118,7 +115,7 @@ fern_specimens_gps_raw <- read_csv("data_raw/specimens.csv", col_types = specime
     year = year(date_collected),
     month = month(date_collected) %>% str_pad(side = "left", pad = "0", width = 2),
     day = day(date_collected) %>% str_pad(side = "left", pad = "0", width = 2),
-    date_collected = paste(year, month, day, sep = "-")
+    date_collected = paste3(year, month, day, sep = "-")
   ) %>%
   # Add taxon
   mutate(taxon = paste3(genus, specific_epithet, infraspecific_name)) %>%
