@@ -16,7 +16,7 @@ references:
   - literal: R Core Team
   issued:
   - year: 2020
-  title: 'R: A language and environment for statistical computing. Version 4.0.2. R Foundation for Statistical Computing, Vienna, Austria'
+  title: 'R: A language and environment for statistical computing. Version 4.0.3. R Foundation for Statistical Computing, Vienna, Austria'
   URL: https://www.R-project.org/
 
 - id: Orme2018
