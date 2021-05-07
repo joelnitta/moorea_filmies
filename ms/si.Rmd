@@ -137,18 +137,18 @@ make_nacl_time_plot <- function (data, serial_no_cols, time_limits) {
       x = species, ymin = pre, ymax = post, y = post, 
       group = species_duration, color = serial_no)
   ) +
-  geom_linerange(position = position_dodge(0.5)) +
-  geom_point(position = position_dodge(0.5)) +
-  scale_y_datetime(limits = time_limits, minor_breaks = "1 day") +
-  # Print all 'species' on the y-axis using `drop = false`
-  scale_x_discrete(labels = str_abbrev_sp_pretty, drop = FALSE) +
-  # Print all levels of 'serial no' in the legend using `drop = false`
-  scale_color_manual(values = serial_no_cols, drop = FALSE) +
-  labs(x = "Species", color = "Serial no.") +
-  coord_flip() +
-  theme(
-    axis.title = element_blank(),
-    axis.text.y = element_markdown()
+    geom_linerange(position = position_dodge(0.5)) +
+    geom_point(position = position_dodge(0.5)) +
+    scale_y_datetime(limits = time_limits, minor_breaks = "1 day") +
+    # Print all 'species' on the y-axis using `drop = false`
+    scale_x_discrete(labels = str_abbrev_sp_pretty, drop = FALSE) +
+    # Print all levels of 'serial no' in the legend using `drop = false`
+    scale_color_manual(values = serial_no_cols, drop = FALSE) +
+    labs(x = "Species", color = "Serial no.") +
+    coord_flip() +
+    theme(
+      axis.title = element_blank(),
+      axis.text.y = element_markdown()
     )
 } 
 
@@ -168,18 +168,18 @@ make_nacl_rh_plot <- function(data, serial_no_cols, time_range, rh_range, groups
   }
   
   p +
-  geom_line(size = 0.25) +
-  scale_color_manual(values = serial_no_cols) +
-  scale_x_datetime(limits = time_range, minor_breaks = "1 day") +
-  scale_y_continuous(
-    label = scales::label_percent(accuracy = 1), 
-    limits = rh_range) +
-  labs(
-    y = "Relative humidity",
-    color = "Serial no.") +
-  guides(color = "none") +
-  theme(axis.title.x = element_blank()) +
-  guides(color = "none")
+    geom_line(size = 0.25) +
+    scale_color_manual(values = serial_no_cols) +
+    scale_x_datetime(limits = time_range, minor_breaks = "1 day") +
+    scale_y_continuous(
+      label = scales::label_percent(accuracy = 1), 
+      limits = rh_range) +
+    labs(
+      y = "Relative humidity",
+      color = "Serial no.") +
+    guides(color = "none") +
+    theme(axis.title.x = element_blank()) +
+    guides(color = "none")
 }
 
 make_nacl_temp_plot <- function(data, serial_no_cols, time_range, temp_range, title, groups = FALSE) {
@@ -198,22 +198,22 @@ make_nacl_temp_plot <- function(data, serial_no_cols, time_range, temp_range, ti
   }
   
   p +
-  geom_line(size = 0.25) +
-  scale_color_manual(values = serial_no_cols) +
-  scale_x_datetime(limits = time_range, minor_breaks = "1 day") +
-  scale_y_continuous(
-    label = label_number(suffix = "\u00b0C", accuracy = 1), 
-    limits = temp_range) +
-  labs(
-    y = "Temperature",
-    color = "Serial no.",
-    title = title) +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 11),
-    axis.title.x = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank()) +
-  guides(color = "none")
+    geom_line(size = 0.25) +
+    scale_color_manual(values = serial_no_cols) +
+    scale_x_datetime(limits = time_range, minor_breaks = "1 day") +
+    scale_y_continuous(
+      label = label_number(suffix = "\u00b0C", accuracy = 1), 
+      limits = temp_range) +
+    labs(
+      y = "Temperature",
+      color = "Serial no.",
+      title = title) +
+    theme(
+      plot.title = element_text(hjust = 0.5, size = 11),
+      axis.title.x = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank()) +
+    guides(color = "none")
 }
 
 # Define function to plot facetted light curve
@@ -314,7 +314,7 @@ habit_colors <- c(
 
 **Electronic supplementary materials: Online Resource 1** 
 
-**Title:** Intergenerational niche differentiation in filmy ferns (Hymenophyllaceae)
+**Title:** Ecophysiological differentiation between life stages in filmy ferns (Hymenophyllaceae)
 
 ```{r paper-info, results = "asis", eval = params$output_type == "ms", purl = FALSE}
 # Only print journal name in SI for submission
@@ -324,7 +324,7 @@ cat("
 **Journal:** Journal of Plant Research 
 
 **Corresponding author:** Joel H. Nitta  
-Department of Integrated Biosciences, Graduate School of Frontier Sciences, The University of Tokyo, 5-1-5 Kashiwanoha, Kashiwa, Chiba 277-8562, Japan  
+Department of Biological Sciences, Graduate School of Science, The University of Tokyo, 2-11-16 Yayoi, Bunkyo-ku, Tokyo 113-0032, Japan  
 Phone: +81-4-7136-3681  
 Fax: +81-4-7136-3680  
 email: joelnitta\\@gmail.com
@@ -472,7 +472,7 @@ licl_time_range_2012 <- c(
   # when started datalogger recording
   min = filter(sporo_dt_times, salt == "LiCl") %>% pull(pre) %>% min, 
   max = max(licl_chamber_data_2012$date_time)
-  )
+)
 
 licl_chamber_data_2013 <-
   filter(filmy_dt_chamber, 
@@ -557,7 +557,7 @@ licl_temp_plot_2012 + licl_temp_plot_2013 + licl_temp_plot_2014 +
   licl_time_plot_2012 + licl_time_plot_2013 + licl_time_plot_2014 +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
   plot_annotation(title = "**a**") &
-  theme(plot.title = element_markdown())
+  theme(plot.title = element_markdown(), panel.grid.minor = element_blank())
 ```
 
 ```{r sporophyte-dt-MgNO3, fig.height = 6.6, fig.width = 9, fig.cap = ""}
@@ -585,7 +585,7 @@ mgno3_time_range_2012 <- c(
   # when started datalogger recording
   min = filter(sporo_dt_times, salt == "MgNO3") %>% pull(pre) %>% min, 
   max = max(mgno3_chamber_data_2012$date_time)
-  )
+)
 
 mgno3_chamber_data_2013 <-
   filter(filmy_dt_chamber, 
@@ -671,7 +671,7 @@ mgno3_temp_plot_2012 + mgno3_temp_plot_2013 + mgno3_temp_plot_2014 +
   mgno3_time_plot_2012 + mgno3_time_plot_2013 + mgno3_time_plot_2014 +
   plot_layout(ncol = 3, nrow = 3, guides = "collect") +
   plot_annotation(title = "**b**") &
-  theme(plot.title = element_markdown())
+  theme(plot.title = element_markdown(), panel.grid.minor = element_blank())
 ```
 
 ```{r sporophyte-dt-NaCl, fig.height = 6.6, fig.width = 9, fig.cap = ""}
@@ -825,7 +825,7 @@ nacl_rh_plot_2012 <- make_nacl_rh_plot(
   nacl_time_range_2012, 
   nacl_rh_range
 )
-  
+
 nacl_rh_plot_2013 <- make_nacl_rh_plot(
   nacl_chamber_data %>% filter(year == "2013"),
   serial_no_cols,
@@ -881,7 +881,9 @@ nacl_temp_plot_2012 + nacl_temp_plot_2013 + nacl_temp_plot_2014 +
   plot_annotation(title = "**c**") &
   theme(
     plot.title = element_markdown(),
-    legend.position = "bottom")
+    legend.position = "bottom",
+    panel.grid.minor = element_blank()
+  )
 ```
 
 \elandscape
@@ -987,7 +989,7 @@ chamber_gameto_2012_temp_plot + chamber_gameto_2013_temp_plot +
   dt_times_gameto_2012_plot + dt_times_gameto_2013_plot + 
   plot_layout(ncol = 2, nrow = 3) +
   plot_annotation(title = "**d**") &
-  theme(plot.title = element_markdown())
+  theme(plot.title = element_markdown(), panel.grid.minor = element_blank())
 ```
 
 \newpage
@@ -1265,6 +1267,7 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
   theme_bw() +
   theme(
     panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
     strip.text = element_markdown(),
     legend.position = "bottom",
     legend.box="vertical", 
@@ -1281,7 +1284,7 @@ ggplot(rel_water_species_means_with_rec, aes(x = rec_time, y = rel_water, group 
 
 # Remove one sample that had only outlier points and no good measurements
 light_data_all_mod <-
-light_data_all %>%
+  light_data_all %>%
   group_by(light_id) %>%
   mutate(all_outliers = all(outlier)) %>%
   ungroup() %>%
@@ -1387,7 +1390,7 @@ plot_sp_mean <- function(data, var_name, var_label) {
     labs(
       y = var_label,
       x = "Growth Habit",
-      fill = "Generation"
+      fill = "Life stage"
     )
   
 }
@@ -1406,7 +1409,7 @@ c <- plot_sp_mean(combined_species_means_habit, recovery_mean, "Recovery") +
 a + b + c + guide_area() + 
   plot_layout(ncol = 2, guides = 'collect') + 
   plot_annotation(tag_levels = "a") &
-  theme(plot.tag = element_text(face = 'bold'))
+  theme(plot.tag = element_text(face = 'bold'), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
 ```
 
 **`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species. Growth habit abbreviations: HE, high elevation epiphyte; LE, low elevation epiphyte; S, saxicolous; T, terrestrial.
