@@ -14,7 +14,7 @@ To run all analyses and generate the manuscript:
 
 For each of the links below, click on "Download Dataset" or "Download all", then place the zipped data file in the `data` folder of this repo. You can manually unzip the data archives if you want to see the contents, but the code needs the original zipped file in `data/` to run.
 
-- https://figshare.com/s/d6349abf01a3756a5aae
+- https://doi.org/10.6084/m9.figshare.14184572
 - https://doi.org/10.5061/dryad.df59g
 - https://doi.org/10.5061/dryad.fqz612jps
 
