@@ -142,7 +142,7 @@ Epiphytes were more tolerant of desiccation than terrestrial species in both lif
 Despite their lack of greater physiological tolerances, gametophytes of several species occurred over a wider elevational range than conspecific sporophytes.
 Our results demonstrate that filmy fern gametophytes and sporophytes differ in their physiology and niche requirements, and point to the importance of microhabitat in shaping the evolution of water-use strategies in vascular plants.
 
-**Keywords**: chlorophyll fluorescence; desiccation tolerance; DNA barcoding; French Polynesia; gametophyte; Hymenophyllaceae
+**Keywords**: Chlorophyll fluorescence; Desiccation tolerance; DNA barcoding; French Polynesia; Gametophyte; Hymenophyllaceae
 
 \newpage
 
@@ -177,7 +177,7 @@ This makes filmy ferns a potentially useful group for understanding the transiti
 Filmy fern sporophytes encompass a broad diversity of growth forms (terrestrial, saxicolous, hemi-epiphytic, and holoepiphytic) and morphologies, with rhizome and leaf sizes varying over an order of magnitude [@Dubuisson2013; @Hennequin2008; @Nitta2009].
 As would be expected from their poikilohydric nature, DT of varying degrees has been reported in sporophytes of many filmy fern species (see references below).
 Filmy fern gametophytes are similarly diverse, with morphotypes including filamentous, ribbon, and a combination of these two types (`r figure("habit")`e--h).
-While there are no quantitative data about DT in filmy fern gametophytes available, DT has been reported in gametophytes from several other fern lineages [@Pittermann2013; @WatkinsJr.2007a; @WatkinsJr.2012], and may be expected to occur in filmy ferns as well.
+While there are no quantitative data about DT in filmy fern gametophytes available, DT has been reported in gametophytes from several other fern lineages [@Pittermann2013; @WatkinsJr.2012; @WatkinsJr.2007a], and may be expected to occur in filmy ferns as well.
 The possibility for varying degrees of vegetative DT in both stages of the life cycle of filmy ferns makes them a potentially useful system to compare how DT is utilized between haploid, non-vascular and diploid, vascular life stages.
 Furthermore, the diversity of growth forms and habitats in filmy ferns makes them an ideal group for a comparative study of water-stress strategies (\ie, desiccation tolerance vs. desiccation avoidance) and their association with different ecological niches (\ie, along gradients of temperature and relative humidity).
 
@@ -291,7 +291,7 @@ Rapid light response curves were constructed for each species by measuring photo
 Briefly, the maximum yield (F~m~) was first measured in the absence of actinic light.
 Next, plants were equilibrated to the actinic light for 30 s, and photosynthetic yield (∆F/F~m~) measured with a 0.8 s saturating pulse.
 This was repeated for each photosynthetic photon flux density (PPFD) level, up to ca.
-500 µmol·m^-2^·s^-1^.
+500 µmol m^-2^ s^-1^.
 Response curves were fitted using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (RETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter; outliers at high PPFD likely to distort the curve were discarded [@Proctor2012].
 The PPFD at 95 % saturation of RETR (PPFD~95%~) and maximum RETR (ETR~max~) were then calculated from the curve.
 Light responses were measured in eight individuals per species in the lab for sporophytes, and on single individuals in the field for gametophytes. The gametophytes were later identified to species using the DNA barcodes.
@@ -333,8 +333,6 @@ Code used to analyze the data and generate figures and this manuscript are avail
 A Docker image is available to run the code at https://hub.docker.com/r/joelnitta/moorea_filmies.
 The \package{targets} package [@Landau2021] was used to automate the workflow.
 The \package{ggplot2} [@Wickham2016], \package{ggtree}, [@Yu2017] and \package{patchwork} (https://github.com/thomasp85/patchwork) packages were used to generate the figures.
-
-\*\*\* NOTE TO `r ifelse(params$output_type == "ms", "EDITOR AND REVIEWERS", "READER")`: The DOI for the dataset will not be active until the paper is accepted. Until then, this link can be used for the dataset https://figshare.com/s/d6349abf01a3756a5aae  \*\*\*
 
 ## Results
 
@@ -592,8 +590,8 @@ Light responses were measured in sporophytes of `r n_light_species_sporo` specie
 
 Photosynthetic optima showed clear differences across life stages: sporophytes were adapted for higher light levels, whereas gametophytes were adapted for lower light levels (\figs{ }`r figure_num("combined")`, `r s_figure_num("light-curves")`, `r s_figure_num("traits-box")`).
 Sporophytes reached their maximum photosynthetic rate (PPFD~95%~) at light levels ca.
-`r mean_par_sporo` µmol·m^--2^ ·s^--1^ (*n* = `r mean_par_sporo_n` species), whereas gametophytes did so at `r mean_par_gameto` µmol·m^--2^ ·s^--1^ (*n* = `r mean_par_gameto_n` species).
-Similarly, sporophytes attained higher rates of electron transport (ETR~max~) (`r mean_etr_sporo` µmol·m^--2^ ·s^--1^, *n* = `r mean_etr_sporo_n` species) than gametophytes (`r mean_etr_gameto` µmol·m^--2^ ·s^--1^, *n* = `r mean_etr_gameto_n` species).
+`r mean_par_sporo` µmol m^--2^ s^--1^ (*n* = `r mean_par_sporo_n` species), whereas gametophytes did so at `r mean_par_gameto` µmol m^--2^ s^--1^ (*n* = `r mean_par_gameto_n` species).
+Similarly, sporophytes attained higher rates of electron transport (ETR~max~) (`r mean_etr_sporo` µmol m^--2^ s^--1^, *n* = `r mean_etr_sporo_n` species) than gametophytes (`r mean_etr_gameto` µmol m^--2^ s^--1^, *n* = `r mean_etr_gameto_n` species).
 
 The GLMM including the effect of life stage only was selected as the best-fitting model for ETR~max~, and the combined effect of growth habit plus life stage and their interaction was selected for PPFD~95%~ (`r table("glmm")`).
 
@@ -675,9 +673,9 @@ Growth rates of tolerant versus non-tolerant gametophytes, including quantificat
 ### Gametophytes are adapted for lower light levels than sporophytes
 
 We observed a clear difference between life stages in photosynthetic optima, with gametophytes consistently adapted for lower light levels than sporophytes (`r figure("combined")`, `r table("glmm")`).
-In the only other study to our knowledge that compared photosynthetic rates between gametophytes and sporophytes of a filmy fern, @Johnson2000 also found that gametophytes of *V. speciosa* reached maximum ETR at lower levels than sporophytes: in gametophytes of this species, photosynthesis became saturated at a PPFD of 4--5 µmol·m^-2^·s^-1^ in the field or 30--50 µmol·m^-2^·s^-1^ in the lab vs. 30--50 µmol·m^-2^ ·s^-1^ for sporophytes (lab measurement only).
-Although we found similar differences in direction between gametophytes and sporophytes, the measurements of @Johnson2000 are considerably lower than what we observed in the field for both Moorean filmy fern gametophytes (PPFD~95%~ \circa{ }40--60 µmol·m^-2^·s^-1^) and sporophytes (PPFD~95%~ \circa{ }130--160 µmol·m^-2^·s^-1^).
-This makes sense in light of the fact that *V. speciosa* is an extremely deep-shade plant, with gametophytes occupying protected rock crevices that receive less than 1 µmol·m^-2^·s^-1^ PPFD for most of the day [@Johnson2000]; many of the gametophytes sampled in our study occur in more exposed conditions.
+In the only other study to our knowledge that compared photosynthetic rates between gametophytes and sporophytes of a filmy fern, @Johnson2000 also found that gametophytes of *V. speciosa* reached maximum ETR at lower levels than sporophytes: in gametophytes of this species, photosynthesis became saturated at a PPFD of 4--5 µmol m^-2^ s^-1^ in the field or 30--50 µmol m^-2^ s^-1^ in the lab vs. 30--50 µmol m^-2^ s^-1^ for sporophytes (lab measurement only).
+Although we found similar differences in direction between gametophytes and sporophytes, the measurements of @Johnson2000 are considerably lower than what we observed in the field for both Moorean filmy fern gametophytes (PPFD~95%~ \circa{ }40--60 µmol m^-2^ s^-1^) and sporophytes (PPFD~95%~ \circa{ }130--160 µmol m^-2^ s^-1^).
+This makes sense in light of the fact that *V. speciosa* is an extremely deep-shade plant, with gametophytes occupying protected rock crevices that receive less than 1 µmol m^-2^ s^-1^ PPFD for most of the day [@Johnson2000]; many of the gametophytes sampled in our study occur in more exposed conditions.
 It is surprising, however, that we did not observe any consistent differences between species in different habitats, given that light levels should vary between tree trunks and the forest floor, at least on a \circa{ }1 m scale.
 Although the GLMM showed an interaction effect between life stage and growth habit for PPFD~95%~, the model including only life stage was selected for ETR~max~ (`r table("glmm")`).
 It is possible that the actual light levels experienced by gametophytes growing in these habitats may not vary significantly if they occupy protected microsites such as bryophyte mats or crevices in rock or bark.
@@ -993,8 +991,8 @@ Growth habit indicated by colored symbols (blue = low elevation epiphyte, green 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
 Asterisk indicates significant difference in means (*P* <0.05) between life stages for a particular species (*t*-test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for *t*-test.
 Left bar plot shows recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). 
-Middle bar plot shows maximum relative electron transport rate of photosystem II (ETR~max~) (µmol e-·m^-2^·s^-1^). 
-Right bar plot shows photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~) (µmol quanta·m^-2^·s^-1^).
+Middle bar plot shows maximum relative electron transport rate of photosystem II (ETR~max~) (µmol e- m^-2^ s^-1^). 
+Right bar plot shows photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~) (µmol quanta m^-2^ s^-1^).
 Absence of a bar indicates measurements not available for gametophytes or sporophytes of that species.
 
 **`r figure("corr")`** Recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa plotted against environmental vapor pressure deficit (VPD; kPa) (**a**, **b**) or range of gametophytes beyond sporophytes (m) (**c**) for gametophytes (**a**, **c**) or sporophytes (**b**). 
