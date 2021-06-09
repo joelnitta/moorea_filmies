@@ -137,7 +137,7 @@ However, little is known about the transition from desiccation tolerant non-vasc
 Filmy ferns (Hymenophyllaceae) represent a useful system to investigate how water-stress strategies differ between non-vascular and vascular stages within a single organism because they have vascularized sporophytes and nonvascular gametophytes that are each capable of varying degrees of desiccation tolerance.
 To explore this, we surveyed sporophytes and gametophytes of `r n_filmy_sp` species (`r n_distinct(filmy_species)` taxa including varieties) of filmy ferns on Moorea (French Polynesia) and used chlorophyll fluorescence to measure desiccation tolerance and light responses.
 We conducted phylogenetically informed analyses to identify differences in physiology between life stages and growth habits.
-Gametophytes had similar or less desiccation tolerance (ability to recover from 2 d desiccation at -86 MPa) and lower photosynthetic optima (maximum electron transport rate of photosystem II and light level at 95% of that rate) than sporophytes.
+Gametophytes had similar or less desiccation tolerance (ability to recover from 2 days desiccation at -86 MPa) and lower photosynthetic optima (maximum electron transport rate of photosystem II and light level at 95% of that rate) than sporophytes.
 Epiphytes were more tolerant of desiccation than terrestrial species in both life stages.
 Despite their lack of greater physiological tolerances, gametophytes of several species occurred over a wider elevational range than conspecific sporophytes.
 Our results demonstrate that filmy fern gametophytes and sporophytes differ in their physiology and niche requirements, and point to the importance of microhabitat in shaping the evolution of water-use strategies in vascular plants.
@@ -268,7 +268,7 @@ We did not attempt to differentiate genotypes between fronds in species with lon
 All experiments were initiated within 48 h of collection.
 Pre-treatment maximum photochemical yield of photosystem II (F~v~/F~m~) [@Kitajima1975] was measured in fresh plants after a 10 min period of dark-adaptation using a portable mini-PAM chlorophyll fluorometer (Walz Gmbh, Effeltrich, Germany).
 Any samples with pre-treatment F~v~/F~m~ < 0.4 were excluded from analysis, as typical values of F~v~/F~m~ in healthy plants tend to be \circa{ }0.8 [@Bjorkman1987].
-Samples were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100 % RH), and water withheld for either a short (2 d) or long (15 d) interval [@Testo2013].
+Samples were then transferred to desiccation chambers containing saturated salts at three different desiccation intensities or a control treatment with moist tissues (100 % RH), and water withheld for either a short (2 days) or long (15 days) interval [@Testo2013].
 Conditions inside the desiccation chambers were monitored during the experiment using Track-It RH/Temp dataloggers (Monarch Instrument, Amherst, NH) logging every 10 min (2012 field season for species other than *Callistopteris apiifolia* (Presl) Copel.) or Hobo ProV2 dataloggers logging every 5 min (2012 *C. apiifolia*, 2013, 2014 field seasons).
 The desiccation chambers were kept in an air-conditioned room. 
 Temperature inside the chambers was mean `r mean(filmy_dt_chamber$temp) %>% round(1)` ± SD `r sd(filmy_dt_chamber$temp) %>% round(2)` °C (`r s_figure("chamber")`) (hereafter, the value following '±' is standard deviation unless otherwise mentioned).
@@ -281,7 +281,7 @@ We measured relative water content (RWC) in a subset of samples by recording the
 Relative water content was calculated as \(RWC = \frac{TM - DM}{FM - DM} \times 100\), where *TM* is turgid mass, *DM* is dry mass, and *FM* is fresh mass.
 
 Because field-collected gametophytes could not be identified to species prior to DNA extraction, no planned replication by species was possible.
-We therefore applied the same treatment for all gametophytes (2 d at -86 MPa) in batches of individuals (`r s_table("gameto-batches")`), and verified the species of each individual after the experiment using the DNA barcode approach described above.
+We therefore applied the same treatment for all gametophytes (2 days at -86 MPa) in batches of individuals (`r s_table("gameto-batches")`), and verified the species of each individual after the experiment using the DNA barcode approach described above.
 Thus, gametophytes of some species were sampled many times whereas those of other species were not.
 Relative water content was not calculated for gametophytes, as these were too small to measure accurately with the balances available.
 
@@ -311,7 +311,7 @@ We tested the significance of *K* by comparing the observed value against values
 We tested the significance of λ with a log-likelihood test comparing the likelihood of the observed value of λ vs. λ = 0.
 For all further analyses, we used methods that account for phylogenetic history for physiological traits that showed evidence of phylogenetic signal in at least one of the two metrics, and standard methods otherwise.
 
-We used general linear mixed models (GLMMs) to investigate the effect of growth habit and life stage on DT (% recovery of F~v~/F~m~ after 48 h recovery from desiccation at -86 MPa for 2 d) and photosynthetic parameters (ETR~max~ and PPFD~95%~) using the \package{MCMCglmm} package [@Hadfield2010].
+We used general linear mixed models (GLMMs) to investigate the effect of growth habit and life stage on DT (% recovery of F~v~/F~m~ after 48 h recovery from desiccation at -86 MPa for 2 days) and photosynthetic parameters (ETR~max~ and PPFD~95%~) using the \package{MCMCglmm} package [@Hadfield2010].
 For each of the three response variables (species mean DT, ETR~max~, and PPFD~95%~), we constructed five models: a null model with no fixed effects, or models with either growth habit (high-elevation epiphyte, low-elevation epiphyte, terrestrial or saxicolous), life stage (sporophyte vs. gametophyte), growth habit and life stage, or growth habit, life stage, and their interaction as fixed effects.
 We included species as a random effect in all models, and included a phylogenetic variance-covariance matrix if the response variable showed evidence of phylogenetic signal [@Hadfield2010].
 We used an inverse-Gamma distribution for all priors, and ran analyses for 500,000 iterations, with burnin after 1,000 iterations and thinning every 500 iterations.
@@ -492,11 +492,11 @@ gameto_dt_ter_mean <- mean_gameto_dt_by_habit %>%
 Ability to recover from desiccation was tested in sporophytes of `r n_dt_species_sporo` species and gametophytes of `r n_dt_species_gameto` species, including `r n_dt_species_both` species with both life stages.
 
 A general correlation of DT with habitat was observed in sporophytes (`r figure("dt")`a).
-The two terrestrial species lacked DT, although *C. apiifolia* showed slightly greater ability to recover by 48 h compared to *Abrodictyum dentatum* (Bosch) Ebihara & K. Iwats., which completely failed to recover from even the gentlest treatment of 2 d at --38 NaCl (more stringent tests were not conducted on *A. dentatum* after confirming its lack of DT at this level).
-Saxicolous species (*Crepidomanes kurzii* (Bedd.) Tagawa & K. Iwats., *Polyphlebium endlicherianum* (C. Presl) Ebihara & K. Iwats., and *Vandenboschia maxima* (Blume) Copel.) also had low DT; only *C. kurzii* was able to recover from desiccation up to --86 MPa for 2 d but not more.
-Nearly all epiphytic species were capable of recovering from desiccation of up to 2 d at --86 MPa.
+The two terrestrial species lacked DT, although *C. apiifolia* showed slightly greater ability to recover by 48 h compared to *Abrodictyum dentatum* (Bosch) Ebihara & K. Iwats., which completely failed to recover from even the gentlest treatment of 2 days at --38 NaCl (more stringent tests were not conducted on *A. dentatum* after confirming its lack of DT at this level).
+Saxicolous species (*Crepidomanes kurzii* (Bedd.) Tagawa & K. Iwats., *Polyphlebium endlicherianum* (C. Presl) Ebihara & K. Iwats., and *Vandenboschia maxima* (Blume) Copel.) also had low DT; only *C. kurzii* was able to recover from desiccation up to --86 MPa for 2 days but not more.
+Nearly all epiphytic species were capable of recovering from desiccation of up to 2 days at --86 MPa.
 *Crepidomanes bipunctatum*, a widespread low-elevation epiphyte, showed the greatest ability to recover from desiccation across all treatments.
-Interestingly, high-elevation epiphytes *Hymenophyllum multifidum* (G. Forst.) Sw. and *Hymenophyllum polyanthos* (Sw.) Sw. could recover from desiccation at --86 or --282 MPa for 15 d, but not --38 MPa.
+Interestingly, high-elevation epiphytes *Hymenophyllum multifidum* (G. Forst.) Sw. and *Hymenophyllum polyanthos* (Sw.) Sw. could recover from desiccation at --86 or --282 MPa for 15 days, but not --38 MPa.
 
 Gametophytes of terrestrial species could not tolerate desiccation (mean 48 h recovery `r gameto_dt_ter_mean`). Levels of DT were in general higher for saxicolous and epiphytic gametophytes, but otherwise did not show a clear pattern (`r figure("dt")`b).
 
@@ -504,10 +504,10 @@ Desiccation tolerance of gametophytes tended to be lower than sporophytes (`r fi
 Only `r dt_g_more_than_s` showed significantly higher DT in gametophytes compared to sporophytes (*t*-test, *P* = `r dt_g_more_than_s_pvals`).
 
 Control samples generally did not show any decrease in F~v~/F~m~ throughout the duration of the experiment (`r s_figure("dt-control")`) and maintained RWC near 100% (\figs{ }`r s_figure_num("water-all")`, `r s_figure_num("water-s")`). 
-Relative water content in the desiccated state ranged from `r rel_water_table %>% filter(salt == "LiCl", dry_time == "15", rec_time == "desiccated") %>% pull(sum_val)` in the --282 MPa, 15 d treatment to `r rel_water_table %>% filter(salt == "NaCl", dry_time == "2", rec_time == "desiccated") %>% pull(sum_val)` in the --38 MPa, 2 d treatment (`r s_figure("water-all")`), and returned to \circa{ }100 % upon re-wetting in all species sampled (\figs{ }`r s_figure_num("water-all")`, `r s_figure_num("water-s")`).
+Relative water content in the desiccated state ranged from `r rel_water_table %>% filter(salt == "LiCl", dry_time == "15", rec_time == "desiccated") %>% pull(sum_val)` in the --282 MPa, 15 days treatment to `r rel_water_table %>% filter(salt == "NaCl", dry_time == "2", rec_time == "desiccated") %>% pull(sum_val)` in the --38 MPa, 2 days treatment (`r s_figure("water-all")`), and returned to \circa{ }100 % upon re-wetting in all species sampled (\figs{ }`r s_figure_num("water-all")`, `r s_figure_num("water-s")`).
 
 Relative humidity in the growth chambers was high when samples were first inserted, then gradually decreased to the target value maintained by each drying salt (`r s_figure("chamber")`).
-In a few cases (particularly species with larger fronds, \eg, *C. apiifolia*), the NaCl chamber did not reach equilibrium humidity before 2 d (`r s_figure("chamber")`).
+In a few cases (particularly species with larger fronds, \eg, *C. apiifolia*), the NaCl chamber did not reach equilibrium humidity before 2 days (`r s_figure("chamber")`).
 Brief fluctuations in humidity were observed when chambers were opened to insert or remove samples (`r s_figure("chamber")`).
 
 The GLMM including the combined effects of life stage plus growth habit and their interaction was selected as the best-fitting model for DT (`r table("glmm")`). 
@@ -634,7 +634,7 @@ The recent finding of a constitutive mechanism for DT in filmy ferns [@GarcesCea
 The conservative behavior of fern stomata, which lack a response to the plant stress hormone ABA, is well documented [@Brodribb2011; @Mcadam2012; @Mcadam2013].
 It is possible that filmy ferns also behave conservatively with respect to water-stress.
 We suggest that the variation in DT observed here is relevant because it is correlated with habitat, and likely reflects overall physiological tolerance, not just artificial extremes.
-For example, sporophytes of some high elevation epiphytes that we surveyed (*H. multifidum*, *H. polyanthos*) seem to be able to better withstand intense vs. moderate desiccation, with higher recovery values at -282 and -86 MPa vs. -38 MPa when dry for 15 d.
+For example, sporophytes of some high elevation epiphytes that we surveyed (*H. multifidum*, *H. polyanthos*) seem to be able to better withstand intense vs. moderate desiccation, with higher recovery values at -282 and -86 MPa vs. -38 MPa when dry for 15 days.
 This may be an adaptation to cloud forest conditions; although cloud forests are frequently moist due to constant fog, dry periods are intense during the times when there is no cloud cover (J. Nitta, pers. obs.).
 The complete lack of DT in terrestrial species is not surprising, considering they have much more direct access to water than epiphytes and therefore are under substantially less selective pressure to maintain DT.
 Because controls kept at 100% RH maintained F~v~/F~m~ values near pre-treatment levels in all sporophytes (`r s_figure("dt-control")`), it is unlikely that the lack of tolerance seen in terrestrial species is solely due to removal from the soil.
@@ -657,7 +657,7 @@ This is perhaps best illustrated by *C. apiifolia* (`r figure("habit")`d, e, h).
 Sporophytes of this species are usually restricted to moist cloud forest sites from \circa{ }600 m to 1200 m, but we observed gametophytes over a much wider range, down to 200 m (`r s_figure("range")`).
 A similar distribution pattern has been reported in congeneric *Callistopteris baldwinii* (D. C. Eaton) Copel.
 from Hawaii [@Dassler1997].
-Since gametophytes of *C. apiifolia* are common on Moorea and have a unique morphology [@Nitta2017], we were able to collect sufficient material of this species for additional tests of DT at 100% RH for 2 d.
+Since gametophytes of *C. apiifolia* are common on Moorea and have a unique morphology [@Nitta2017], we were able to collect sufficient material of this species for additional tests of DT at 100% RH for 2 days.
 However, *C. apiifolia* gametophytes still failed to recover from even this gentle treatment (`r s_figure("capi-water")`).
 This suggests that the widespread gametophytes of *C. apiifolia* do not rely on DT to attain their distribution, but instead must do so via some other mechanism.
 Although we measured terrestrial microhabitats by positioning sensors a few cm above the ground, these sensors are still outside of the boundary layer.
@@ -771,7 +771,7 @@ phylosig %>%
     escape = FALSE)
 ```
 
-Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa; ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached.
+Recovery, recovery of F~v~/F~m~ (%) following 2 days desiccation at –86 MPa; ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached.
 
 \newpage
 
@@ -828,7 +828,7 @@ glmm_summary %>%
     escape = FALSE)
 ```
 
-ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
+ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 days desiccation at –86 MPa
 
 Best model (that with the lowest DIC) for each response variable in bold
 
@@ -906,7 +906,7 @@ if(params$output_type == "preprint") glmm_params_table <- kable_styling(glmm_par
   
 ```
 
-ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa
+ETR~max~, maximum relative electron transport rate; PPFD~95%~, light level at which 95% of ETR~max~ is reached; Recovery, recovery of F~v~/F~m~ (%) following 2 days desiccation at –86 MPa
 
 Effect of life stage is relative to gametophytes; effect of growth habit is relative to high elevation epiphytes
 
@@ -995,7 +995,7 @@ Middle bar plot shows maximum relative electron transport rate of photosystem II
 Right bar plot shows photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~) (µmol quanta m^-2^ s^-1^).
 Absence of a bar indicates measurements not available for gametophytes or sporophytes of that species.
 
-**`r figure("corr")`** Recovery of F~v~/F~m~ (%) following 2 d desiccation at –86 MPa plotted against environmental vapor pressure deficit (VPD; kPa) (**a**, **b**) or range of gametophytes beyond sporophytes (m) (**c**) for gametophytes (**a**, **c**) or sporophytes (**b**). 
+**`r figure("corr")`** Recovery of F~v~/F~m~ (%) following 2 days desiccation at –86 MPa plotted against environmental vapor pressure deficit (VPD; kPa) (**a**, **b**) or range of gametophytes beyond sporophytes (m) (**c**) for gametophytes (**a**, **c**) or sporophytes (**b**). 
 Species means ± 1 SD are shown. 
 Growth habit indicated by colored symbols (blue = low elevation epiphyte, green = high elevation epiphyte, yellow = saxicolous, red = terrestrial). 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but were treated as epiphytes to distinguish them from exclusively saxicolous species.
