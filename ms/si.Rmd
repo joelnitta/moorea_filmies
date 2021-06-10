@@ -238,8 +238,8 @@ make_facet_lc_plot <- function(light_data, lc_model_fitted_data, lc_model_params
       aes(xintercept = par), color = cbPalette[["red"]]) +
     scale_alpha_manual(values = c("TRUE" = 0.2, "FALSE" = 1.0)) +
     labs(
-      y = "ETR (µmol m<sup>-2</sup>·s<sup>-1</sup>)", 
-      x = "PPFD (µmol m<sup>-2</sup>·s<sup>-1</sup>)", 
+      y = "ETR (µmol m<sup>-2</sup> s<sup>-1</sup>)", 
+      x = "PPFD (µmol m<sup>-2</sup> s<sup>-1</sup>)", 
       alpha = "Outlier") +
     theme(
       axis.title.x = element_markdown(),
@@ -341,7 +341,7 @@ email: joelnitta\\@gmail.com
 
 **`r s_figure("dt-control")`**. Recovery of controls (samples kept on moist tissues) during desiccation tolerance test of filmy fern sporophytes from Moorea, French Polynesia. 
 
-**`r s_figure("water-all")`**. Relative water content (RWC) of sporophytes after desiccation by duration of desiccation treatment (2 or 15 days).
+**`r s_figure("water-all")`**. Relative water content (RWC) of sporophytes in desiccated state by duration of desiccation treatment (2 or 15 days).
 
 **`r s_figure("water-s")`**. Relative water content (RWC) of sporophytes during desiccation tolerance test.
 
@@ -1204,14 +1204,14 @@ ggplot(rel_water_species_means_desic, aes(x = rel_water, y = species, group = sa
   theme_bw() +
   theme(
     panel.grid.minor.y = element_blank(),
-    panel.grid.major.y = element_blank(),
+    # panel.grid.major.y = element_blank(),
     axis.text.y = element_markdown(),
     legend.position = "bottom"
   ) +
   facet_grid(vars(dry_time), labeller = as_labeller(c(`2` = "2 days", `15` = "15 days")))
 ```
 
-**`r s_figure("water-all")`**. Relative water content (RWC) of sporophytes after desiccation by duration of desiccation treatment (2 or 15 days). RWC was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not RWC of zero).
+**`r s_figure("water-all")`**. Relative water content (RWC) of sporophytes in desiccated state (after desiccation but before recovery) by duration of desiccation treatment (2 or 15 days). RWC was not measured for all combinations of species and desiccation treatments; missing points indicate data not collected (not RWC of zero).
 
 \newpage
 
@@ -1358,7 +1358,7 @@ for(i in 2:n_gameto_lc_pages) {
 }
 ```
 
-**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes; **b**, gametophytes. Title of each subplot indicates species followed by light curve ID number assigned to each sample (light curve IDs match those in filmy_light_curves.csv data file). Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % of ETR~max~ (PPFD~95%~).
+**`r s_figure("light-curves")`**. Rapid light response curves of filmy ferns from Moorea, French Polynesia. **a**, sporophytes; **b**, gametophytes. Title of each subplot indicates species followed by light curve ID number assigned to each sample (light curve IDs match those in filmy_light_curves.csv data file available at https://doi.org/10.6084/m9.figshare.14184572). Light curves fit using the equation $y = A(1 - e^{-kx})$, where *y* is relative electron transport rate of photosystem II (ETR), *x* is photosynthetic photon flux density (PPFD), *A* is the asymptote of the curve, and *k* is a slope parameter. Outliers at high PPFD not included in the model indicated in light grey. Blue line indicates maximum modeled relative electron transport rate (ETR~max~). Red line indicates PPFD at 95 % of ETR~max~ (PPFD~95%~).
 
 \newpage
 
@@ -1412,7 +1412,7 @@ a + b + c + guide_area() +
   theme(plot.tag = element_text(face = 'bold'), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
 ```
 
-**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ ·s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ ·s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species. Growth habit abbreviations: HE, high elevation epiphyte; LE, low elevation epiphyte; S, saxicolous; T, terrestrial.
+**`r s_figure("traits-box")`**. Box plots comparing physiological parameters between sporophytes (red) and gametophytes (blue) across growth habits in filmy ferns from Moorea, French Polynesia. Each point represents one species; dark line is median, lower and upper edges correspond to first and third quartiles, and whiskers extend to the most extreme value no further than 1.5 times the inter-quartile range. **a**, ETR~max~ (µmol electrons m^--2^ s^--1^); **b** PPFD~95%~ (µmol photons m^--2^ s^--1^); **c**, recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are treated as epiphytes to distinguish them from exclusively saxicolous species. Growth habit abbreviations: HE, high elevation epiphyte; LE, low elevation epiphyte; S, saxicolous; T, terrestrial.
 
 \newpage
 

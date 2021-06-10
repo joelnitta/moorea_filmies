@@ -317,7 +317,7 @@ We included species as a random effect in all models, and included a phylogeneti
 We used an inverse-Gamma distribution for all priors, and ran analyses for 500,000 iterations, with burnin after 1,000 iterations and thinning every 500 iterations.
 We compared models using the Deviance Information Criterion (DIC) [@Spiegelhalter2002] and selected the best-fitting model as the one with the lowest DIC.
 
-Comparisons of DT, ETR~max~, and PPFD~95%~ between gametophytes and sporophytes of the same species do not involve phylogeny, so we used a two-sided *t*-test for these.
+Comparisons of DT, ETR~max~, and PPFD~95%~ between gametophytes and sporophytes of the same species do not involve phylogeny, so we used a two-sided *t* test for these.
 
 To test for a correlation between environmental water availability and DT, we first derived a single maximum VPD for each species by calculating the average of the maximum daily VPD at all sites where that species was present.
 We used maximum VPD (\ie, minimum humidity) values because these may represent a climatic extreme that limits the occurrence of species.
@@ -501,8 +501,8 @@ Interestingly, high-elevation epiphytes *Hymenophyllum multifidum* (G. Forst.) S
 
 Gametophytes of terrestrial species could not tolerate desiccation (mean 48 h recovery `r gameto_dt_ter_mean`). Levels of DT were in general higher for saxicolous and epiphytic gametophytes, but otherwise did not show a clear pattern (`r figure("dt")`b).
 
-Desiccation tolerance of gametophytes tended to be lower than sporophytes (`r figure("combined")`), and was significantly lower in `r dt_g_less_than_s` (*t*-test, *P* = `r dt_g_less_than_s_pvals`, respectively).
-Only `r dt_g_more_than_s` showed significantly higher DT in gametophytes compared to sporophytes (*t*-test, *P* = `r dt_g_more_than_s_pvals`).
+Desiccation tolerance of gametophytes tended to be lower than sporophytes (`r figure("combined")`), and was significantly lower in `r dt_g_less_than_s` (*t* test, *P* = `r dt_g_less_than_s_pvals`, respectively).
+Only `r dt_g_more_than_s` showed significantly higher DT in gametophytes compared to sporophytes (*t* test, *P* = `r dt_g_more_than_s_pvals`).
 
 Control samples generally did not show any decrease in F~v~/F~m~ throughout the duration of the experiment (`r s_figure("dt-control")`) and maintained RWC near 100% (\figs{ }`r s_figure_num("water-all")`, `r s_figure_num("water-s")`). 
 Relative water content in the desiccated state ranged from `r rel_water_table %>% filter(salt == "LiCl", dry_time == "15", rec_time == "desiccated") %>% pull(sum_val)` in the --282 MPa, 15 days treatment to `r rel_water_table %>% filter(salt == "NaCl", dry_time == "2", rec_time == "desiccated") %>% pull(sum_val)` in the --38 MPa, 2 days treatment (`r s_figure("water-all")`), and returned to \circa{ }100 % upon re-wetting in all species sampled (\figs{ }`r s_figure_num("water-all")`, `r s_figure_num("water-s")`).
@@ -594,7 +594,7 @@ Sporophytes reached their maximum photosynthetic rate (PPFD~95%~) at light level
 `r mean_par_sporo` µmol m^--2^ s^--1^ (*n* = `r mean_par_sporo_n` species), whereas gametophytes did so at `r mean_par_gameto` µmol m^--2^ s^--1^ (*n* = `r mean_par_gameto_n` species).
 Similarly, sporophytes attained higher rates of electron transport (ETR~max~) (`r mean_etr_sporo` µmol m^--2^ s^--1^, *n* = `r mean_etr_sporo_n` species) than gametophytes (`r mean_etr_gameto` µmol m^--2^ s^--1^, *n* = `r mean_etr_gameto_n` species).
 
-The GLMM including the effect of life stage only was selected as the best-fitting model for ETR~max~, and the combined effect of growth habit plus life stage and their interaction was selected for PPFD~95%~ (`r table("glmm")`).
+The GLMM including the effect of life stage only was selected as the best-fitting model for ETR~max~, and the combined effects of growth habit plus life stage and their interaction was selected for PPFD~95%~ (`r table("glmm")`).
 
 ### Relationships of vapor pressure deficit and range size with DT
 
@@ -712,11 +712,8 @@ Staff at the University of California Berkeley's Richard B. Gump South Pacific R
 Funding provided in part by the National Science Foundation (Doctoral Dissertation Improvement Grant DEB-1311169 to JHN and CCD), Setup Funds from Harvard University to CCD, American Society of Plant Taxonomists (Research Grant for Graduate Students to JHN), Garden Club of America (Award in Tropical Botany to JHN), Harvard University Herbaria (Fernald Fieldwork Fellowship to JHN), Society of Systematic Biologists (Graduate Student Research Award to JHN), and Systematics Association (Systematics Research Fund to JHN).
 
 ```{r esm-statement, results = "asis", eval = params$output_type == "ms", purl = FALSE}
-# FIXME: add DOI when available
 cat("
-**Electronic supplementary material**
-
-The online version of this article (DOI) contains supplementary material, which is available to authorized users.
+**Supplementary Information** The online version contains supplementary material available at https://doi.org/10.1007/s10265-021-01318-z.
 ")
 ```
 
@@ -985,16 +982,16 @@ Growth habit indicated in parentheses after each species: **T** terrestrial, **S
 **`r figure("combined")`** Phylogeny of filmy ferns from Moorea, French Polynesia with comparison of physiological parameters (mean ± 1 SD) between sporophytes (dark grey bars) and gametophytes (light grey bars).
 Phylogeny adapted from @Nitta2017; only species with physiological data shown.
 Bootstrap support >50% from 100 ML bootstraps indicated at nodes.
-Bold letters indicate major clades (H = hymenophylloid clade, T = trichomanoid clade).
+Bold letters indicate major clades (**H** hymenophylloid clade, **T** trichomanoid clade).
 Growth habit indicated by colored symbols (blue = low elevation epiphyte, green = high elevation epiphyte, yellow = saxicolous, red = terrestrial).
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but are shown as epiphytes to distinguish them from exclusively saxicolous species.
-Asterisk indicates significant difference in means (*P* <0.05) between life stages for a particular species (*t*-test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for *t*-test.
+Asterisks indicates significant difference in means (\*\*\* = *P* < 0.001, \*\* = *P* < 0.01, \* = *P* < 0.05) between life stages for a particular species (*t* test); ns indicates no significant difference; lack of ns or asterisk means not enough observations available for that species for *t* test.
 Left bar plot shows recovery (%) of chlorophyll fluorescence (F~v~/F~m~) following 2 day desiccation at –86 MPa (*Abrodictyum dentatum* was desiccated at –38 MPa instead of –86 MPa). 
 Middle bar plot shows maximum relative electron transport rate of photosystem II (ETR~max~) (µmol e- m^-2^ s^-1^). 
 Right bar plot shows photosynthetic photon flux density at 95% saturation of RETR (PPFD~95%~) (µmol quanta m^-2^ s^-1^).
 Absence of a bar indicates measurements not available for gametophytes or sporophytes of that species.
 
-**`r figure("corr")`** Recovery of F~v~/F~m~ (%) following 2 days desiccation at –86 MPa plotted against environmental vapor pressure deficit (VPD; kPa) (**a**, **b**) or range of gametophytes beyond sporophytes (m) (**c**) for gametophytes (**a**, **c**) or sporophytes (**b**). 
+**`r figure("corr")`** Recovery of F~v~/F~m~ (%) following 2 days desiccation at –86 MPa plotted against environmental vapor pressure deficit (VPD; kPa) (**a**, **b**) or range of gametophytes beyond sporophytes (m) (**c**) for sporophytes (**a**) or gametophytes (**b**, **c**). 
 Species means ± 1 SD are shown. 
 Growth habit indicated by colored symbols (blue = low elevation epiphyte, green = high elevation epiphyte, yellow = saxicolous, red = terrestrial). 
 *Crepidomanes bipunctatum* and *C. humile* were observed growing as both epiphytes and saxicoles, but were treated as epiphytes to distinguish them from exclusively saxicolous species.
@@ -1203,6 +1200,20 @@ generation_colors <- c(
 # Subset tree to only species with trait data
 phy <- drop.tip(phy, setdiff(phy$tip.label, traits$species))
 
+# Make tibble of clade labels to plot on tree
+clade_labels <-
+tibble(
+  node = c(
+    getMRCA(phy, c("Crepidomanes_bipunctatum", "Callistopteris_apiifolia")),
+    getMRCA(phy, c("Hymenophyllum_multifidum", "Hymenophyllum_pallidum"))
+  ),
+  clade_label = c(
+    "T", # trichomanoid clade
+    "H" # hymenophylloid clade
+  )
+)
+
+
 # Sort species by position in phylogeny
 traits <-
   traits %>%
@@ -1215,7 +1226,16 @@ habit <-
   filter(species %in% phy$tip.label)
   
 # Part A (left): tree
-a <- ggtree(phy) %<+% habit +
+a <- ggtree(phy) %<+% habit %<+% clade_labels +
+  geom_nodelab(
+    aes(label = clade_label), 
+    hjust = 1, vjust = 0, geom = "label", 
+    label.padding = unit(0.4, "lines"),
+    label.size = 0,
+    size = 4,
+    fill = "transparent",
+    fontface = "bold"
+    ) +
   geom_tippoint(aes(color = habit), position = position_nudge(x = 14, y = 0), size = 3.0) +
   scale_color_manual(values = habit_colors, labels = pretty_text) +
   labs(color = "Growth habit") +
@@ -1458,6 +1478,7 @@ vpd_sporophyte_fitted <-
     plot_data, species, vpd_sporophyte_mean
   ), by = "species")
 
+# a: sporophytes recovery vs. vpd
 a <- ggplot(plot_data, aes(x = vpd_sporophyte_mean, y = recovery_sporophyte_mean, color = habit)) +
   geom_line(data = vpd_sporophyte_fitted, color = "dark grey") +
   geom_linerange(aes(
@@ -1483,6 +1504,7 @@ a <- ggplot(plot_data, aes(x = vpd_sporophyte_mean, y = recovery_sporophyte_mean
     x = "VPD (kPa)",
     color = "Growth habit")
 
+# b: gametophytes recovery vs. vpd
 b <- ggplot(plot_data, aes(x = vpd_gametophyte_mean, y = recovery_gametophyte_mean, color = habit)) +
   geom_linerange(aes(
     ymin = recovery_gametophyte_mean - recovery_gametophyte_sd,
@@ -1503,6 +1525,7 @@ b <- ggplot(plot_data, aes(x = vpd_gametophyte_mean, y = recovery_gametophyte_me
     color = "Growth habit") +
   guides(color = "none")
 
+# c: gametophytes recovery vs G beyond S
 c <- ggplot(plot_data, aes(x = gameto_beyond_sporo, y = recovery_gametophyte_mean, color = habit)) +
   geom_linerange(aes(
     ymin = recovery_gametophyte_mean - recovery_gametophyte_sd,
