@@ -33,13 +33,13 @@ cd /path/to/repo
 Unzip the data:
 
 ```
-docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.2 Rscript R/unzip_data.R
+docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:1.0.0 Rscript R/unzip_data.R
 ```
 
 Run `targets::tar_make()`:
 
 ```
-docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:0.0.2 Rscript -e 'targets::tar_make()'
+docker run --rm -v ${PWD}:/tmpdir -w /tmpdir joelnitta/moorea_filmies:1.0.0 Rscript -e 'targets::tar_make()'
 ```
 
 You will see the targets being built by `targets`. The final manuscript should be compiled at the end as `manuscript.docx` (MS for journal submission) and `moorea_filmies_preprint.pdf` (preprint PDF) in the `results/ms` folder. Other figure and table files will also be compiled. Supplemental information will be written to the `results/si` folder.
